@@ -1,0 +1,32 @@
+{
+    "name": "html_chat",
+    "email": "igordubinin1@yandex.ru",
+    "url": "https://github.com/Igorok/html_chat",
+    "version": "0.0.1",
+    "private": false,
+    "dependencies": {
+        "lodash":"",
+        "moment":"",
+        "async":"",
+        "mongodb":"",
+        "express":"",
+        "errorhandler": "",
+        "express-handlebars":"",
+        "multer": "",
+        "socket.io": "",
+        "redis": "",
+        "compression": "",
+        "body-parser": "",
+        "safe": "",
+        "uglify": "",
+        "less-middleware": "",
+        "grunt": "",
+        "grunt-contrib-handlebars": "",
+        "grunt-contrib-requirejs": "",
+        "grunt-contrib-uglify": "",
+        "grunt-contrib-watch": ""
+    },
+    "engines": {
+        "node": "v0.10.x"
+    }
+}

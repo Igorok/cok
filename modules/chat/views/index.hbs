@@ -1,0 +1,9 @@
+<h1>main page</h1>
+<div id="test"></div>
+<script>
+    require(["jquery", "c_helper"], function ($, c_helper) {
+        $.get("/users", function (data) {
+            c_helper.render($("#test"), "userList", {data: data});
+        });
+    });
+</script>
