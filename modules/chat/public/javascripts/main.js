@@ -4,9 +4,10 @@ require.config({
     waitSeconds: 20,
     paths: {
         "jquery": "jquery",
-        "bootstrap": "bootstrap",
+        "lodash": "lodash",
         "handlebars": "handlebars",
         "tpl": "tpl",
+        "bootstrap": "bootstrap",
         "c_helper": "c_helper"
     },
     shim:{

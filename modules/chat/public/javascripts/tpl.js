@@ -3,7 +3,7 @@ define(['handlebars'], function(Handlebars) {
 this["chat"] = this["chat"] || {};
 
 this["chat"]["index"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  return "<h1>main page</h1>\n<div id=\"test\"></div>\n<script>\n    require([\"jquery\", \"c_helper\"], function ($, c_helper) {\n        $.get(\"/users\", function (data) {\n            c_helper.render($(\"#test\"), \"userList\", {data: data});\n        });\n    });\n</script>";
+  return "<h1>main page</h1>\n<div id=\"test\"></div>\n<ul>\n    <li><a href=\"#/user\">users</a></li>\n    <li><a href=\"#/chat/index\">chat</a></li>\n    <li><a href=\"#/chat/detail/123\">123</a></li>\n</ul>\n<script>\n    require([\"jquery\", \"c_helper\", \"app\"], function ($, c_helper) {\n        $.get(\"/users\", function (data) {\n            c_helper.render($(\"#test\"), \"userList\", {data: data});\n        });\n        \n    });\n</script>";
   },"useData":true});
 
 
