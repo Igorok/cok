@@ -1,16 +1,14 @@
-<h1>main page</h1>
-<div id="test"></div>
 <ul>
     <li><a href="#/">home</a></li>
     <li><a href="#/user">users</a></li>
     <li><a href="#/chat/index">chat</a></li>
     <li><a href="#/chat/detail/123">123</a></li>
 </ul>
+<div id="body"></div>
+
 <script>
-    require(["jquery", "c_core", "c_app"], function ($, c_core) {
-        c_core.call("index.getUserList", "asdasd", 123, {login: "123123"}, function (result) {
-            console.log(result[0]);
-        });
+    require(["jquery", "cok_core", "cok_app"], function ($, cok_core) {
+        console.log("start")
         
     });
 </script>

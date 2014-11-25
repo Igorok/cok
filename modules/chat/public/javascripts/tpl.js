@@ -14,7 +14,7 @@ this["chat"]["userList"] = Handlebars.template({"1":function(depth0,helpers,part
   stack1 = ((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : helperMissing),(options={"name":"data","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data}),(typeof helper === functionType ? helper.call(depth0, options) : helper));
   if (!helpers.data) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
   if (stack1 != null) { buffer += stack1; }
-  return buffer + "</ul>\n<script>\n    /*require([\"jquery\"], function ($) {\n        $('body').css({\"background\": \"blue\"});\n    });*/\n</script>";
+  return buffer + "</ul>";
 },"useData":true});
 
 return this["chat"];

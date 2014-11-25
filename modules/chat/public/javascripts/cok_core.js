@@ -17,6 +17,7 @@ define(["jquery", "jsonrpcclient", "lodash", "handlebars", "tpl"], function ($, 
         var curentController;
         var curentAction;
         alias = alias.toString().split("/");
+        
         alias.shift();
         if (_.isEmpty(alias) || _.isEmpty(alias[0])) {
             curentController = "default";
