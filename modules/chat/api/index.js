@@ -11,7 +11,7 @@ clientRedis = redis.createClient();
 var dbHelper = require(__dirname + '/../helpers/db_helper.js');
 
 
-exports.getUserList = function (cb) {
+exports.getUserList = function (_data, cb) {
     dbHelper.collection("users", safe.sure(cb, function (users) {
         users.find().toArray(cb);
     }));

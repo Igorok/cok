@@ -1,14 +1,15 @@
 <h1>main page</h1>
 <div id="test"></div>
 <ul>
+    <li><a href="#/">home</a></li>
     <li><a href="#/user">users</a></li>
     <li><a href="#/chat/index">chat</a></li>
     <li><a href="#/chat/detail/123">123</a></li>
 </ul>
 <script>
-    require(["jquery", "c_helper", "app"], function ($, c_helper) {
-        $.get("/users", function (data) {
-            c_helper.render($("#test"), "userList", {data: data});
+    require(["jquery", "c_core", "c_app"], function ($, c_core) {
+        c_core.call("index.getUserList", "asdasd", 123, {login: "123123"}, function (result) {
+            console.log(result[0]);
         });
         
     });

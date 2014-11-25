@@ -20,7 +20,7 @@ module.exports = function(grunt) {
                 }*/
             },
             files: {
-              "modules/chat/public/javascripts/tpl.js": "modules/chat/views/**.hbs"
+              "modules/chat/public/javascripts/tpl.js": "modules/chat/views/shared/**.hbs"
             }
           }
         },
@@ -28,7 +28,7 @@ module.exports = function(grunt) {
             options: {
                 livereload: true,
             },
-            files: ['modules/chat/views/**.hbs'],
+            files: ['modules/chat/views/shared/**.hbs'],
             tasks: ['handlebars'],
         },
     });

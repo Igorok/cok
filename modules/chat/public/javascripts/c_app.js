@@ -1,9 +1,7 @@
-define (["jquery", "c_helper"], function ($, c_helper) {
+define (["jquery", "c_core"], function ($, c_core) {
     var routes = {
         default: {
-            index: function () {
-                console.log("home")
-            }
+            index: homepage
         },
         user: {
             index: function () {
@@ -23,10 +21,15 @@ define (["jquery", "c_helper"], function ($, c_helper) {
         }
     };
     
-    c_helper.init(routes, function () {
-        c_helper.router(location.hash)
+    function homepage () {
+        console.log("home page")
+        $('body').css({"background": "green"});
+        $('body').append("home page");
+    }
+    c_core.init(routes, function () {
+        c_core.router(location.hash)
     });
     $(window).bind('hashchange', function() {
-        c_helper.router(location.hash);
+        c_core.router(location.hash);
     });
 });

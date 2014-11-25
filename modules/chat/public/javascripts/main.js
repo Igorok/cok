@@ -7,8 +7,9 @@ require.config({
         "lodash": "lodash",
         "handlebars": "handlebars",
         "tpl": "tpl",
+        "jsonrpcclient": "jsonrpcclient",
         "bootstrap": "bootstrap",
-        "c_helper": "c_helper"
+        "c_core": "c_core"
     },
     shim:{
         "bootstrap": {
@@ -16,6 +17,9 @@ require.config({
         },
         "tpl": {
             deps:["handlebars"]
+        },
+        "jsonrpcclient": {
+            deps:["jquery"]
         }
     }
 });

@@ -1,10 +1,13 @@
-var apiMain = require(__dirname + '/../api/index.js');
+var _ = require('lodash');
+var api = {
+    "index": require(__dirname + '/../api/index.js'),
+}
 
 // routes
 module.exports = function (app) {
     
     app.get('/', index);
-    app.get('/users', getUserList);
+    app.post('/jsonrpc', jsonrpc);
 }
 
 
@@ -14,11 +17,43 @@ function index (req, res) {
     res.render('index');
 }
 
-function getUserList (req, res) {
-    apiMain.getUserList(function (err, _users) {
-        if (err) {
-            console.trace(err);
+function jsonrpc (req, res) {
+    if (! req.xhr) {
+        return res.send(400);
+    }
+    var jsonrpc = req.body;
+    res.header("Cache-Control", "no-cache");
+    var params = jsonrpc.params;
+    if (typeof params !== 'object') {
+        params = JSON.parse(params);
+    }
+    params = {
+        params: params
+    };
+    if (! _.isArray(params)) {
+        params = [params];
+    }
+    
+    var func = jsonrpc.method.match(/^(.*)\.(.*)$/);
+    var module = func[1];
+    func = func[2];
+    if (! api[module] || ! api[module][func]) {
+        return res.sendStatus(500);
+    }
+    var fn = api[module][func];
+    var rf = function () {
+        var jsonres = {jsonrpc: "2.0", id: jsonrpc.id};
+        if (arguments[0]) {
+            var err = arguments[0];
+            console.trace(err, module, func);
+            jsonres.error = {err: err, code:-1};
+            jsonres.result = null;
+        } else {
+            jsonres.result = Array.prototype.slice.call(arguments, 1);
         }
-        res.send(_users);
-    });
+        res.json(jsonres);
+    };
+
+    params.push(rf);
+    fn.apply(api, params);
 }
