@@ -1,17 +1,31 @@
-define(["jquery", "jsonrpcclient", "lodash", "handlebars", "tpl"], function ($, jsonrpc, _, hbs, tpl) {
+define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"], function ($, jsonrpc, storageapi, _, hbs, tpl) {
     var routes;
+    var user;
+    var storage = $.localStorage;
+    
+    function getUser (cb) {
+        if (! user) {
+            user = storage.get('user');
+        }
+        cb(user);
+    }
+    
     // set vars
     function init (_routes, cb) {
         if (! routes) {
             routes = _routes;
         }
-        cb();
+        getUser (function (user) {
+            cb()
+        })
     }
+    
     // render views
     function render (selector, view, data) {
         var _view = tpl[view](data);
         selector.html(_view);
     }
+    
     // parse hash
     function router (alias) {
         var curentController;
@@ -34,6 +48,7 @@ define(["jquery", "jsonrpcclient", "lodash", "handlebars", "tpl"], function ($, 
         }
         routes[curentController][curentAction].apply();
     }
+    
     // ajax request
     function call () {
         if (arguments.length < 2) {
@@ -42,8 +57,8 @@ define(["jquery", "jsonrpcclient", "lodash", "handlebars", "tpl"], function ($, 
         var _method = arguments[0];
         var cb = arguments[arguments.length - 1];
         var data = Array.prototype.slice.call(arguments, 1, arguments.length - 1);
-        var foo = new $.JsonRpcClient({ ajaxUrl: '/jsonrpc' });
-        foo.call(
+        var rpc = new $.JsonRpcClient({ ajaxUrl: '/jsonrpc' });
+        rpc.call(
             _method,
             data,
             function (result) {
@@ -55,11 +70,27 @@ define(["jquery", "jsonrpcclient", "lodash", "handlebars", "tpl"], function ($, 
         );
     }
     
+    // authorise
+    function authorise (data) {
+        call ("user.Authorise", data, function (result) {
+            if (_.isUndefined(result) || _.isUndefined(result)) {
+                return false;
+            } else {
+                user = result[0];
+                console.log(user)
+                storage.set('user', result[0]);
+                window.location = "/";
+            }
+        });
+    }
+    
     // shared functions
     return {
         init: init,
         render: render,
         router: router,
         call: call,
+        authorise: authorise,
+        getUser: getUser,
     }
 });

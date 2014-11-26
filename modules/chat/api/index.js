@@ -4,10 +4,6 @@ var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
 var BSON = mongo.BSONPure;
-var GridStore = mongo.GridStore;
-var path = require('path');
-var redis = require("redis");
-clientRedis = redis.createClient();
 var dbHelper = require(__dirname + '/../helpers/db_helper.js');
 
 

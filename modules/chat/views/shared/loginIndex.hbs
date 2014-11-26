@@ -1,0 +1,29 @@
+<script>
+    require(["jquery", "cok_core"], function ($, cok_core) {
+        $("body").on("submit", "#loginForm", function () {
+            cok_core.authorise({
+                login: $('#login').val(),
+                password: $('#password').val(),
+            });
+            return false;
+        });
+    });
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <br><br><br><br>
+            <form role="form" id="loginForm">
+                <div class="form-group">
+                    <label for="login">Login</label>
+                    <input type="text" class="form-control" id="login" placeholder="Login" require>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Password" require>
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>

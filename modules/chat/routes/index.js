@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var api = {
     "index": require(__dirname + '/../api/index.js'),
+    "user": require(__dirname + '/../api/user.js'),
 }
 
 // routes
@@ -38,6 +39,7 @@ function jsonrpc (req, res) {
     var module = func[1];
     func = func[2];
     if (! api[module] || ! api[module][func]) {
+        console.log("not found", module, func)
         return res.sendStatus(500);
     }
     var fn = api[module][func];

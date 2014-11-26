@@ -4,6 +4,7 @@ require.config({
     waitSeconds: 20,
     paths: {
         "jquery": "jquery",
+        "storageapi": "storageapi",
         "lodash": "lodash",
         "handlebars": "handlebars",
         "tpl": "tpl",
@@ -19,6 +20,9 @@ require.config({
             deps:["handlebars"]
         },
         "jsonrpcclient": {
+            deps:["jquery"]
+        },
+        "storageapi": {
             deps:["jquery"]
         }
     }
