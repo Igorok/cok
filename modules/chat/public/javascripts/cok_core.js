@@ -65,6 +65,11 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
                 cb(result);
             },
             function(error) {
+                if (error.err === 403) {
+                    user = null;
+                    storage.remove('user');
+                    window.location = "/#/login";
+                }
                 console.log("error ", error)
             }
         );
@@ -77,7 +82,6 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
                 return false;
             } else {
                 user = result[0];
-                console.log(user)
                 storage.set('user', result[0]);
                 window.location = "/";
             }

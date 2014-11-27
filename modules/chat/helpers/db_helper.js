@@ -1,7 +1,9 @@
 var safe = require('safe');
 var mongo = require('mongodb');
+var requireRedis = require("redis");
 var cfg = require('./config_helper');
 var _db;
+var _redis;
 function dbHelper () {
     var self = this;
     self.db = function (cb) {
@@ -26,6 +28,8 @@ function dbHelper () {
             });
         }));
     };
+    
+    self.redis = (_redis || requireRedis.createClient());
 }
 
 // export
