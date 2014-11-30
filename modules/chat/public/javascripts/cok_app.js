@@ -1,26 +1,15 @@
-define (["jquery", "cok_core"], function ($, cok_core) {
-    
+define (["jquery", "cok_core", "cok_controller"], function ($, cok_core, cok_controller) {
     // routes
     var routes = {
         default: {
-            index: function () {
-                checkAuth(function (_user) {
-                    homepage(_user);
-                });
-            }
+            index: cok_controller.homepage
         },
         login: {
-            index: login
+            index: cok_controller.login
         },
         user: {
-            index: function () {
-                checkAuth(function (_user) {
-                    userIndex(_user);
-                });
-            },
-            detail: function () {
-                console.log("user detail");
-            }
+            index: cok_controller.userIndex,
+            detail: cok_controller.userDetail,
         },
         chat: {
             index: function () {
@@ -32,42 +21,25 @@ define (["jquery", "cok_core"], function ($, cok_core) {
         }
     };
     
-    // actions
-    function checkAuth (cb) {
-        cok_core.getUser(function (_user) {
-            if (_.isEmpty(_user)) {
-                window.location = "/#/login";
-            } else {
-                cb(_user);
-            }
-        });
-    }
-    function login () {
-        cok_core.getUser(function (_user) {
-            if (! _.isEmpty(_user)) {
-                window.location = "/";
-            } else {
-                cok_core.render ($("#body"), "loginIndex");
-            }
-        });
-    }
-    function homepage (_user) {
-        cok_core.render ($("#body"), "defaultIndex");
-    }
-    function userIndex (_user) {
-        var token = _user ? _user.token : null;
-        cok_core.call("user.getUserList", {token: token}, function (result) {
-            cok_core.render ($("#body"), "userIndex", {data: result[0]});
-        });
-    }
-    
-    
-    
-    
+    // main menu for app
+    var menu = [
+        {
+            title: "home",
+            hash: "#/",
+        },
+        {
+            title: "user list",
+            hash: "#/user/index",
+        },
+        {
+            title: "chat list",
+            hash: "#/chat/index",
+        },
+    ];
     
     // initialise
-    cok_core.init(routes, function () {
-        cok_core.router(location.hash)
+    cok_core.init(routes, menu, function () {
+        cok_core.router(location.hash);
     });
     $(window).bind('hashchange', function() {
         cok_core.router(location.hash);

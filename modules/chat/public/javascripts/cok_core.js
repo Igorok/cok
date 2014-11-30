@@ -1,37 +1,55 @@
 define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"], function ($, jsonrpc, storageapi, _, hbs, tpl) {
+    function cok_core () {}
     var routes;
+    var menu;
     var user;
     var storage = $.localStorage;
     
-    function getUser (cb) {
+    // get current user
+    var getUser = cok_core.prototype.getUser = function (cb) {
         if (! user) {
             user = storage.get('user');
         }
         cb(user);
-    }
+    };
     
     // set vars
-    function init (_routes, cb) {
+    cok_core.prototype.init = function (_routes, _menu, cb) {
         if (! routes) {
             routes = _routes;
         }
+        if (! menu) {
+            menu = _menu;
+            render($('#mainMenu'), "mainMenu", {data: menu});
+        }
         getUser (function (user) {
-            cb()
-        })
-    }
+            cb();
+        });
+    };
+    
+    // logout
+    var logout = cok_core.prototype.logout = function () {
+        routes = null;
+        menu = null;
+        user = null;
+        user = null;
+        $('#mainMenu').empty();
+        storage.remove('user');
+        window.location = "/#/login";
+    };
     
     // render views
-    function render (selector, view, data) {
+    var render = cok_core.prototype.render = function (selector, view, data) {
         var _view = tpl[view](data);
         selector.html(_view);
-    }
+    };
     
     // parse hash
-    function router (alias) {
+    cok_core.prototype.router = function (alias) {
         var curentController;
         var curentAction;
+        var params;
         alias = alias.toString().split("/");
-        
         alias.shift();
         if (_.isEmpty(alias) || _.isEmpty(alias[0])) {
             curentController = "default";
@@ -45,12 +63,15 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
             } else {
                 curentAction = alias[1];
             }
+            if (alias.length > 2) {
+                params = alias.slice(2, alias.length);
+            }
         }
-        routes[curentController][curentAction].apply();
-    }
+        routes[curentController][curentAction].apply(this, params);
+    };
     
     // ajax request
-    function call () {
+    var call = cok_core.prototype.call = function () {
         if (arguments.length < 2) {
             return false;
         }
@@ -66,35 +87,27 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
             },
             function(error) {
                 if (error.err === 403) {
-                    user = null;
-                    storage.remove('user');
-                    window.location = "/#/login";
+                    logout();
                 }
-                console.log("error ", error)
+                console.log("error ", error);
             }
         );
-    }
+    };
     
     // authorise
-    function authorise (data) {
+    cok_core.prototype.authorise = function (data) {
         call ("user.Authorise", data, function (result) {
             if (_.isUndefined(result) || _.isUndefined(result)) {
                 return false;
             } else {
                 user = result[0];
                 storage.set('user', result[0]);
-                window.location = "/";
+                render($('#mainMenu'), "mainMenu", {data: menu});
+                window.location = "#/";
             }
         });
-    }
+    };
     
     // shared functions
-    return {
-        init: init,
-        render: render,
-        router: router,
-        call: call,
-        authorise: authorise,
-        getUser: getUser,
-    }
+    return new cok_core();
 });

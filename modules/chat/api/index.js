@@ -7,8 +7,10 @@ var BSON = mongo.BSONPure;
 var dbHelper = require(__dirname + '/../helpers/db_helper.js');
 
 
-exports.getUserList = function (_data, cb) {
-    dbHelper.collection("users", safe.sure(cb, function (users) {
-        users.find().toArray(cb);
-    }));
+exports.getMainMenu = function (_data, cb) {
+    var params = _data.params[0];
+    var token = params ? params.token.toString() : null;
+    if (! token) {
+        return cb (403);
+    }
 };

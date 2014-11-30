@@ -1,19 +1,8 @@
 <script>
     require(["jquery", "cok_core", "cok_app"], function ($, cok_core) {
-        cok_core.getUser(function (user) {
-            if (_.isEmpty(user)) {
-                $('#mainMenu').empty();
-            }
-        })
+        
     });
 </script>
 
-<div id="mainMenu">
-    <ul>
-        <li><a href="#/">home</a></li>
-        <li><a href="#/user">users</a></li>
-        <li><a href="#/chat/index">chat</a></li>
-        <li><a href="#/chat/detail/123">123</a></li>
-    </ul>
-</div>
+<div id="mainMenu"></div>
 <div id="body"></div>

@@ -4,6 +4,10 @@ var requireRedis = require("redis");
 var cfg = require('./config_helper');
 var _db;
 var _redis;
+
+/**
+* databases
+*/
 function dbHelper () {
     var self = this;
     self.db = function (cb) {

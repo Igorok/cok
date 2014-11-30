@@ -6,7 +6,10 @@ var moment = require('moment');
 var mongo = require('mongodb');
 var BSON = mongo.BSONPure;
 var dbHelper = require(__dirname + '/../helpers/db_helper.js');
-
+var self = this;
+/**
+* login to system
+*/
 exports.Authorise = function (_data, cb) {
     var params = _data.params[0];
     if (_.isUndefined(params.login) || _.isUndefined(params.password)) {
@@ -31,20 +34,49 @@ exports.Authorise = function (_data, cb) {
     }));
 };
 
-// user list
-exports.getUserList = function (_data, cb) {
+/**
+* check authenticate
+*/
+exports.checkAuth = function (_data, cb) {
     var params = _data.params[0];
     var token = params ? params.token.toString() : null;
     if (! token) {
-        return cb (403);
+        return cb (new Error(403));
     }
     dbHelper.redis.hgetall(token, safe.sure(cb, function (_user) {
         if (! _user) {
-            return cb (403);
+            return cb (new Error(403));
         } else {
-            dbHelper.collection("users", safe.sure(cb, function (users) {
-                users.find().toArray(cb);
-            }));
+            cb(_user, params);
         }
     }));
+}
+
+/**
+* all users
+*/
+exports.getUserList = function (_data, cb) {
+    self.checkAuth (_data, function () {
+        dbHelper.collection("users", safe.sure(cb, function (users) {
+            users.find().toArray(cb);
+        }));
+    });
+};
+
+/**
+* detail user
+*/
+exports.getUserDetail = function (_data, cb) {
+    self.checkAuth (_data, function (_user, _params) {
+        if (_.isEmpty(_params._id)) {
+            return cb (new Error("Wrong form data"));
+        }
+        var _id = _params._id.toString();
+        dbHelper.collection("users", safe.sure(cb, function (users) {
+            users.findOne({_id: BSON.ObjectID(_id)}, safe.sure(cb, function (_result) {
+                cb (null, _result);
+            }));
+        }));
+    });
+    
 };
