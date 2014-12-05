@@ -4,39 +4,34 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
     var menu;
     var user;
     var storage = $.localStorage;
-    
     // get current user
-    var getUser = cok_core.prototype.getUser = function (cb) {
+    var getUser = cok_core.prototype.getUser = function () {
         if (! user) {
             user = storage.get('user');
         }
-        cb(user);
+        return user;
+    };
+
+    cok_core.prototype.setUser = function (_user, cb) {
+        if (_user) {
+            storage.set('user', _user);
+            user = _user
+        }
+        cb();
+    };
+    cok_core.prototype.removeUser = function (_user) {
+        user = storage.remove('user');
     };
     
     // set vars
-    cok_core.prototype.init = function (_routes, _menu, cb) {
+    cok_core.prototype.init = function (_routes, cb) {
         if (! routes) {
             routes = _routes;
         }
-        if (! menu) {
-            menu = _menu;
-            render($('#mainMenu'), "mainMenu", {data: menu});
-        }
-        getUser (function (user) {
-            cb();
-        });
+        getUser();
     };
     
-    // logout
-    var logout = cok_core.prototype.logout = function () {
-        routes = null;
-        menu = null;
-        user = null;
-        user = null;
-        $('#mainMenu').empty();
-        storage.remove('user');
-        window.location = "/#/login";
-    };
+
     
     // render views
     var render = cok_core.prototype.render = function (selector, view, data) {
@@ -55,7 +50,7 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
             curentController = "default";
             curentAction = "index";
         } else if (! _.isEmpty(alias[0]) && ! _.contains(_.keys(routes), alias[0])) {
-            window.location = "/";
+            window.location = "#!/";
         } else {
             curentController = alias[0];
             if (_.isEmpty(alias[1]) || ! routes[curentController][alias[1]]) {
@@ -71,7 +66,7 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
     };
     
     // ajax request
-    var call = cok_core.prototype.call = function () {
+    cok_core.prototype.call = function () {
         if (arguments.length < 2) {
             return false;
         }
@@ -87,26 +82,16 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
             },
             function(error) {
                 if (error.err === 403) {
-                    logout();
+                    window.location = "#!/logout";
+                } else if (error.err === 404) {
+                    window.location = "#!/";
                 }
                 console.log("error ", error);
             }
         );
     };
     
-    // authorise
-    cok_core.prototype.authorise = function (data) {
-        call ("user.Authorise", data, function (result) {
-            if (_.isUndefined(result) || _.isUndefined(result)) {
-                return false;
-            } else {
-                user = result[0];
-                storage.set('user', result[0]);
-                render($('#mainMenu'), "mainMenu", {data: menu});
-                window.location = "#/";
-            }
-        });
-    };
+
     
     // shared functions
     return new cok_core();

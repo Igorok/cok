@@ -1,0 +1,16 @@
+<script>
+    require(["jquery", "cok_core", "cok_controller"], function ($, cok_core, cok_controller) {
+        cok_controller.checkAuth(function (_user) {
+            var token = _user.token;
+            cok_core.call("index.getChatList", {token: token}, function (result) {
+                cok_core.render ($("#body"), "userIndex", {data: result[0]});
+            });
+        });
+    });
+</script>
+chat
+<ul>
+{{#data}}
+    <li><strong><a href="#!/user/detail/{{_id}}">{{login}}</a></strong> {{email}}</li>
+{{/data}}
+</ul>

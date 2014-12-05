@@ -1,7 +1,7 @@
 <script>
-    require(["jquery", "cok_core"], function ($, cok_core) {
+    require(["jquery", "cok_controller"], function ($, cok_controller) {
         $("body").on("submit", "#loginForm", function () {
-            cok_core.authorise({
+            cok_controller.authorise({
                 login: $('#login').val(),
                 password: $('#password').val(),
             });

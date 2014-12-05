@@ -40,7 +40,11 @@ function jsonrpc (req, res) {
     func = func[2];
     if (! api[module] || ! api[module][func]) {
         console.log("not found", module, func)
-        return res.sendStatus(500);
+        var jsonres = {jsonrpc: "2.0", id: jsonrpc.id};
+        console.trace(404, module, func);
+        jsonres.error = {err: 404, code:-1};
+        jsonres.result = null;
+        return res.json(jsonres);
     }
     var fn = api[module][func];
     var rf = function () {

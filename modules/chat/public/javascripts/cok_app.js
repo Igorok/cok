@@ -7,6 +7,9 @@ define (["jquery", "cok_core", "cok_controller"], function ($, cok_core, cok_con
         login: {
             index: cok_controller.login
         },
+        logout: {
+            index: cok_controller.logout
+        },
         user: {
             index: cok_controller.userIndex,
             detail: cok_controller.userDetail,
@@ -20,27 +23,10 @@ define (["jquery", "cok_core", "cok_controller"], function ($, cok_core, cok_con
             }
         }
     };
-    
-    // main menu for app
-    var menu = [
-        {
-            title: "home",
-            hash: "#/",
-        },
-        {
-            title: "user list",
-            hash: "#/user/index",
-        },
-        {
-            title: "chat list",
-            hash: "#/chat/index",
-        },
-    ];
-    
+
     // initialise
-    cok_core.init(routes, menu, function () {
-        cok_core.router(location.hash);
-    });
+    cok_core.init(routes);
+    cok_core.router(location.hash);
     $(window).bind('hashchange', function() {
         cok_core.router(location.hash);
     });

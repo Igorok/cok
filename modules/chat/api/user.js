@@ -39,15 +39,16 @@ exports.Authorise = function (_data, cb) {
 */
 exports.checkAuth = function (_data, cb) {
     var params = _data.params[0];
-    var token = params ? params.token.toString() : null;
-    if (! token) {
-        return cb (new Error(403));
+    var token;
+    if (! params || ! params.token) {
+        return cb (403);
     }
+    token = params.token.toString();
     dbHelper.redis.hgetall(token, safe.sure(cb, function (_user) {
         if (! _user) {
-            return cb (new Error(403));
+            return cb (403);
         } else {
-            cb(_user, params);
+            cb(null, _user, params);
         }
     }));
 }
@@ -56,20 +57,20 @@ exports.checkAuth = function (_data, cb) {
 * all users
 */
 exports.getUserList = function (_data, cb) {
-    self.checkAuth (_data, function () {
+    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
             users.find().toArray(cb);
         }));
-    });
+    }));
 };
 
 /**
 * detail user
 */
 exports.getUserDetail = function (_data, cb) {
-    self.checkAuth (_data, function (_user, _params) {
+    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params._id)) {
-            return cb (new Error("Wrong form data"));
+            return cb ("Wrong form data");
         }
         var _id = _params._id.toString();
         dbHelper.collection("users", safe.sure(cb, function (users) {
@@ -77,6 +78,6 @@ exports.getUserDetail = function (_data, cb) {
                 cb (null, _result);
             }));
         }));
-    });
+    }));
     
 };
