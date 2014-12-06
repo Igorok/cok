@@ -24,7 +24,8 @@ exports.Authorise = function (_data, cb) {
             }
             delete user.password;
             var userToken = crypto.createHash('sha1').digest('hex');
-            dbHelper.redis.hmset(userToken, user, safe.sure(cb, function () {
+            var ruser = JSON.stringify(user);
+            dbHelper.redis.set(userToken, ruser, safe.sure(cb, function () {
                 dbHelper.redis.expire(userToken, 24*60*60, safe.sure(cb, function () {
                     user.token = userToken;
                     cb (null, user);
@@ -33,6 +34,7 @@ exports.Authorise = function (_data, cb) {
         }));
     }));
 };
+
 
 /**
 * check authenticate
@@ -44,22 +46,31 @@ exports.checkAuth = function (_data, cb) {
         return cb (403);
     }
     token = params.token.toString();
-    dbHelper.redis.hgetall(token, safe.sure(cb, function (_user) {
+    dbHelper.redis.get(token, safe.sure(cb, function (_user) {
         if (! _user) {
             return cb (403);
         } else {
+            _user = JSON.parse(_user);
             cb(null, _user, params);
         }
     }));
 }
 
 /**
+* logout to system
+*/
+exports.logout = function (_data, cb) {
+    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        dbHelper.redis.del(_params.token, {}, cb);
+    }));
+};
+/**
 * all users
 */
 exports.getUserList = function (_data, cb) {
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.find().toArray(cb);
+            users.find({_id: {$ne: BSON.ObjectID(_user._id)}}).toArray(cb);
         }));
     }));
 };
@@ -74,10 +85,66 @@ exports.getUserDetail = function (_data, cb) {
         }
         var _id = _params._id.toString();
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.findOne({_id: BSON.ObjectID(_id)}, safe.sure(cb, function (_result) {
+            users.findOne({_id: BSON.ObjectID(_id)}, {login:1, email: 1}, safe.sure(cb, function (_result) {
                 cb (null, _result);
             }));
         }));
     }));
     
+};
+
+/**
+* add friends for user
+*/
+exports.addFriend = function (_data, cb) {
+    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isEmpty(_params._id)) {
+            return cb ("Wrong form data");
+        }
+        var token = _params.token;
+        var _id = _params._id.toString();
+        var uFriends;
+        if (_user.friends && (_user.friends.length > 0)) {
+            uFriends = _.pluck(_user.friends, "_id");
+        } else {
+            uFriends = [];
+        }
+        if (_.contains(uFriends, _id)) {
+            return cb ("Friend already exists");
+        }
+        dbHelper.collection("users", safe.sure(cb, function (users) {
+            users.update({_id: BSON.ObjectID(_user._id)},
+                {$push: {
+                    friends: {_id: _id}
+                }},
+                safe.sure(cb, function () {
+                    if (! _user.friends) {
+                        _user.friends = [];
+                    }
+                    _user.friends.push({_id: _id});
+                    _user = JSON.stringify(_user);
+                dbHelper.redis.set(token, _user, cb);
+            }));
+
+        }));
+    }));
+
+};
+
+/**
+* friends list
+*/
+exports.getFriendList = function (_data, cb) {
+    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        dbHelper.collection("users", safe.sure(cb, function (users) {
+            async.series([
+                function (cb) {
+                    users.findOne()
+                }
+            ], safe.sure(cd, function () {
+                cb();
+            }));
+        }));
+    }));
+
 };

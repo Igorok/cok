@@ -1,5 +1,6 @@
-<ul>
 {{#data}}
-    <li><strong><a href="#!/user/detail/{{_id}}">{{login}}</a></strong> {{email}}</li>
+    <div>
+        <a href="#!/user/detail/{{_id}}">{{login}}</a>
+        <button id="addFriendBtn" data-id="{{_id}}" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus"></span></button>
+    </div>
 {{/data}}
-</ul>

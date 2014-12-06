@@ -11,6 +11,10 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
             hash: "#!/user/index",
         },
         {
+            title: "friends list",
+            hash: "#!/user/friend",
+        },
+        {
             title: "chat list",
             hash: "#!/chat/index",
         },
@@ -58,9 +62,13 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
 
     // logout
     var logout = cok_controller.prototype.logout = function () {
-        cok_core.removeUser();
-        $("#mainMenu").empty();
-        window.location = "#!/login";
+        var _user = checkedUser();
+        var token = _user.token;
+        cok_core.call("user.logout", {token: token}, function (result) {
+            cok_core.removeUser();
+            $("#mainMenu").empty();
+            window.location = "#!/login";
+        });
     };
     
     // loin page
@@ -75,7 +83,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     
     // home page
     cok_controller.prototype.homepage = function () {
-        var _user = cok_core.getUser();
+        var _user = checkedUser();
         var token = _user.token;
         cok_core.render ($("#body"), "defaultIndex");
     }
@@ -86,6 +94,14 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
         var token = _user.token;
         cok_core.call("user.getUserList", {token: token}, function (result) {
             cok_core.render ($("#body"), "userIndex", {data: result[0]});
+        });
+
+        $('body').on('click', '#addFriendBtn', function () {
+            var btn = $(this);
+            var _id = btn.attr('data-id');
+            cok_core.call("user.addFriend", {token: token, _id: _id}, function (result) {
+                btn.remove();
+            });
         });
     }
     
@@ -98,6 +114,16 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
         });
     }
     
+
+    /*
+    * chat index
+    */
+    cok_controller.prototype.chatIndex = function () {
+        var _user = checkedUser();
+        var token = _user.token;
+        cok_core.render ($("#body"), "chatIndex");
+    }
+
     menuRender();
     return new cok_controller();
     

@@ -5,12 +5,17 @@ var moment = require('moment');
 var mongo = require('mongodb');
 var BSON = mongo.BSONPure;
 var dbHelper = require(__dirname + '/../helpers/db_helper.js');
+var userApi = require(__dirname + '/user.js');
 
 
-exports.getMainMenu = function (_data, cb) {
-    var params = _data.params[0];
-    var token = params ? params.token.toString() : null;
-    if (! token) {
-        return cb (403);
-    }
+
+/**
+* all users
+*/
+exports.getChatList = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+            chatgroups.find().toArray(cb);
+        }));
+    }));
 };

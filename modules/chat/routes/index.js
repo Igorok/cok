@@ -2,14 +2,13 @@ var _ = require('lodash');
 var api = {
     "index": require(__dirname + '/../api/index.js'),
     "user": require(__dirname + '/../api/user.js'),
-}
+};
 
 // routes
 module.exports = function (app) {
-    
     app.get('/', index);
     app.post('/jsonrpc', jsonrpc);
-}
+};
 
 
 

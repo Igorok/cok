@@ -49,20 +49,19 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
         if (_.isEmpty(alias) || _.isEmpty(alias[0])) {
             curentController = "default";
             curentAction = "index";
+            routes[curentController][curentAction].apply(this, params);
         } else if (! _.isEmpty(alias[0]) && ! _.contains(_.keys(routes), alias[0])) {
             window.location = "#!/";
+        } else if (_.isEmpty(alias[1]) || ! routes[alias[0]][alias[1]]) {
+            window.location = "#!/" + alias[0] + "/index";
         } else {
             curentController = alias[0];
-            if (_.isEmpty(alias[1]) || ! routes[curentController][alias[1]]) {
-                curentAction = "index";
-            } else {
-                curentAction = alias[1];
-            }
+            curentAction = alias[1];
             if (alias.length > 2) {
                 params = alias.slice(2, alias.length);
             }
+            routes[curentController][curentAction].apply(this, params);
         }
-        routes[curentController][curentAction].apply(this, params);
     };
     
     // ajax request

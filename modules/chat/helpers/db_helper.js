@@ -33,7 +33,10 @@ function dbHelper () {
         }));
     };
     
-    self.redis = (_redis || requireRedis.createClient());
+    if (! _redis) {
+        _redis = requireRedis.createClient();
+    }
+    self.redis = _redis;
 }
 
 // export
