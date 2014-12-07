@@ -12,7 +12,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
         },
         {
             title: "friends list",
-            hash: "#!/user/friend",
+            hash: "#!/user/friends",
         },
         {
             title: "chat list",
@@ -90,21 +90,14 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     
     // user index page
     cok_controller.prototype.userIndex = function () {
-        var _user = checkedUser();
-        var token = _user.token;
-        cok_core.call("user.getUserList", {token: token}, function (result) {
-            cok_core.render ($("#body"), "userIndex", {data: result[0]});
-        });
-
-        $('body').on('click', '#addFriendBtn', function () {
-            var btn = $(this);
-            var _id = btn.attr('data-id');
-            cok_core.call("user.addFriend", {token: token, _id: _id}, function (result) {
-                btn.remove();
-            });
-        });
+        cok_core.render ($("#body"), "userIndex");
     }
-    
+    /**
+    * friends list
+    */
+    cok_controller.prototype.userFriends = function () {
+        cok_core.render ($("#body"), "friendsIndex");
+    };
     // user detail page
     cok_controller.prototype.userDetail = function (_id) {
         var _user = checkedUser();

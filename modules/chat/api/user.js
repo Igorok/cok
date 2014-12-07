@@ -69,8 +69,19 @@ exports.logout = function (_data, cb) {
 */
 exports.getUserList = function (_data, cb) {
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        var friendIds = [];
+        if (_user.friends && (_user.friends.length > 0)) {
+            friendIds = _.pluck(_user.friends, "_id");
+        }
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.find({_id: {$ne: BSON.ObjectID(_user._id)}}).toArray(cb);
+            users.find({_id: {$ne: new BSON.ObjectID(_user._id)}}, {login: 1, email: 1}, {limit: 500}).toArray(safe.sure(cb, function (uArr) {
+                _.each(uArr, function (val) {
+                    if (_.contains(friendIds, val._id.toHexString())) {
+                        val.friend = true;
+                    }
+                });
+                cb(null, uArr);
+            }));
         }));
     }));
 };
@@ -85,7 +96,7 @@ exports.getUserDetail = function (_data, cb) {
         }
         var _id = _params._id.toString();
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.findOne({_id: BSON.ObjectID(_id)}, {login:1, email: 1}, safe.sure(cb, function (_result) {
+            users.findOne({_id: new BSON.ObjectID(_id)}, {login:1, email: 1}, safe.sure(cb, function (_result) {
                 cb (null, _result);
             }));
         }));
@@ -113,7 +124,7 @@ exports.addFriend = function (_data, cb) {
             return cb ("Friend already exists");
         }
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.update({_id: BSON.ObjectID(_user._id)},
+            users.update({_id: new BSON.ObjectID(_user._id)},
                 {$push: {
                     friends: {_id: _id}
                 }},
@@ -125,10 +136,39 @@ exports.addFriend = function (_data, cb) {
                     _user = JSON.stringify(_user);
                 dbHelper.redis.set(token, _user, cb);
             }));
-
         }));
     }));
+};
 
+
+/**
+* delete friends for user
+*/
+exports.deleteFriend = function (_data, cb) {
+    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isEmpty(_params._id) || ! _user.friends) {
+            return cb ("Already deleted");
+        }
+        var token = _params.token;
+        var _id = _params._id.toString();
+        var friendIds = _.pluck(_user.friends, "_id");
+        if (! _.contains(friendIds, _id)) {
+            return cb ("Already deleted");
+        }
+        _.remove(_user.friends, function(val) {
+            return val._id == _id;
+        });
+        dbHelper.collection("users", safe.sure(cb, function (users) {
+            users.update({_id: new BSON.ObjectID(_user._id)},
+                {$pull: {
+                    friends: {_id: _id}
+                }},
+                safe.sure(cb, function () {
+                    _user = JSON.stringify(_user);
+                    dbHelper.redis.set(token, _user, cb);
+            }));
+        }));
+    }));
 };
 
 /**
@@ -137,14 +177,19 @@ exports.addFriend = function (_data, cb) {
 exports.getFriendList = function (_data, cb) {
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            async.series([
-                function (cb) {
-                    users.findOne()
-                }
-            ], safe.sure(cd, function () {
-                cb();
+            if (! _user.friends || ! (_user.friends.length > 0)) {
+                return cb();
+            }
+            var friendIds = [];
+            _.each(_user.friends, function (val) {
+                friendIds.push(new BSON.ObjectID(val._id));
+            });
+            users.find({_id: {$in: friendIds}}, {login: 1, email: 1}).toArray(safe.sure(cb, function (uArr) {
+                _.each(uArr, function (val) {
+                    val.friend = true;
+                });
+                cb(null, uArr)
             }));
         }));
     }));
-
 };
