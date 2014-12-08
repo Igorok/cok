@@ -1,29 +1,28 @@
 <script>
-    require (["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok_core, cok_controller) {
-    var _user = cok_controller.checkedUser();
-    var token = _user.token;
+require (["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok_core, cok_controller) {
+    $(function () {
+        var _user = cok_controller.checkedUser();
+        var token = _user.token;
+
+        var renderFriends = function () {
+            cok_core.call("user.getFriendList", {token: token}, function (result) {
+                cok_core.render ($("#friendsCase"), "userList", {data: result[0]});
+            });
+        };
 
 
-        console.log('render')
-    var renderFriends = function () {
-        console.log('request', token)
 
-
-
-        cok_core.call("user.getFriendList", {token: token}, function (result) {
-            console.log(result)
-            cok_core.render ($("#friendsCase"), "userList", {data: result[0]});
-        });
-    };
-    renderFriends();
-    $('body').one('click', '.delFriendBtn', function () {
-        var btn = $(this);
-        var _id = btn.attr('data-id');
-        console.log('click')
-        cok_core.call("user.deleteFriend", {token: token, _id: _id}, function (result) {
-            renderFriends();
+        renderFriends();
+        $('#friendsCase').on('click', '.delFriendBtn', function () {
+            var btn = $(this);
+            var _id = btn.attr('data-id');
+            console.log('click friend')
+            cok_core.call("user.deleteFriend", {token: token, _id: _id}, function (result) {
+                renderFriends();
+            });
         });
     });
-    });
+});
 </script>
+asd
 <div id="friendsCase"></div>

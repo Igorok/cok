@@ -90,13 +90,13 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     
     // user index page
     cok_controller.prototype.userIndex = function () {
-        cok_core.render ($("#body"), "userIndex");
+        cok_core.render ($("#body"), "userIndex", {});
     }
     /**
     * friends list
     */
     cok_controller.prototype.userFriends = function () {
-        cok_core.render ($("#body"), "friendsIndex");
+        cok_core.render ($("#body"), "friendsIndex", {});
     };
     // user detail page
     cok_controller.prototype.userDetail = function (_id) {

@@ -1,8 +1,29 @@
 <script>
     require(["jquery", "cok_core", "cok_app"], function ($, cok_core) {
-        
+        $(function () {
+            var mainMenu = false;
+            var showMainMenu = function () {
+                if (! mainMenu) {
+                    mainMenu = true;
+                    $('#mainMenu').animate({'left': '0px'}, 500);
+                } else {
+                    mainMenu = false;
+                    $('#mainMenu').animate({'left': '-310px'}, 500);
+                }
+            };
+            $('#btnMain').click(function () {
+                showMainMenu();
+            });
+        });
     });
 </script>
-
-<div id="mainMenu"></div>
 <div id="body"></div>
+<div id="mainMenu"></div>
+<div id="secondMenu"></div>
+
+<div id="navPanel">
+    <div class="clearfix">
+        <button id="btnMain" class="btn btn-default btn-left"><span class="glyphicon glyphicon-th-list"></span></button>
+        <button id="btnSecond" class="btn btn-default btn-right"><span class="glyphicon glyphicon-cog"></span></button>
+    </div>
+</div>

@@ -25,5 +25,6 @@ require.config({
         "storageapi": {
             deps:["jquery"]
         }
-    }
+    },
+    urlArgs: { 'bust': Date.now() }
 });

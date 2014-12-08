@@ -74,7 +74,7 @@ exports.getUserList = function (_data, cb) {
             friendIds = _.pluck(_user.friends, "_id");
         }
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.find({_id: {$ne: new BSON.ObjectID(_user._id)}}, {login: 1, email: 1}, {limit: 500}).toArray(safe.sure(cb, function (uArr) {
+            users.find({_id: {$ne: new BSON.ObjectID(_user._id)}}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (uArr) {
                 _.each(uArr, function (val) {
                     if (_.contains(friendIds, val._id.toHexString())) {
                         val.friend = true;

@@ -35,8 +35,10 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
     
     // render views
     var render = cok_core.prototype.render = function (selector, view, data) {
+        /*var _view = tpl[view](data);
+        selector.html(_view);*/
         var _view = tpl[view](data);
-        selector.html(_view);
+        return selector.html(_view);
     };
     
     // parse hash

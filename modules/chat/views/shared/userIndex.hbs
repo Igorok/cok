@@ -1,28 +1,29 @@
 <script>
     require (["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok_core, cok_controller) {
-    var _user = cok_controller.checkedUser();
-    var token = _user.token;
-    cok_core.call("user.getUserList", {token: token}, function (result) {
-        cok_core.render ($("#userCase"), "userList", {data: result[0]});
-    });
-
-    // add fried
-    $('body').on('click', '.addFriendBtn', function () {
-        var btn = $(this);
-        var _id = btn.attr('data-id');
-        cok_core.call("user.addFriend", {token: token, _id: _id}, function (result) {
-            btn.remove();
+    $(function () {
+        var _user = cok_controller.checkedUser();
+        var token = _user.token;
+        cok_core.call("user.getUserList", {token: token}, function (result) {
+            cok_core.render ($("#userCase"), "userList", {data: result[0]});
         });
-    });
 
-    // remove friend
-    $('body').on('click', '.delFriendBtn', function () {
-        var btn = $(this);
-        var _id = btn.attr('data-id');
-        console.log('click')
-        cok_core.call("user.deleteFriend", {token: token, _id: _id}, function (result) {
-            console.log(btn)
-            btn.remove();
+        // add fried
+        $('#userCase').on('click', '.addFriendBtn', function () {
+            var btn = $(this);
+            var _id = btn.attr('data-id');
+            cok_core.call("user.addFriend", {token: token, _id: _id}, function (result) {
+                btn.remove();
+            });
+        });
+
+        // remove friend
+        $('#userCase').on('click', '.delFriendBtn', function () {
+            var btn = $(this);
+            var _id = btn.attr('data-id');
+            console.log('click user')
+            cok_core.call("user.deleteFriend", {token: token, _id: _id}, function (result) {
+                btn.remove();
+            });
         });
     });
 });
