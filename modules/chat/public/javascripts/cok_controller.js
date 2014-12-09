@@ -3,24 +3,24 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     // main menu for app
     var menu = [
         {
-            title: "home",
-            hash: "#!/",
+            title: '<span class="glyphicon glyphicon-home"></span> Home',
+            hash: '#!/',
         },
         {
-            title: "user list",
-            hash: "#!/user/index",
+            title: '<span class="glyphicon glyphicon-user"></span> Users',
+            hash: '#!/user/index',
         },
         {
-            title: "friends list",
-            hash: "#!/user/friends",
+            title: '<span class="glyphicon glyphicon-star"></span> Friends',
+            hash: '#!/user/friends',
         },
         {
-            title: "chat list",
-            hash: "#!/chat/index",
+            title: '<span class="glyphicon glyphicon-envelope"></span> Chats',
+            hash: '#!/chat/index',
         },
         {
-            title: "logout",
-            hash: "#!/logout",
+            title: '<span class="glyphicon glyphicon-off"></span> Logout',
+            hash: '#!/logout',
         },
     ];
     
@@ -40,6 +40,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     var menuRender = cok_controller.prototype.menuRender = function () {
         var _user = cok_core.getUser();
         if (! _.isEmpty(_user)) {
+            $("#navPanel").show();
             cok_core.render ($("#mainMenu"), "mainMenu", {data: menu});
         } else {
             return false;
@@ -62,13 +63,17 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
 
     // logout
     var logout = cok_controller.prototype.logout = function () {
-        var _user = checkedUser();
+        /*var _user = checkedUser();
         var token = _user.token;
         cok_core.call("user.logout", {token: token}, function (result) {
             cok_core.removeUser();
             $("#mainMenu").empty();
             window.location = "#!/login";
-        });
+        });*/
+        cok_core.removeUser();
+        $("#navPanel").hide();
+        $("#mainMenu").animate({'left': '-200px'}, 200).empty();
+        window.location = "#!/login";
     };
     
     // loin page

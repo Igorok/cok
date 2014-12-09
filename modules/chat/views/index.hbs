@@ -5,10 +5,12 @@
             var showMainMenu = function () {
                 if (! mainMenu) {
                     mainMenu = true;
-                    $('#mainMenu').animate({'left': '0px'}, 500);
+                    $('#body').animate({'padding-left': '200px'}, 200);
+                    $('#mainMenu').animate({'left': '0px'}, 200);
                 } else {
                     mainMenu = false;
-                    $('#mainMenu').animate({'left': '-310px'}, 500);
+                    $('#body').animate({'padding-left': '0px'}, 200);
+                    $('#mainMenu').animate({'left': '-200px'}, 200);
                 }
             };
             $('#btnMain').click(function () {
@@ -22,7 +24,7 @@
 <div id="secondMenu"></div>
 
 <div id="navPanel">
-    <div class="clearfix">
+    <div class="clearfix nav-case">
         <button id="btnMain" class="btn btn-default btn-left"><span class="glyphicon glyphicon-th-list"></span></button>
         <button id="btnSecond" class="btn btn-default btn-right"><span class="glyphicon glyphicon-cog"></span></button>
     </div>

@@ -46,11 +46,26 @@ message-case {
 .login-btn-case .btn-login {
     width: 100%;
 }
+
+
+body {
+    font-size: 16px;
+}
 #navPanel {
+    display: none;
     position: fixed;
-    bottom: 5px;
-    left: 5px;
-    right: 5px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #272c34;
+}
+#navPanel .nav-case {
+    padding: 5px;
+}
+#navPanel .btn {
+    background: #272c34;
+    color: #00ce9b;
+    border-color: #1f7f5c;
 }
 #navPanel .btn-left {
     float: left;
@@ -59,11 +74,24 @@ message-case {
     float: right;
 }
 #mainMenu {
-    width: 300px;
+    width: 200px;
     position: fixed;
     top: 0;
-    left: -310px;
+    bottom: 0;
+    left: -200px;
+    background: #272c34;
 }
-
-
+#mainMenu a {
+    color: #00ce9b;
+}
+#mainMenu .nav li a:hover,
+#mainMenu .nav li a:focus {
+    text-decoration: none;
+    background-color: #1f7f5c;
+    color: #ffffff;
+}
+.sub-container {
+    padding-left: 15px;
+    padding-right: 15px;
+}
 
