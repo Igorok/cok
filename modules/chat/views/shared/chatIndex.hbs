@@ -5,6 +5,27 @@
         cok_core.call("index.getChatList", {token: token}, function (result) {
             cok_core.render ($("#chatCase"), "chatList", {data: result[0]});
         });
+        
+        
+        
+        
+        /*var menu = [
+        {
+            title: '<span class="glyphicon glyphicon-file"></span> Add',
+            hash: '#!/',
+        },
+        {
+            title: '<span class="glyphicon glyphicon-trash"></span> Remove',
+            hash: '#!/',
+        },
+        ];
+        
+        cok_core.render ($("#secondMenu"), "mainMenu", {data: menu});*/
     });
 </script>
+<br>
+<div class="sub-container">
+    <a class="btn btn-default" href="#!/chat/create"><span class="glyphicon glyphicon-file"></span> Add</a>
+</div>
+<br>
 <div id="chatCase" class="sub-container"></div>

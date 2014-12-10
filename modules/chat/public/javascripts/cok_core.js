@@ -41,6 +41,15 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
         return selector.html(_view);
     };
     
+    
+    var systemMessage = cok_core.prototype.systemMessage = function (selector, event, message) {
+        if (! selector.length) {
+            selector = $('#body');
+        }
+        render(selector, 'systemMessage', {event: event, message: message})
+    };
+    
+    
     // parse hash
     cok_core.prototype.router = function (alias) {
         var curentController;

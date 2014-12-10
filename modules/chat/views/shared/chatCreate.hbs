@@ -1,0 +1,55 @@
+<script>
+    require(["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok_core, cok_controller) {
+        var _user = cok_controller.checkedUser();
+        var token = _user.token;
+        $('#chatCreateForm').submit(function () {
+            var formData = $(this).serializeArray();
+            var result = [];
+            if (! _.isEmpty(formData)) {
+                _.each(formData, function (val) {
+                    result.push(val.name);
+                });
+            } else {
+                cok_core.systemMessage($('#messageCase'), 'danger', 'Users is empty')
+            }
+            return false;
+        });
+        /*cok_core.call("index.getChatList", {token: token}, function (result) {
+            cok_core.render ($("#chatCase"), "chatList", {data: result[0]});
+        });*/
+        
+        
+        
+        
+        /*var menu = [
+        {
+            title: '<span class="glyphicon glyphicon-file"></span> Add',
+            hash: '#!/',
+        },
+        {
+            title: '<span class="glyphicon glyphicon-trash"></span> Remove',
+            hash: '#!/',
+        },
+        ];
+        
+        cok_core.render ($("#secondMenu"), "mainMenu", {data: menu});*/
+    });
+</script>
+<br>
+<div id="chatCase" class="sub-container">
+    <div id="messageCase"></div>
+    <form role="form" id="chatCreateForm">
+       <div class="row">
+        {{#data}}
+        <div class="col-xs-4">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="{{_id}}"> {{login}}
+                </label>
+            </div>
+        </div>
+        {{/data}}
+        </div>
+        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+    </form>
+</div>

@@ -17,6 +17,7 @@ define (["jquery", "cok_core", "cok_controller"], function ($, cok_core, cok_con
         },
         chat: {
             index: cok_controller.chatIndex,
+            create: cok_controller.chatCreate,
             detail: function () {
                 console.log("chat detail");
             }

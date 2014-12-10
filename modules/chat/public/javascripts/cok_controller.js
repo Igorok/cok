@@ -117,11 +117,15 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     * chat index
     */
     cok_controller.prototype.chatIndex = function () {
-        var _user = checkedUser();
-        var token = _user.token;
         cok_core.render ($("#body"), "chatIndex");
     }
-
+    cok_controller.prototype.chatCreate = function () {
+        var _user = checkedUser();
+        var token = _user.token;
+        cok_core.call("user.getFriendList", {token: token}, function (result) {
+            cok_core.render ($("#body"), "chatCreate", {data: result[0]});
+        });
+    }
     menuRender();
     return new cok_controller();
     

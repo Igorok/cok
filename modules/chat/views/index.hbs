@@ -1,7 +1,8 @@
 <script>
-    require(["jquery", "cok_core", "cok_app"], function ($, cok_core) {
+    require(["jquery", "cok_core", "cok_app", "bootstrap"], function ($, cok_core) {
         $(function () {
             var mainMenu = false;
+            var secondMenu = false;
             var showMainMenu = function () {
                 if (! mainMenu) {
                     mainMenu = true;
@@ -13,8 +14,22 @@
                     $('#mainMenu').animate({'left': '-200px'}, 200);
                 }
             };
+            var showSecondMenu = function () {
+                if (! secondMenu) {
+                    secondMenu = true;
+                    $('#secondMenu').animate({'right': '0px'}, 200);
+                } else {
+                    secondMenu = false;
+                    $('#secondMenu').animate({'right': '-200px'}, 200);
+                }
+            };
+            
+            
             $('#btnMain').click(function () {
                 showMainMenu();
+            });
+            $('#btnSecond').click(function () {
+                showSecondMenu();
             });
         });
     });
