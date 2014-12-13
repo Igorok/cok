@@ -4,8 +4,11 @@
             <strong><a href="#!/chat/detail/{{_id}}">{{#users}}{{login}}&nbsp;{{/users}}</a></strong>
        </div>
        <div class="col-xs-2">
+          {{crPermission}}
+           {{#crPermission}}
            <button class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></button>
            <button class="btn btn-default"><span class="glyphicon glyphicon-remove"></span></button>
+           {{/crPermission}}
        </div>
     </div><br>
 {{/data}}

@@ -40,8 +40,7 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
         var _view = tpl[view](data);
         return selector.html(_view);
     };
-    
-    
+
     var systemMessage = cok_core.prototype.systemMessage = function (selector, event, message) {
         if (! selector.length) {
             selector = $('#body');
@@ -96,6 +95,9 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
                 } else if (error.err === 404) {
                     window.location = "#!/";
                 }
+
+                var msg = error.err ? error.err : error;
+                systemMessage($('#body'), 'danger', msg);
                 console.log("error ", error);
             }
         );

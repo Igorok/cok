@@ -4,10 +4,13 @@
         var token = _user.token;
         $('#chatCreateForm').submit(function () {
             var formData = $(this).serializeArray();
-            var result = [];
+            var users = [];
             if (! _.isEmpty(formData)) {
                 _.each(formData, function (val) {
-                    result.push(val.name);
+                    users.push(val.name);
+                });
+                cok_core.call("index.addChat", {token: token, users: users}, function (result) {
+                    window.location = "#!/chat/index";
                 });
             } else {
                 cok_core.systemMessage($('#messageCase'), 'danger', 'Users is empty')

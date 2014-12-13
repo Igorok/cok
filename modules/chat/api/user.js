@@ -23,13 +23,28 @@ exports.Authorise = function (_data, cb) {
                 return cb ("Wrong data");
             }
             delete user.password;
-            var userToken = crypto.createHash('sha1').digest('hex');
-            var ruser = JSON.stringify(user);
-            dbHelper.redis.set(userToken, ruser, safe.sure(cb, function () {
-                dbHelper.redis.expire(userToken, 24*60*60, safe.sure(cb, function () {
-                    user.token = userToken;
-                    cb (null, user);
-                }));
+            var userToken;
+            async.series([
+                function (cb) {
+                    crypto.randomBytes(48, safe.sure(cb, function(buf) {
+                        userToken = buf.toString('hex');
+                        cb();
+                    }));
+                },
+                function (cb) {
+                    var ruser = JSON.stringify(user);
+                    dbHelper.redis.set(userToken, ruser, safe.sure(cb, function () {
+                        cb();
+                    }));
+                },
+                function (cb) {
+                    dbHelper.redis.expire(userToken, 24*60*60, safe.sure(cb, function () {
+                        cb();
+                    }));
+                }
+            ], safe.sure(cb, function () {
+                user.token = userToken;
+                cb (null, user);
             }));
         }));
     }));

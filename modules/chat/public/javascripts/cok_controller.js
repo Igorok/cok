@@ -84,19 +84,19 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
         } else {
             cok_core.render ($("#body"), "loginIndex");
         }
-    }
+    };
     
     // home page
     cok_controller.prototype.homepage = function () {
         var _user = checkedUser();
         var token = _user.token;
         cok_core.render ($("#body"), "defaultIndex");
-    }
+    };
     
     // user index page
     cok_controller.prototype.userIndex = function () {
         cok_core.render ($("#body"), "userIndex", {});
-    }
+    };
     /**
     * friends list
     */
@@ -110,7 +110,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
         cok_core.call("user.getUserDetail", {token: token, _id: _id}, function (result) {
             cok_core.render ($("#body"), "userDetail", {data: result[0]});
         });
-    }
+    };
     
 
     /*
@@ -118,14 +118,14 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     */
     cok_controller.prototype.chatIndex = function () {
         cok_core.render ($("#body"), "chatIndex");
-    }
+    };
     cok_controller.prototype.chatCreate = function () {
         var _user = checkedUser();
         var token = _user.token;
         cok_core.call("user.getFriendList", {token: token}, function (result) {
             cok_core.render ($("#body"), "chatCreate", {data: result[0]});
         });
-    }
+    };
     menuRender();
     return new cok_controller();
     
