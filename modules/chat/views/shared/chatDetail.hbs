@@ -1,0 +1,40 @@
+<script>
+require(["jquery", "lodash", "io", "cok_core", "cok_controller"], function ($, _, io, cok_core, cok_controller) {
+    var _user = cok_controller.checkedUser();
+    var token = _user.token;
+    var chatId = '{{chatId}}';
+    if (_.isEmpty(chatId)) {
+        window.location("#!/chat/index");
+    }
+    var socket = io();
+    socket.emit("join", {token: token, chatId: chatId});
+    socket.on("error", function (err) {
+        cok_core.error(err);
+    });
+    // add user
+    socket.on('join', function (userId) {
+        console.log(userId)
+        if (! userId) {
+            $location.path("/chats");
+        } else {
+            $scope.$apply(function() {
+                $scope.chatUsers[userId].active = true;
+            });
+        }
+    })
+
+
+    // cok_core.call("index.getChatList", {token: token}, function (result) {
+    //     chatTable = new cok_core.tableRender("chatList", $("#chatCase tbody"), result[0], {}, 10, $('#chatCasePager'));
+    //     chatTable.render();
+    // });
+    // $('#chatCase').on('click', 'th', function () {
+    //     if (chatTable) {
+    //         chatTable.sort($(this));
+    //     }
+});
+</script>
+<form id="chatMessage">
+    <input type="text" name="message" value="">
+    <input type="submit" name="submit" value="submit">
+</form>

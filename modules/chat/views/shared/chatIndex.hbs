@@ -2,25 +2,16 @@
     require(["jquery", "cok_core", "cok_controller"], function ($, cok_core, cok_controller) {
         var _user = cok_controller.checkedUser();
         var token = _user.token;
+        var chatTable;
         cok_core.call("index.getChatList", {token: token}, function (result) {
-            cok_core.render ($("#chatCase"), "chatList", {data: result[0]});
+            chatTable = new cok_core.tableRender("chatList", $("#chatCase tbody"), result[0], {}, 10, $('#chatCasePager'));
+            chatTable.render();
         });
-        
-        
-        
-        
-        /*var menu = [
-        {
-            title: '<span class="glyphicon glyphicon-file"></span> Add',
-            hash: '#!/',
-        },
-        {
-            title: '<span class="glyphicon glyphicon-trash"></span> Remove',
-            hash: '#!/',
-        },
-        ];
-        
-        cok_core.render ($("#secondMenu"), "mainMenu", {data: menu});*/
+        $('#chatCase').on('click', 'th', function () {
+            if (chatTable) {
+                chatTable.sort($(this));
+            }
+        });
     });
 </script>
 <br>
@@ -28,4 +19,16 @@
     <a class="btn btn-default" href="#!/chat/create"><span class="glyphicon glyphicon-file"></span> Add</a>
 </div>
 <br>
-<div id="chatCase" class="sub-container"></div>
+<div class="sub-container">
+    <table id="chatCase" class="table table-hover">
+        <thead>
+            <tr>
+                <th data-sort="date">Date</th>
+                <th>Chat</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div id="chatCasePager"></div>
+</div>

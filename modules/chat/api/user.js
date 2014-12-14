@@ -55,6 +55,9 @@ exports.Authorise = function (_data, cb) {
 * check authenticate
 */
 exports.checkAuth = function (_data, cb) {
+    if (! _data || ! cb || (typeof(cb) != 'function')) {
+        return cb (403);
+    }
     var params = _data.params[0];
     var token;
     if (! params || ! params.token) {
@@ -116,7 +119,7 @@ exports.getUserDetail = function (_data, cb) {
             }));
         }));
     }));
-    
+
 };
 
 /**

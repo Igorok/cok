@@ -19,26 +19,35 @@ this["chat"]["chatCreate"] = Handlebars.template({"1":function(depth0,helpers,pa
 
 
 
+this["chat"]["chatDetail"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+  var helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
+  return "<script>\nrequire([\"jquery\", \"lodash\", \"io\", \"cok_core\", \"cok_controller\"], function ($, _, io, cok_core, cok_controller) {\n    var _user = cok_controller.checkedUser();\n    var token = _user.token;\n    var chatId = '"
+    + escapeExpression(((helper = (helper = helpers.chatId || (depth0 != null ? depth0.chatId : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"chatId","hash":{},"data":data}) : helper)))
+    + "';\n    if (_.isEmpty(chatId)) {\n        window.location(\"#!/chat/index\");\n    }\n    var socket = io();\n    socket.emit(\"join\", {token: token, chatId: chatId});\n    socket.on(\"error\", function (err) {\n        cok_core.error(err);\n    });\n    // add user\n    socket.on('join', function (userId) {\n        console.log(userId)\n        if (! userId) {\n            $location.path(\"/chats\");\n        } else {\n            $scope.$apply(function() {\n                $scope.chatUsers[userId].active = true;\n            });\n        }\n    })\n\n\n    // cok_core.call(\"index.getChatList\", {token: token}, function (result) {\n    //     chatTable = new cok_core.tableRender(\"chatList\", $(\"#chatCase tbody\"), result[0], {}, 10, $('#chatCasePager'));\n    //     chatTable.render();\n    // });\n    // $('#chatCase').on('click', 'th', function () {\n    //     if (chatTable) {\n    //         chatTable.sort($(this));\n    //     }\n});\n</script>\n<form id=\"chatMessage\">\n    <input type=\"text\" name=\"message\" value=\"\">\n    <input type=\"submit\" name=\"submit\" value=\"submit\">\n</form>\n";
+},"useData":true});
+
+
+
 this["chat"]["chatIndex"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  return "<script>\n    require([\"jquery\", \"cok_core\", \"cok_controller\"], function ($, cok_core, cok_controller) {\n        var _user = cok_controller.checkedUser();\n        var token = _user.token;\n        cok_core.call(\"index.getChatList\", {token: token}, function (result) {\n            cok_core.render ($(\"#chatCase\"), \"chatList\", {data: result[0]});\n        });\n        \n        \n        \n        \n        /*var menu = [\n        {\n            title: '<span class=\"glyphicon glyphicon-file\"></span> Add',\n            hash: '#!/',\n        },\n        {\n            title: '<span class=\"glyphicon glyphicon-trash\"></span> Remove',\n            hash: '#!/',\n        },\n        ];\n        \n        cok_core.render ($(\"#secondMenu\"), \"mainMenu\", {data: menu});*/\n    });\n</script>\n<br>\n<div class=\"sub-container\">\n    <a class=\"btn btn-default\" href=\"#!/chat/create\"><span class=\"glyphicon glyphicon-file\"></span> Add</a>\n</div>\n<br>\n<div id=\"chatCase\" class=\"sub-container\"></div>\n";
+  return "<script>\n    require([\"jquery\", \"cok_core\", \"cok_controller\"], function ($, cok_core, cok_controller) {\n        var _user = cok_controller.checkedUser();\n        var token = _user.token;\n        var chatTable;\n        cok_core.call(\"index.getChatList\", {token: token}, function (result) {\n            chatTable = new cok_core.tableRender(\"chatList\", $(\"#chatCase tbody\"), result[0], {}, 10, $('#chatCasePager'));\n            chatTable.render();\n        });\n        $('#chatCase').on('click', 'th', function () {\n            if (chatTable) {\n                chatTable.sort($(this));\n            }\n        });\n    });\n</script>\n<br>\n<div class=\"sub-container\">\n    <a class=\"btn btn-default\" href=\"#!/chat/create\"><span class=\"glyphicon glyphicon-file\"></span> Add</a>\n</div>\n<br>\n<div class=\"sub-container\">\n    <table id=\"chatCase\" class=\"table table-hover\">\n        <thead>\n            <tr>\n                <th data-sort=\"date\">Date</th>\n                <th>Chat</th>\n                <th>Actions</th>\n            </tr>\n        </thead>\n        <tbody></tbody>\n    </table>\n    <div id=\"chatCasePager\"></div>\n</div>\n";
   },"useData":true});
 
 
 
 this["chat"]["chatList"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
-  var stack1, helper, options, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, blockHelperMissing=helpers.blockHelperMissing, buffer = "    <div class=\"row\">\n       <div class=\"col-xs-10\">\n            <strong><a href=\"#!/chat/detail/"
+  var stack1, helper, options, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, blockHelperMissing=helpers.blockHelperMissing, buffer = "<tr>\n    <td>"
+    + escapeExpression(((helper = (helper = helpers.fDate || (depth0 != null ? depth0.fDate : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"fDate","hash":{},"data":data}) : helper)))
+    + "</td>\n    <td>\n        <strong><a href=\"#!/chat/detail/"
     + escapeExpression(((helper = (helper = helpers._id || (depth0 != null ? depth0._id : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"_id","hash":{},"data":data}) : helper)))
     + "\">";
   stack1 = ((helper = (helper = helpers.users || (depth0 != null ? depth0.users : depth0)) != null ? helper : helperMissing),(options={"name":"users","hash":{},"fn":this.program(2, data),"inverse":this.noop,"data":data}),(typeof helper === functionType ? helper.call(depth0, options) : helper));
   if (!helpers.users) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
   if (stack1 != null) { buffer += stack1; }
-  buffer += "</a></strong>\n       </div>\n       <div class=\"col-xs-2\">\n          "
-    + escapeExpression(((helper = (helper = helpers.crPermission || (depth0 != null ? depth0.crPermission : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"crPermission","hash":{},"data":data}) : helper)))
-    + "\n";
+  buffer += "</a></strong>\n    </td>\n    <td>\n";
   stack1 = ((helper = (helper = helpers.crPermission || (depth0 != null ? depth0.crPermission : depth0)) != null ? helper : helperMissing),(options={"name":"crPermission","hash":{},"fn":this.program(4, data),"inverse":this.noop,"data":data}),(typeof helper === functionType ? helper.call(depth0, options) : helper));
   if (!helpers.crPermission) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
   if (stack1 != null) { buffer += stack1; }
-  return buffer + "       </div>\n    </div><br>\n";
+  return buffer + "    </td>\n</tr>\n";
 },"2":function(depth0,helpers,partials,data) {
   var helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
   return escapeExpression(((helper = (helper = helpers.login || (depth0 != null ? depth0.login : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"login","hash":{},"data":data}) : helper)))
@@ -50,7 +59,7 @@ this["chat"]["chatList"] = Handlebars.template({"1":function(depth0,helpers,part
   stack1 = ((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : helperMissing),(options={"name":"data","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data}),(typeof helper === functionType ? helper.call(depth0, options) : helper));
   if (!helpers.data) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
   if (stack1 != null) { buffer += stack1; }
-  return buffer + "\n";
+  return buffer + "<br />\n";
 },"useData":true});
 
 

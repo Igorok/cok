@@ -9,6 +9,7 @@ require.config({
         "handlebars": "handlebars",
         "tpl": "tpl",
         "jsonrpcclient": "jsonrpcclient",
+        "io": "io",
         "bootstrap": "bootstrap",
         "c_core": "c_core"
     },

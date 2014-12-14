@@ -22,7 +22,7 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
     cok_core.prototype.removeUser = function (_user) {
         user = storage.remove('user');
     };
-    
+
     // set vars
     cok_core.prototype.init = function (_routes, cb) {
         if (! routes) {
@@ -30,9 +30,9 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
         }
         getUser();
     };
-    
 
-    
+
+
     // render views
     var render = cok_core.prototype.render = function (selector, view, data) {
         /*var _view = tpl[view](data);
@@ -47,8 +47,8 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
         }
         render(selector, 'systemMessage', {event: event, message: message})
     };
-    
-    
+
+
     // parse hash
     cok_core.prototype.router = function (alias) {
         var curentController;
@@ -73,7 +73,20 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
             routes[curentController][curentAction].apply(this, params);
         }
     };
-    
+
+    // error
+    var selfError = cok_core.prototype.error = function (error) {
+        if ((error == 403) || (error.err == 403)) {
+            return window.location = "#!/logout";
+        } else if (error.err === 404) {
+            return  window.location = "#!/";
+        }
+
+        var msg = error.err ? error.err : error;
+        systemMessage($('#body'), 'danger', msg);
+        console.log("error ", error);
+    };
+
     // ajax request
     cok_core.prototype.call = function () {
         if (arguments.length < 2) {
@@ -90,21 +103,105 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
                 cb(result);
             },
             function(error) {
-                if (error.err === 403) {
-                    window.location = "#!/logout";
-                } else if (error.err === 404) {
-                    window.location = "#!/";
-                }
-
-                var msg = error.err ? error.err : error;
-                systemMessage($('#body'), 'danger', msg);
-                console.log("error ", error);
+                selfError(error);
             }
         );
     };
-    
 
-    
+    cok_core.prototype.tableRender = function (_view, _selector, _data, _option, _rowCount, _pagerSelector) {
+        var selfView = _view;
+        var selfSelector = _selector;
+        var selfData = _data;
+        var selfOption = _option;
+        var selfRowCount = _rowCount ? _rowCount : 10;
+        var selfCurentPage = 1;
+        var selfPagerSelector = _pagerSelector;
+
+        var selfRender = function (cb) {
+            var pageCount = selfData.length / selfRowCount;
+            if (selfData.length % selfRowCount != 0) {
+                pageCount = parseInt(pageCount) + 1;
+            }
+            var startRenderIndex = (selfCurentPage -1) * selfRowCount;
+            if (startRenderIndex > selfData.length) {
+                startRenderIndex = selfData.length - selfRowCount;
+            }
+            var endRenderIndex = selfCurentPage * selfRowCount;
+            if (endRenderIndex > selfData.length) {
+                endRenderIndex = selfData.length;
+            }
+            var renderData = selfData.slice(startRenderIndex, endRenderIndex);
+            var pagerTemplate = '<ul class="pagination">';
+            if (pageCount > 1) {
+                for (var i = 1; i <= pageCount; i++) {
+                    var active = '';
+                    if (i == selfCurentPage) {
+                        active += 'class="active"';
+                    }
+                    pagerTemplate += '<li '+ active +'><a href="#">'+ i +'</a></li>';
+                }
+            }
+            pagerTemplate += '</ul>';
+
+            render(selfSelector, selfView, {data: renderData, option: selfOption});
+
+            if (selfPagerSelector) {
+                selfPagerSelector.html(pagerTemplate);
+            }
+            if (cb) {
+                cb();
+            }
+        }
+        var sort = function (key, asc) {
+            var self = this;
+            selfData = _.sortBy(selfData, key);
+            if (! asc) {
+                selfData.reverse();
+            }
+            selfRender();
+        }
+        // public method
+        this.render = function (cb) {
+            return selfRender(cb);
+        }
+        this.pageChange = function (_pageNum) {
+            if (_pageNum) {
+                selfCurentPage = _pageNum;
+            }
+            return selfRender();
+        }
+        this.sort = function (th) {
+            if (! th.attr('data-sort')) {
+                return false;
+            }
+            var asc = 0;
+            var key = th.attr("data-sort");
+            if (th.hasClass("sorted-desc")) {
+                asc = 1;
+            }
+            th.removeClass("sorted-desc sorted-asc");
+            th.addClass((asc ? "sorted-asc" : "sorted-desc"));
+            sort(key, asc);
+        };
+        this.fixedSort = function (th) {
+            if (! th.attr('data-sort')) {
+                return false;
+            }
+            var asc = 0;
+            var key = th.attr("data-sort");
+            if (th.hasClass("sorted-asc")) {
+                asc = 1;
+            }
+            sort(key, asc)
+        };
+    };
+
+
+
+
+
+
+
     // shared functions
     return new cok_core();
 });

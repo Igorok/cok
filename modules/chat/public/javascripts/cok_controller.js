@@ -23,7 +23,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
             hash: '#!/logout',
         },
     ];
-    
+
 
 
     // check user login
@@ -75,7 +75,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
         $("#mainMenu").animate({'left': '-200px'}, 200).empty();
         window.location = "#!/login";
     };
-    
+
     // loin page
     cok_controller.prototype.login = function () {
         var _user = cok_core.getUser();
@@ -85,14 +85,14 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
             cok_core.render ($("#body"), "loginIndex");
         }
     };
-    
+
     // home page
     cok_controller.prototype.homepage = function () {
         var _user = checkedUser();
         var token = _user.token;
         cok_core.render ($("#body"), "defaultIndex");
     };
-    
+
     // user index page
     cok_controller.prototype.userIndex = function () {
         cok_core.render ($("#body"), "userIndex", {});
@@ -111,13 +111,16 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
             cok_core.render ($("#body"), "userDetail", {data: result[0]});
         });
     };
-    
+
 
     /*
-    * chat index
+    * chat
     */
     cok_controller.prototype.chatIndex = function () {
         cok_core.render ($("#body"), "chatIndex");
+    };
+    cok_controller.prototype.chatDetail = function (_id) {
+        cok_core.render ($("#body"), "chatDetail", {chatId: _id});
     };
     cok_controller.prototype.chatCreate = function () {
         var _user = checkedUser();
@@ -128,5 +131,5 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     };
     menuRender();
     return new cok_controller();
-    
+
 });

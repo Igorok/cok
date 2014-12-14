@@ -43,6 +43,7 @@ exports.getChatList = function (_data, cb) {
                     },
                 ], safe.sure(cb, function () {
                     _.each(result, function (val) {
+                        val.fDate = moment(val.date).format('DD/MM/YYYY HH:mm');
                         _.each(val.users, function (curentUser) {
                             if (userObj[curentUser._id]) {
                                 curentUser.login = userObj[curentUser._id].login;
@@ -75,7 +76,7 @@ exports.addChat = function (_data, cb) {
             _.each(_params.users, function (val) {
                 userArr.push({_id: val.toString()});
             });
-                userArr.push({_id: _user._id});
+            userArr.push({_id: _user._id});
             chatgroups.insert({users: userArr, creator: _user._id, date: Date()}, safe.sure(cb, function () {
                 cb(null, true);
             }));

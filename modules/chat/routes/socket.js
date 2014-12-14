@@ -1,3 +1,39 @@
+var safe = require('safe');
+var _ = require("lodash");
+var async = require('async');
+var moment = require('moment');
+var mongo = require('mongodb');
+var BSON = mongo.BSONPure;
+var dbHelper = require(__dirname + '/../helpers/db_helper.js');
+var userApi = require(__dirname + '/../api/user.js');
+
+
+
+module.exports = function (app, io) {
+    io.on('connection', function (socket) {
+        socket.on('join', function (room) {
+            var emitError = function (err) {
+                console.trace(err);
+                return io.emit('error', err);
+            };
+            var data = {
+                params: []
+            };
+            if (_.isEmpty(room)) {
+                return emitError(403);
+            }
+            data.params.push(room);
+            userApi.checkAuth (data, function (err, _user, _params) {
+                if (err) {
+                    return emitError(err);
+                } else {
+                    console.log('_user ', _user, '_params', _params)
+                }
+            });
+        });
+    });
+};
+/*
 var mongoose = require('mongoose');
 var async = require('async')
 var _ = require('lodash')
@@ -127,3 +163,4 @@ module.exports = function (app, io) {
         });
     });
 };
+*/

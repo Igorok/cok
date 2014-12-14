@@ -1,15 +1,15 @@
 {{#data}}
-    <div class="row">
-       <div class="col-xs-10">
-            <strong><a href="#!/chat/detail/{{_id}}">{{#users}}{{login}}&nbsp;{{/users}}</a></strong>
-       </div>
-       <div class="col-xs-2">
-          {{crPermission}}
-           {{#crPermission}}
+<tr>
+    <td>{{fDate}}</td>
+    <td>
+        <strong><a href="#!/chat/detail/{{_id}}">{{#users}}{{login}}&nbsp;{{/users}}</a></strong>
+    </td>
+    <td>
+        {{#crPermission}}
            <button class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></button>
            <button class="btn btn-default"><span class="glyphicon glyphicon-remove"></span></button>
-           {{/crPermission}}
-       </div>
-    </div><br>
+        {{/crPermission}}
+    </td>
+</tr>
 {{/data}}
-
+<br />
