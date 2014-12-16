@@ -19,7 +19,7 @@ function dbHelper () {
             cfg.mongo.db,
             new mongo.Server(cfg.mongo.host, cfg.mongo.port, cfg.mongo.opts), {native_parser: false, safe:true, maxPoolSize: 100}
         );
-        dbc.open(safe.sure(cb,function(db) {
+        dbc.open(safe.sure(cb, function(db) {
             _db = db;
             cb(null, _db);
         }));
@@ -32,7 +32,7 @@ function dbHelper () {
             });
         }));
     };
-    
+
     if (! _redis) {
         _redis = requireRedis.createClient();
     }

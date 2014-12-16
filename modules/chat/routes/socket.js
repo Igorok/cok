@@ -11,23 +11,48 @@ var userApi = require(__dirname + '/../api/user.js');
 
 module.exports = function (app, io) {
     io.on('connection', function (socket) {
-        socket.on('join', function (room) {
-            var emitError = function (err) {
-                console.trace(err);
-                return io.emit('error', err);
-            };
+        var emitError = function (err) {
+            console.trace(err);
+            socket.emit('err', err);
+        };
+        var cUser;
+        var cGroup;
+
+        socket.on('join', function (_formGroup) {
+            if (_.isEmpty(_formGroup)) {
+                return emitError(404);
+            }
             var data = {
                 params: []
             };
-            if (_.isEmpty(room)) {
-                return emitError(403);
-            }
-            data.params.push(room);
-            userApi.checkAuth (data, function (err, _user, _params) {
+            data.params.push(_formGroup);
+            async.waterfall([
+                function (cb) {
+                    userApi.checkAuth (data, safe.sure(cb, function (_user, _params) {
+                        if (! _user || ! _params) {
+                            return cb(403);
+                        }
+                        cUser = _user;
+                        dbHelper.collection("chatgroups", safe.sure(cb, function  (chatgroups) {
+                            chatgroups.findOne({_id: BSON.ObjectID(_params.chatId), "users._id" : _user._id}, safe.sure(cb, function( _group) {
+                                if (! _group) {
+                                    return cb(403);
+                                }
+                                cGroup = _group;
+                                cb();
+                            }));
+                        }));
+                    }));
+                },
+                function (cb) {
+                    socket.join(cGroup._id, cb);
+                },
+            ], function (err) {
                 if (err) {
                     return emitError(err);
                 } else {
-                    console.log('_user ', _user, '_params', _params)
+                    socket.broadcast.to(cGroup._id).emit('join', {cUser: cUser});
+                    socket.emit('join', {cGroup: cGroup});
                 }
             });
         });

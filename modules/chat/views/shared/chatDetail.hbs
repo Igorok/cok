@@ -8,20 +8,16 @@ require(["jquery", "lodash", "io", "cok_core", "cok_controller"], function ($, _
     }
     var socket = io();
     socket.emit("join", {token: token, chatId: chatId});
-    socket.on("error", function (err) {
+    socket.on("err", function (err) {
         cok_core.error(err);
     });
     // add user
     socket.on('join', function (userId) {
-        console.log(userId)
         if (! userId) {
-            $location.path("/chats");
-        } else {
-            $scope.$apply(function() {
-                $scope.chatUsers[userId].active = true;
-            });
+            window.location("#!/chat/index");
         }
-    })
+        console.log(userId)
+    });
 
 
     // cok_core.call("index.getChatList", {token: token}, function (result) {
