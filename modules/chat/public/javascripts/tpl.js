@@ -23,7 +23,7 @@ this["chat"]["chatDetail"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1
   var helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
   return "<script>\nrequire([\"jquery\", \"lodash\", \"io\", \"cok_core\", \"cok_controller\"], function ($, _, io, cok_core, cok_controller) {\n    var _user = cok_controller.checkedUser();\n    var token = _user.token;\n    var chatId = '"
     + escapeExpression(((helper = (helper = helpers.chatId || (depth0 != null ? depth0.chatId : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"chatId","hash":{},"data":data}) : helper)))
-    + "';\n    if (_.isEmpty(chatId)) {\n        window.location(\"#!/chat/index\");\n    }\n    var socket = io();\n    socket.emit(\"join\", {token: token, chatId: chatId});\n    socket.on(\"err\", function (err) {\n        cok_core.error(err);\n    });\n    // add user\n    socket.on('join', function (userId) {\n        if (! userId) {\n            window.location(\"#!/chat/index\");\n        }\n        console.log(userId)\n    });\n\n\n    // cok_core.call(\"index.getChatList\", {token: token}, function (result) {\n    //     chatTable = new cok_core.tableRender(\"chatList\", $(\"#chatCase tbody\"), result[0], {}, 10, $('#chatCasePager'));\n    //     chatTable.render();\n    // });\n    // $('#chatCase').on('click', 'th', function () {\n    //     if (chatTable) {\n    //         chatTable.sort($(this));\n    //     }\n});\n</script>\n<form id=\"chatMessage\">\n    <input type=\"text\" name=\"message\" value=\"\">\n    <input type=\"submit\" name=\"submit\" value=\"submit\">\n</form>\n";
+    + "';\n    var chatItems = [];\n    if (_.isEmpty(chatId)) {\n        window.location(\"#!/chat/index\");\n    }\n    var socket = new io();\n    console.log('socket', socket);\n    socket.emit(\"join\", {token: token, chatId: chatId});\n    socket.on(\"err\", function (err) {\n        cok_core.error(err);\n    });\n    // add user\n    socket.on('join', function (userId) {\n        if (! userId) {\n            window.location(\"#!/chat/index\");\n        }\n        console.log('join');\n    });\n\n    // message\n    socket.on('message', function (msg) {\n        console.log('msg');\n        chatItems.push(msg);\n        chatTable = new cok_core.tableRender(\"chatItem\", $(\"#chatItems tbody\"), chatItems, {}, chatItems.length);\n        chatTable.render();\n    });\n\n    $('#chatMessage').submit(function () {\n        console.log('click ', chatId)\n        var chatText = $('#chatText').val();\n        if (! _.isEmpty(chatText)) {\n            var formData = {\n                token: token,\n                chatId: chatId,\n                chatText: chatText,\n            };\n            socket.emit('message', formData);\n        }\n        return false;\n    });\n});\n</script>\n<div id=\"chatCase\" class=\"sub-container\">\n    <div id=\"chatItems\">\n        <table class=\"table\"><tbody></tbody></table>\n    </div>\n    <form id=\"chatMessage\">\n        <input id=\"chatText\" type=\"text\" name=\"message\" value=\"\" required />\n        <button id=\"chatSubmit\" type=\"submit\" class=\"btn btn-default\"><span class=\"glyphicon glyphicon-send\"></span></button>\n    </form>\n</div>\n";
 },"useData":true});
 
 
@@ -31,6 +31,25 @@ this["chat"]["chatDetail"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1
 this["chat"]["chatIndex"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
   return "<script>\n    require([\"jquery\", \"cok_core\", \"cok_controller\"], function ($, cok_core, cok_controller) {\n        var _user = cok_controller.checkedUser();\n        var token = _user.token;\n        var chatTable;\n        cok_core.call(\"index.getChatList\", {token: token}, function (result) {\n            chatTable = new cok_core.tableRender(\"chatList\", $(\"#chatCase tbody\"), result[0], {}, 10, $('#chatCasePager'));\n            chatTable.render();\n        });\n        $('#chatCase').on('click', 'th', function () {\n            if (chatTable) {\n                chatTable.sort($(this));\n            }\n        });\n    });\n</script>\n<br>\n<div class=\"sub-container\">\n    <a class=\"btn btn-default\" href=\"#!/chat/create\"><span class=\"glyphicon glyphicon-file\"></span> Add</a>\n</div>\n<br>\n<div class=\"sub-container\">\n    <table id=\"chatCase\" class=\"table table-hover\">\n        <thead>\n            <tr>\n                <th data-sort=\"date\">Date</th>\n                <th>Chat</th>\n                <th>Actions</th>\n            </tr>\n        </thead>\n        <tbody></tbody>\n    </table>\n    <div id=\"chatCasePager\"></div>\n</div>\n";
   },"useData":true});
+
+
+
+this["chat"]["chatItem"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+  var helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
+  return "<tr>\n    <td>"
+    + escapeExpression(((helper = (helper = helpers.login || (depth0 != null ? depth0.login : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"login","hash":{},"data":data}) : helper)))
+    + "</td>\n    <td>"
+    + escapeExpression(((helper = (helper = helpers.chatText || (depth0 != null ? depth0.chatText : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"chatText","hash":{},"data":data}) : helper)))
+    + "</td>\n    <td>"
+    + escapeExpression(((helper = (helper = helpers.date || (depth0 != null ? depth0.date : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"date","hash":{},"data":data}) : helper)))
+    + "</td>\n</tr>\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+  var stack1, helper, options, functionType="function", helperMissing=helpers.helperMissing, blockHelperMissing=helpers.blockHelperMissing, buffer = "";
+  stack1 = ((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : helperMissing),(options={"name":"data","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data}),(typeof helper === functionType ? helper.call(depth0, options) : helper));
+  if (!helpers.data) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
+  if (stack1 != null) { buffer += stack1; }
+  return buffer;
+},"useData":true});
 
 
 
@@ -71,7 +90,7 @@ this["chat"]["defaultIndex"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta
 
 
 this["chat"]["friendsIndex"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  return "<script>\nrequire ([\"jquery\", \"lodash\", \"cok_core\", \"cok_controller\"], function ($, _, cok_core, cok_controller) {\n    $(function () {\n        var _user = cok_controller.checkedUser();\n        var token = _user.token;\n\n        var renderFriends = function () {\n            cok_core.call(\"user.getFriendList\", {token: token}, function (result) {\n                cok_core.render ($(\"#friendsCase\"), \"userList\", {data: result[0]});\n            });\n        };\n\n\n\n        renderFriends();\n        $('#friendsCase').on('click', '.delFriendBtn', function () {\n            var btn = $(this);\n            var _id = btn.attr('data-id');\n            console.log('click friend')\n            cok_core.call(\"user.deleteFriend\", {token: token, _id: _id}, function (result) {\n                renderFriends();\n            });\n        });\n    });\n});\n</script>\nasd\n<div id=\"friendsCase\" class=\"sub-container\"></div>\n";
+  return "<script>\nrequire ([\"jquery\", \"lodash\", \"cok_core\", \"cok_controller\"], function ($, _, cok_core, cok_controller) {\n    $(function () {\n        var _user = cok_controller.checkedUser();\n        var token = _user.token;\n\n        var renderFriends = function () {\n            cok_core.call(\"user.getFriendList\", {token: token}, function (result) {\n                cok_core.render ($(\"#friendsCase\"), \"userList\", {data: result[0]});\n            });\n        };\n\n\n\n        renderFriends();\n        $('#friendsCase').on('click', '.delFriendBtn', function () {\n            var btn = $(this);\n            var _id = btn.attr('data-id');\n            console.log('click friend')\n            cok_core.call(\"user.deleteFriend\", {token: token, _id: _id}, function (result) {\n                renderFriends();\n            });\n        });\n    });\n});\n</script>\n<div id=\"friendsCase\" class=\"sub-container\"></div>\n";
   },"useData":true});
 
 

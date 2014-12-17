@@ -3,10 +3,12 @@ require(["jquery", "lodash", "io", "cok_core", "cok_controller"], function ($, _
     var _user = cok_controller.checkedUser();
     var token = _user.token;
     var chatId = '{{chatId}}';
+    var chatItems = [];
     if (_.isEmpty(chatId)) {
         window.location("#!/chat/index");
     }
-    var socket = io();
+    var socket = new io();
+    console.log('socket', socket);
     socket.emit("join", {token: token, chatId: chatId});
     socket.on("err", function (err) {
         cok_core.error(err);
@@ -16,21 +18,38 @@ require(["jquery", "lodash", "io", "cok_core", "cok_controller"], function ($, _
         if (! userId) {
             window.location("#!/chat/index");
         }
-        console.log(userId)
+        console.log('join');
     });
 
+    // message
+    socket.on('message', function (msg) {
+        console.log('msg');
+        chatItems.push(msg);
+        chatTable = new cok_core.tableRender("chatItem", $("#chatItems tbody"), chatItems, {}, chatItems.length);
+        chatTable.render();
+    });
 
-    // cok_core.call("index.getChatList", {token: token}, function (result) {
-    //     chatTable = new cok_core.tableRender("chatList", $("#chatCase tbody"), result[0], {}, 10, $('#chatCasePager'));
-    //     chatTable.render();
-    // });
-    // $('#chatCase').on('click', 'th', function () {
-    //     if (chatTable) {
-    //         chatTable.sort($(this));
-    //     }
+    $('#chatMessage').submit(function () {
+        console.log('click ', chatId)
+        var chatText = $('#chatText').val();
+        if (! _.isEmpty(chatText)) {
+            var formData = {
+                token: token,
+                chatId: chatId,
+                chatText: chatText,
+            };
+            socket.emit('message', formData);
+        }
+        return false;
+    });
 });
 </script>
-<form id="chatMessage">
-    <input type="text" name="message" value="">
-    <input type="submit" name="submit" value="submit">
-</form>
+<div id="chatCase" class="sub-container">
+    <div id="chatItems">
+        <table class="table"><tbody></tbody></table>
+    </div>
+    <form id="chatMessage">
+        <input id="chatText" type="text" name="message" value="" required />
+        <button id="chatSubmit" type="submit" class="btn btn-default"><span class="glyphicon glyphicon-send"></span></button>
+    </form>
+</div>
