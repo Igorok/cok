@@ -7,23 +7,31 @@ require(["jquery", "lodash", "io", "cok_core", "cok_controller"], function ($, _
     if (_.isEmpty(chatId)) {
         window.location("#!/chat/index");
     }
-    var socket = new io();
-    console.log('socket', socket);
-    socket.emit("join", {token: token, chatId: chatId});
-    socket.on("err", function (err) {
+    // var socket = io('//localhost:3000', { forceNew: true });
+    if (window.socket) {
+        window.socket.destroy()
+    }
+    window.socket = new io('//localhost:3000', { forceNew: true });
+
+    window.socket.connect();
+    window.socket.emit("join", {token: token, chatId: chatId});
+
+
+    window.socket.on("err", function (err) {
         cok_core.error(err);
     });
     // add user
-    socket.on('join', function (userId) {
+    window.socket.on('join', function (userId) {
         if (! userId) {
             window.location("#!/chat/index");
         }
-        console.log('join');
+        var tm = Date.now();
+        console.log('join ', tm);
     });
 
     // message
-    socket.on('message', function (msg) {
-        console.log('msg');
+    window.socket.on('message', function (msg) {
+        console.log('msg', msg);
         chatItems.push(msg);
         chatTable = new cok_core.tableRender("chatItem", $("#chatItems tbody"), chatItems, {}, chatItems.length);
         chatTable.render();
@@ -38,7 +46,7 @@ require(["jquery", "lodash", "io", "cok_core", "cok_controller"], function ($, _
                 chatId: chatId,
                 chatText: chatText,
             };
-            socket.emit('message', formData);
+            window.socket.emit('message', formData);
         }
         return false;
     });
