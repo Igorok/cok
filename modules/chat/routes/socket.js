@@ -10,7 +10,6 @@ var userApi = require(__dirname + '/../api/user.js');
 
 module.exports = function (app, io) {
     io.on('connection', function (socket) {
-        console.log('connection')
         var emitError = function (err) {
             console.trace(err);
             socket.emit('err', err);
@@ -24,8 +23,6 @@ module.exports = function (app, io) {
         * join chat group
         */
         socket.on('join', function (_formGroup) {
-            socket.leaveAll();
-            console.log('join')
             if (_.isEmpty(_formGroup)) {
                 return emitError(404);
             }
@@ -33,8 +30,9 @@ module.exports = function (app, io) {
                 params: []
             };
             data.params.push(_formGroup);
+            var cHistory;
             async.waterfall([
-                function (cb) {
+                function getAuth (cb) {
                     userApi.checkAuth (data, safe.sure(cb, function (_user, _params) {
                         if (! _user || ! _params || ! _params.chatId) {
                             return cb(403);
@@ -44,7 +42,7 @@ module.exports = function (app, io) {
                         cb();
                     }));
                 },
-                function (cb) {
+                function getGroup (cb) {
                     dbHelper.collection("chatgroups", safe.sure(cb, function  (chatgroups) {
                         chatgroups.findOne({_id: BSON.ObjectID(chatId), "users._id" : cUser._id}, safe.sure(cb, function( _group) {
                             if (! _group) {
@@ -55,10 +53,23 @@ module.exports = function (app, io) {
                         }));
                     }));
                 },
-                function (cb) {
+                function getHistory (cb) {
+                    dbHelper.collection("chatmessages", safe.sure(cb, function  (chatmessages) {
+                        chatmessages.find({chatId: chatId}, {userId: 1, chatText: 1, date: 1}, {sort: {date: 1}, limit: 100}).toArray(safe.sure(cb, function(_history) {
+                            cHistory = _history;
+                            cb();
+                        }));
+                    }));
+                },
+                function getUsers (cb) {
                     var userIds = [];
                     _.each(cGroup.users, function (usr) {
                         userIds.push(BSON.ObjectID(usr._id));
+                    });
+                    _.each(cHistory, function (cH) {
+                        if (! _.contains(userIds, BSON.ObjectID(cH.userId))) {
+                            userIds.push(BSON.ObjectID(cH.userId));
+                        }
                     });
 
                     dbHelper.collection("users", safe.sure(cb, function  (users) {
@@ -76,6 +87,12 @@ module.exports = function (app, io) {
                                     usr.login = uObj[usr._id].login;
                                     usr.email = uObj[usr._id].email;
                                 });
+
+                                _.each(cHistory, function (cH) {
+                                    cH.login = uObj[cH.userId].login;
+                                    cH.email = uObj[cH.userId].email;
+                                    cH.fDate = moment(cH.date).format('DD/MM/YYYY HH:mm');
+                                });
                             }
                             socket.leaveAll();
                             cb();
@@ -90,7 +107,7 @@ module.exports = function (app, io) {
                     return emitError(err);
                 } else {
                     socket.broadcast.to(chatId).emit('join', {cUser: cUser, cGroup: cGroup});
-                    socket.emit('join', {cUser: cUser, cGroup: cGroup});
+                    socket.emit('join', {cUser: cUser, cGroup: cGroup, cHistory: cHistory});
                 }
             });
         });
@@ -99,7 +116,6 @@ module.exports = function (app, io) {
         * message
         */
         socket.on('message', function (_msg) {
-
             var msg;
             if (_.isEmpty(_msg) || _.isEmpty(_msg.chatText) || _.isEmpty(_msg.chatId)) {
                 return emitError(404);
@@ -134,7 +150,7 @@ module.exports = function (app, io) {
                             userId: cUser._id,
                             chatId: chatId,
                             chatText : msg.chatText.toString(),
-                            date: Date()
+                            date: new Date()
                         }, cb);
                     }));
                 },
@@ -147,39 +163,20 @@ module.exports = function (app, io) {
                         login: cUser.login,
                         chatId: chatId,
                         chatText : msg.chatText.toString(),
-                        date: Date()
+                        date: Date(),
+                        fDate: moment().format('DD/MM/YYYY HH:mm')
                     });
                     socket.emit('message', {
                         userId: cUser._id,
                         login: cUser.login,
                         chatId: chatId,
                         chatText : msg.chatText.toString(),
-                        date: Date()
+                        date: Date(),
+                        fDate: moment().format('DD/MM/YYYY HH:mm')
                     });
                 }
             });
         });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         // leave room
         socket.on('disconnect', function(){

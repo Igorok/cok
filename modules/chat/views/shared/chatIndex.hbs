@@ -3,20 +3,34 @@
         var _user = cok_controller.checkedUser();
         var token = _user.token;
         var chatTable;
-        cok_core.call("index.getChatList", {token: token}, function (result) {
-            chatTable = new cok_core.tableRender("chatList", $("#chatCase tbody"), result[0], {}, 10, $('#chatCasePager'));
-            chatTable.render();
-        });
+        var chatRender = function () {
+            cok_core.call("index.getChatList", {token: token}, function (result) {
+                chatTable = new cok_core.tableRender("chatList", $("#chatCase tbody"), result[0], {}, 10, $('#chatCasePager'));
+                chatTable.render();
+            });
+        }
+
+        chatRender();
         $('#chatCase').on('click', 'th', function () {
             if (chatTable) {
                 chatTable.sort($(this));
             }
         });
+        $('#chatCase').on('click', '.cRemove', function () {
+            var _id = $(this).attr('data-id');
+            cok_core.call("index.removeChat", {token: token, _id: _id}, function (result) {
+                if (result) {
+                    cok_core.systemMessage($('#messageCase'), 'success', 'Chat successfully removed');
+                    chatRender();
+                }
+            });
+        });
     });
 </script>
 <br>
+<div id="messageCase"></div>
 <div class="sub-container">
-    <a class="btn btn-default" href="#!/chat/create"><span class="glyphicon glyphicon-file"></span> Add</a>
+    <a class="btn btn-primary" href="#!/chat/create"><span class="glyphicon glyphicon-file"></span> Add</a>
 </div>
 <br>
 <div class="sub-container">

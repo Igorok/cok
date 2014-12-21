@@ -17,9 +17,11 @@
             var showSecondMenu = function () {
                 if (! secondMenu) {
                     secondMenu = true;
+                     $('#body').animate({'padding-right': '200px'}, 200);
                     $('#secondMenu').animate({'right': '0px'}, 200);
                 } else {
                     secondMenu = false;
+                     $('#body').animate({'padding-right': '0'}, 200);
                     $('#secondMenu').animate({'right': '-200px'}, 200);
                 }
             };

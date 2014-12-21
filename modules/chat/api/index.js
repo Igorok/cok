@@ -77,8 +77,39 @@ exports.addChat = function (_data, cb) {
                 userArr.push({_id: val.toString()});
             });
             userArr.push({_id: _user._id});
-            chatgroups.insert({users: userArr, creator: _user._id, date: Date()}, safe.sure(cb, function () {
+            chatgroups.insert({users: userArr, creator: _user._id, date: new Date()}, safe.sure(cb, function () {
                 cb(null, true);
+            }));
+        }));
+    }));
+};
+
+/**
+* remove chat group
+*/
+exports.removeChat = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
+            return cb('Wrong data');
+        }
+        var _id = _params._id.toString();
+        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+            dbHelper.collection("chatmessages", safe.sure(cb, function (chatmessages) {
+                chatgroups.findOne({_id: BSON.ObjectID(_id)}, safe.sure(cb, function (_group) {
+                    if (_group.creator != _user._id) {
+                        return cb(403);
+                    }
+                    async.parallel([
+                        function (cb) {
+                            chatmessages.remove({chatId: _id}, cb)
+                        },
+                        function (cb) {
+                            chatgroups.remove({_id: BSON.ObjectID(_id)}, cb)
+                        },
+                    ], safe.sure(cb, function() {
+                        cb(null, true)
+                    }));
+                }));
             }));
         }));
     }));
