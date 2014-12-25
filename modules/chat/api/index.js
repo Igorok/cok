@@ -68,15 +68,17 @@ exports.getChatList = function (_data, cb) {
 */
 exports.addChat = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        if (_.isEmpty(_params) || _.isEmpty(_params.users)) {
+        if (_.isEmpty(_params) || _.isEmpty(_params.users) || ! _.isArray(_params.users)) {
             return cb('Wrong data');
         }
         dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
             var userArr = [];
+            if (! _.contains(_params.users, _user._id)) {
+                userArr.push({_id: _user._id});
+            }
             _.each(_params.users, function (val) {
                 userArr.push({_id: val.toString()});
             });
-            userArr.push({_id: _user._id});
             chatgroups.insert({users: userArr, creator: _user._id, date: new Date()}, safe.sure(cb, function () {
                 cb(null, true);
             }));
@@ -84,6 +86,112 @@ exports.addChat = function (_data, cb) {
     }));
 };
 
+
+/**
+* edit chat group
+*/
+exports.editChat = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isEmpty(_params) || _.isEmpty(_params._id) || _.isEmpty(_params.users) || ! _.isArray(_params.users)) {
+            return cb('Wrong data');
+        }
+        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+            var _id = _params._id.toString();
+            var userArr = [];
+            if (! _.contains(_params.users, _user._id)) {
+                userArr.push({_id: _user._id});
+            }
+            _.each(_params.users, function (val) {
+                userArr.push({_id: val.toString()});
+            });
+            var cGroup;
+            async.waterfall([
+                function (cb) {
+                    chatgroups.findOne({_id: BSON.ObjectID(_id), creator: _user._id}, safe.sure(cb, function (_cGroup) {
+                        if (_.isEmpty(_cGroup)) {
+                            return cb(403);
+                        } else {
+                            cGroup = _cGroup;
+                            cb();
+                        }
+                    }));
+                },
+                function (cb) {
+                    chatgroups.update({_id: BSON.ObjectID(_id)}, {$set: {users: userArr}}, safe.sure(cb, function () {
+                        cb();
+                    }));
+                }
+            ], safe.sure(cb, function () {
+                cb(null, true);
+            }));
+        }));
+    }));
+};
+
+/**
+* get edit chat
+*/
+exports.getEditChat = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
+            return cb('Wrong data');
+        }
+        var cUser = _user;
+        var _id = _params._id.toString();
+        var cGroup;
+        var friendIds = [];
+        var groupUsrIds = [];
+        var usrIds = [];
+        var usrArr = [];
+        if (cUser.friends && (cUser.friends.length > 0)) {
+            friendIds = _.pluck(cUser.friends, "_id");
+        }
+        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+        dbHelper.collection("users", safe.sure(cb, function (users) {
+            async.waterfall([
+                function (cb) {
+                    chatgroups.findOne({_id: BSON.ObjectID(_id), creator: cUser._id}, safe.sure(cb, function (_cGroup) {
+                        if (_.isEmpty(_cGroup)) {
+                            return cb(403);
+                        } else {
+                            cGroup = _cGroup;
+                            groupUsrIds = _.pluck(cGroup.users, "_id");
+                            usrIds = _.union(friendIds, groupUsrIds);
+                            cb();
+                        }
+                    }));
+                },
+                function (cb) {
+                    if (! _.isEmpty(usrIds)) {
+                        var usrObjIds = [];
+                        _.each(usrIds, function (val) {
+                            if (val != cUser._id) {
+                                usrObjIds.push(BSON.ObjectID(val));
+                            }
+                        });
+                        users.find({_id: {$in : usrObjIds}}, {login: 1}).toArray(safe.sure(cb, function (_uArr) {
+                            if (! _.isEmpty(_uArr)) {
+                                _.each(_uArr, function (val) {
+                                    if (_.contains(groupUsrIds, val._id.toHexString())) {
+                                        val.checked = true;
+                                    }
+                                    usrArr.push(val);
+                                });
+                                cGroup.usrArr = usrArr;
+                            }
+                            cb();
+                        }));
+                    } else {
+                        cb();
+                    }
+                },
+            ], safe.sure(cb, function () {
+                cb(null, cGroup);
+            }));
+        }));
+        }));
+    }));
+};
 /**
 * remove chat group
 */

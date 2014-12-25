@@ -28,8 +28,31 @@ this["chat"]["chatDetail"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1
 
 
 
+this["chat"]["chatEdit"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+  var stack1, helper, options, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, blockHelperMissing=helpers.blockHelperMissing, buffer = "        <div class=\"col-xs-4\">\n            <div class=\"checkbox\">\n                <label>\n                    <input type=\"checkbox\" name=\""
+    + escapeExpression(((helper = (helper = helpers._id || (depth0 != null ? depth0._id : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"_id","hash":{},"data":data}) : helper)))
+    + "\" ";
+  stack1 = ((helper = (helper = helpers.checked || (depth0 != null ? depth0.checked : depth0)) != null ? helper : helperMissing),(options={"name":"checked","hash":{},"fn":this.program(2, data),"inverse":this.noop,"data":data}),(typeof helper === functionType ? helper.call(depth0, options) : helper));
+  if (!helpers.checked) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "> "
+    + escapeExpression(((helper = (helper = helpers.login || (depth0 != null ? depth0.login : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"login","hash":{},"data":data}) : helper)))
+    + "\n                </label>\n            </div>\n        </div>\n";
+},"2":function(depth0,helpers,partials,data) {
+  return "checked";
+  },"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+  var stack1, lambda=this.lambda, escapeExpression=this.escapeExpression, blockHelperMissing=helpers.blockHelperMissing, buffer = "<script>\n    require([\"jquery\", \"lodash\", \"cok_core\", \"cok_controller\"], function ($, _, cok_core, cok_controller) {\n        var _user = cok_controller.checkedUser();\n        var token = _user.token;\n        var _id = \""
+    + escapeExpression(lambda(((stack1 = (depth0 != null ? depth0.data : depth0)) != null ? stack1._id : stack1), depth0))
+    + "\";\n        $('#chatCreateForm').submit(function () {\n            var formData = $(this).serializeArray();\n            var users = [];\n            if (! _.isEmpty(formData)) {\n                _.each(formData, function (val) {\n                    users.push(val.name);\n                });\n                cok_core.call(\"index.editChat\", {token: token, users: users, _id: _id}, function (result) {\n                    window.location = \"#!/chat/index\";\n                });\n            } else {\n                cok_core.systemMessage($('#messageCase'), 'danger', 'Users is empty')\n            }\n            return false;\n        });\n    });\n</script>\n<br>\n<div id=\"chatCase\" class=\"sub-container\">\n    <div id=\"messageCase\"></div>\n    <form role=\"form\" id=\"chatCreateForm\">\n       <div class=\"row\">\n";
+  stack1 = blockHelperMissing.call(depth0, lambda(((stack1 = (depth0 != null ? depth0.data : depth0)) != null ? stack1.usrArr : stack1), depth0), {"name":"data.usrArr","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data});
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "        </div>\n        <button type=\"submit\" class=\"btn btn-primary\"><span class=\"glyphicon glyphicon-floppy-disk\"></span> Save</button>\n    </form>\n</div>\n";
+},"useData":true});
+
+
+
 this["chat"]["chatIndex"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  return "<script>\n    require([\"jquery\", \"cok_core\", \"cok_controller\"], function ($, cok_core, cok_controller) {\n        var _user = cok_controller.checkedUser();\n        var token = _user.token;\n        var chatTable;\n        var chatRender = function () {\n            cok_core.call(\"index.getChatList\", {token: token}, function (result) {\n                chatTable = new cok_core.tableRender(\"chatList\", $(\"#chatCase tbody\"), result[0], {}, 10, $('#chatCasePager'));\n                chatTable.render();\n            });\n        }\n        \n        chatRender();\n        $('#chatCase').on('click', 'th', function () {\n            if (chatTable) {\n                chatTable.sort($(this));\n            }\n        });\n        $('#chatCase').on('click', '.cRemove', function () {\n            var _id = $(this).attr('data-id');\n            cok_core.call(\"index.removeChat\", {token: token, _id: _id}, function (result) {\n                if (result) {\n                    cok_core.systemMessage($('#messageCase'), 'success', 'Chat successfully removed');\n                    chatRender();\n                }\n            });\n        });\n    });\n</script>\n<br>\n<div id=\"messageCase\"></div>\n<div class=\"sub-container\">\n    <a class=\"btn btn-primary\" href=\"#!/chat/create\"><span class=\"glyphicon glyphicon-file\"></span> Add</a>\n</div>\n<br>\n<div class=\"sub-container\">\n    <table id=\"chatCase\" class=\"table table-hover\">\n        <thead>\n            <tr>\n                <th data-sort=\"date\">Date</th>\n                <th>Chat</th>\n                <th>Actions</th>\n            </tr>\n        </thead>\n        <tbody></tbody>\n    </table>\n    <div id=\"chatCasePager\"></div>\n</div>\n";
+  return "<script>\n    require([\"jquery\", \"cok_core\", \"cok_controller\"], function ($, cok_core, cok_controller) {\n        var _user = cok_controller.checkedUser();\n        var token = _user.token;\n        var chatTable;\n        var chatRender = function () {\n            cok_core.call(\"index.getChatList\", {token: token}, function (result) {\n                chatTable = new cok_core.tableRender(\"chatList\", $(\"#chatCase tbody\"), result[0], {}, 10, $('#chatCasePager'));\n                chatTable.render();\n            });\n        }\n\n        chatRender();\n        $('#chatCase').on('click', 'th', function () {\n            if (chatTable) {\n                chatTable.sort($(this));\n            }\n        });\n        $('#chatCase').on('click', '.cRemove', function () {\n            var _id = $(this).attr('data-id');\n            cok_core.call(\"index.removeChat\", {token: token, _id: _id}, function (result) {\n                if (result) {\n                    cok_core.systemMessage($('#messageCase'), 'success', 'Chat successfully removed');\n                    chatRender();\n                }\n            });\n        });\n    });\n</script>\n<br>\n<div id=\"messageCase\"></div>\n<div class=\"sub-container\">\n    <a class=\"btn btn-primary\" href=\"#!/chat/create\"><span class=\"glyphicon glyphicon-file\"></span> Add</a>\n</div>\n<br>\n<div class=\"sub-container\">\n    <table id=\"chatCase\" class=\"table table-hover\">\n        <thead>\n            <tr>\n                <th data-sort=\"date\">Date</th>\n                <th>Chat</th>\n                <th>Actions</th>\n            </tr>\n        </thead>\n        <tbody></tbody>\n    </table>\n    <div id=\"chatCasePager\"></div>\n</div>\n";
   },"useData":true});
 
 
@@ -73,7 +96,9 @@ this["chat"]["chatList"] = Handlebars.template({"1":function(depth0,helpers,part
     + "&nbsp;";
 },"4":function(depth0,helpers,partials,data) {
   var helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
-  return "           <button class=\"btn btn-primary\"><span class=\"glyphicon glyphicon-edit\"></span></button>\n           <button class=\"btn btn-danger cRemove\" data-id=\""
+  return "           <a href=\"#!/chat/edit/"
+    + escapeExpression(((helper = (helper = helpers._id || (depth0 != null ? depth0._id : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"_id","hash":{},"data":data}) : helper)))
+    + "\" class=\"btn btn-primary\"><span class=\"glyphicon glyphicon-edit\"></span></a>\n           <button class=\"btn btn-danger cRemove\" data-id=\""
     + escapeExpression(((helper = (helper = helpers._id || (depth0 != null ? depth0._id : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"_id","hash":{},"data":data}) : helper)))
     + "\"><span class=\"glyphicon glyphicon-remove\"></span></button>\n";
 },"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
