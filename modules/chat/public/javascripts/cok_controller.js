@@ -50,7 +50,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     // authorise
     cok_controller.prototype.authorise = function (data) {
         cok_core.call ("user.Authorise", data, function (result) {
-            if (_.isUndefined(result) || _.isUndefined(result)) {
+            if (_.isUndefined(result) || _.isEmpty(result)) {
                 return false;
             } else {
                 cok_core.setUser(result[0], function () {
@@ -73,6 +73,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
         cok_core.removeUser();
         $("#navPanel").hide();
         $("#mainMenu").animate({'left': '-200px'}, 200).empty();
+        $("#body").animate({'padding': '0'}, 200);
         window.location = "#!/login";
     };
 
@@ -85,6 +86,23 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
             cok_core.render ($("#body"), "loginIndex");
         }
     };
+    // loin page
+    cok_controller.prototype.registrationRender = function () {
+        var _user = cok_core.getUser();
+        if (! _.isEmpty(_user)) {
+            window.location = "#!/";
+        } else {
+            cok_core.render ($("#body"), "loginRegistration");
+        }
+    };
+    // registration
+    cok_controller.prototype.registration = function () {
+        cok_core.call ("user.Registration", data, function (result) {
+            window.location = "#!/login";
+        });
+    };
+
+
 
     // home page
     cok_controller.prototype.homepage = function () {

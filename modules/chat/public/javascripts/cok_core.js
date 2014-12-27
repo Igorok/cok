@@ -42,8 +42,12 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
     var systemMessage = cok_core.prototype.systemMessage = function (selector, event, message) {
         if (! selector.length) {
             selector = $('#body');
+        } else {
+            selector.find('.alert').remove();
         }
-        render(selector, 'systemMessage', {event: event, message: message})
+        // alert
+        var _view = tpl['systemMessage']({event: event, message: message});
+        selector.prepend(_view);
     };
 
 

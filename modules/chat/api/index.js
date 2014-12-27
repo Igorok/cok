@@ -222,3 +222,21 @@ exports.removeChat = function (_data, cb) {
         }));
     }));
 };
+
+
+/**
+* remove chat group
+*/
+exports.leaveChat = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
+            return cb('Wrong data');
+        }
+        var _id = _params._id.toString();
+        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+            chatgroups.update({_id: BSON.ObjectID(_id), "users._id": _user._id}, {$pull: { users: {_id: _user._id}}}, {multi: true}, safe.sure(cb, function (_result) {
+                cb(null, true);
+            }));
+        }));
+    }));
+};

@@ -4,6 +4,18 @@ require(["jquery", "lodash", "io", "cok_core", "cok_controller"], function ($, _
     var token = _user.token;
     var chatId = '{{chatId}}';
     var chatItems = [];
+
+    var resizeHistory = function () {
+        var wHeight = $(window).height();
+        $('#chatFixedItems').height(wHeight - 95);
+        console.log(wHeight)
+
+    };
+    resizeHistory();
+    window.onresize = function() {
+        resizeHistory();
+    };
+    // chatFixedItems
     if (_.isEmpty(chatId)) {
         window.location("#!/chat/index");
     }

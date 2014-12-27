@@ -87,17 +87,30 @@ exports.logout = function (_data, cb) {
 */
 exports.getUserList = function (_data, cb) {
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        var uArr;
+        var cUser;
         var friendIds = [];
-        if (_user.friends && (_user.friends.length > 0)) {
-            friendIds = _.pluck(_user.friends, "_id");
-        }
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.find({_id: {$ne: new BSON.ObjectID(_user._id)}}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (uArr) {
-                _.each(uArr, function (val) {
-                    if (_.contains(friendIds, val._id.toHexString())) {
-                        val.friend = true;
-                    }
-                });
+            async.waterfall([
+                function (cb) {
+                    users.findOne({_id: BSON.ObjectID(_user._id)}, safe.sure(cb, function (_cUser) {
+                        cUser = _cUser;
+                        friendIds = _.pluck(cUser.friends, "_id");
+                        cb();
+                    }));
+                },
+                function (cb) {
+                    users.find({_id: {$ne: BSON.ObjectID(_user._id)}}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (_uArr) {
+                        uArr = _uArr;
+                        _.each(uArr, function (val) {
+                            if (_.contains(friendIds, val._id.toHexString())) {
+                                val.friend = true;
+                            }
+                        });
+                        cb();
+                    }));
+                },
+            ], safe.sure(cb, function () {
                 cb(null, uArr);
             }));
         }));
@@ -130,29 +143,33 @@ exports.addFriend = function (_data, cb) {
         if (_.isEmpty(_params._id)) {
             return cb ("Wrong form data");
         }
-        var token = _params.token;
         var _id = _params._id.toString();
-        var uFriends;
-        if (_user.friends && (_user.friends.length > 0)) {
-            uFriends = _.pluck(_user.friends, "_id");
-        } else {
-            uFriends = [];
-        }
-        if (_.contains(uFriends, _id)) {
-            return cb ("Friend already exists");
-        }
+        var usersIds = [_id, _user._id];
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.update({_id: new BSON.ObjectID(_user._id)},
-                {$push: {
-                    friends: {_id: _id}
-                }},
-                safe.sure(cb, function () {
-                    if (! _user.friends) {
-                        _user.friends = [];
+            async.each(usersIds, function (uId, cb) {
+                var cUser;
+                users.findOne({_id: BSON.ObjectID(uId)}, safe.sure(cb, function (_cUser) {
+                    if (_.isEmpty(_cUser)) {
+                        return cb(404);
+                    } else {
+                        cUser = _cUser;
+                        var cloneId = _.clone(usersIds);
+                        _.remove(cloneId, function(val) {
+                            return val == uId;
+                        });
+                        cloneId = cloneId[0];
+                        var fIds = _.pluck(cUser.friends, "_id");
+                        if (_.contains(fIds, cloneId)) {
+                            cb();
+                        } else {
+                            users.update({_id: cUser._id}, {$push: {friends: {_id: cloneId}}}, safe.sure(cb, function () {
+                                cb();
+                            }));
+                        }
                     }
-                    _user.friends.push({_id: _id});
-                    _user = JSON.stringify(_user);
-                dbHelper.redis.set(token, _user, cb);
+                }));
+            }, safe.sure(cb, function () {
+                cb(null, true);
             }));
         }));
     }));
@@ -164,26 +181,36 @@ exports.addFriend = function (_data, cb) {
 */
 exports.deleteFriend = function (_data, cb) {
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        if (_.isEmpty(_params._id) || ! _user.friends) {
-            return cb ("Already deleted");
+        if (_.isEmpty(_params._id)) {
+            return cb ("Wrong form data");
         }
-        var token = _params.token;
         var _id = _params._id.toString();
-        var friendIds = _.pluck(_user.friends, "_id");
-        if (! _.contains(friendIds, _id)) {
-            return cb ("Already deleted");
-        }
-        _.remove(_user.friends, function(val) {
-            return val._id == _id;
-        });
+        var usersIds = [_id, _user._id];
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.update({_id: new BSON.ObjectID(_user._id)},
-                {$pull: {
-                    friends: {_id: _id}
-                }},
-                safe.sure(cb, function () {
-                    _user = JSON.stringify(_user);
-                    dbHelper.redis.set(token, _user, cb);
+            async.each(usersIds, function (uId, cb) {
+                var cUser;
+                users.findOne({_id: BSON.ObjectID(uId)}, safe.sure(cb, function (_cUser) {
+                    if (_.isEmpty(_cUser)) {
+                        return cb(404);
+                    } else {
+                        cUser = _cUser;
+                        var cloneId = _.clone(usersIds);
+                        _.remove(cloneId, function(val) {
+                            return val == uId;
+                        });
+                        cloneId = cloneId[0];
+                        var fIds = _.pluck(cUser.friends, "_id");
+                        if (! _.contains(fIds, cloneId)) {
+                            cb();
+                        } else {
+                            users.update({_id: cUser._id}, {$pull: {friends: {_id: cloneId}}}, safe.sure(cb, function () {
+                                cb();
+                            }));
+                        }
+                    }
+                }));
+            }, safe.sure(cb, function () {
+                cb(null, true);
             }));
         }));
     }));
@@ -195,19 +222,23 @@ exports.deleteFriend = function (_data, cb) {
 exports.getFriendList = function (_data, cb) {
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            if (! _user.friends || ! (_user.friends.length > 0)) {
-                return cb();
-            }
-            var friendIds = [];
-            _.each(_user.friends, function (val) {
-                friendIds.push(new BSON.ObjectID(val._id));
-            });
-            users.find({_id: {$in: friendIds}}, {login: 1, email: 1}).toArray(safe.sure(cb, function (uArr) {
-                _.each(uArr, function (val) {
-                    val.friend = true;
+            users.findOne({_id: BSON.ObjectID(_user._id)}, safe.sure(cb, function (cUser) {
+                if (! cUser.friends || _.isEmpty(cUser.friends)) {
+                    return cb();
+                }
+                var friendIds = [];
+                _.each(cUser.friends, function (val) {
+                    friendIds.push(BSON.ObjectID(val._id));
                 });
-                cb(null, uArr)
-            }));
+                console.log('friendIds ', friendIds);
+                users.find({_id: {$in: friendIds}}, {login: 1, email: 1}).toArray(safe.sure(cb, function (uArr) {
+                    _.each(uArr, function (val) {
+                        val.friend = true;
+                    });
+                    console.log('uArr ', uArr)
+                    cb(null, uArr)
+                }));
+            }))
         }));
     }));
 };

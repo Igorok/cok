@@ -5,7 +5,8 @@ define (["jquery", "cok_core", "cok_controller"], function ($, cok_core, cok_con
             index: cok_controller.homepage
         },
         login: {
-            index: cok_controller.login
+            index: cok_controller.login,
+            registration: cok_controller.registrationRender
         },
         logout: {
             index: cok_controller.logout

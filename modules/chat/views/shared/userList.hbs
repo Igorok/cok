@@ -1,11 +1,15 @@
 {{#data}}
-<div>
-    <a href="#!/user/detail/{{_id}}">{{login}}</a>
-    {{#friend}}
-        <button data-id="{{_id}}" class="btn btn-sm btn-danger delFriendBtn"><span class="glyphicon glyphicon-trash"></span></button>
-    {{/friend}}
-    {{^friend}}
-        <button data-id="{{_id}}" class="btn btn-sm btn-success addFriendBtn"><span class="glyphicon glyphicon-plus"></span></button>
-    {{/friend}}
-</div>
+<tr>
+    <td>
+        <a href="#!/user/detail/{{_id}}">{{login}}</a>
+    </td>
+    <td class="action-column">
+        {{#friend}}
+            <button data-id="{{_id}}" class="btn btn-sm btn-danger delFriendBtn"><span class="glyphicon glyphicon-remove"></span></button>
+        {{/friend}}
+        {{^friend}}
+            <button data-id="{{_id}}" class="btn btn-sm btn-success addFriendBtn"><span class="glyphicon glyphicon-plus"></span></button>
+        {{/friend}}
+    </td>
+</tr>
 {{/data}}
