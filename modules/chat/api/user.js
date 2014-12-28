@@ -7,6 +7,43 @@ var mongo = require('mongodb');
 var BSON = mongo.BSONPure;
 var dbHelper = require(__dirname + '/../helpers/db_helper.js');
 var self = this;
+
+
+
+/**
+* login to system
+*/
+exports.Registration = function (_data, cb) {
+    var params = _data.params[0];
+    if (_.isUndefined(params.login) || _.isUndefined(params.email) || _.isUndefined(params.password)) {
+        return cb ("Wrong data");
+    }
+    var login = params.login.toString().trim();
+    var email = params.email.toString().trim();
+    var password = params.password.toString().trim();
+    dbHelper.collection("users", safe.sure(cb, function (users) {
+        users.find({$or : [{login: login}, {email: email}]}).toArray(safe.sure(cb, function (_result) {
+            if (! _.isEmpty(_result)) {
+                return cb (" Username or email already registered");
+            }
+            var hash = crypto.createHash('sha1');
+            hash = hash.update(password).digest('hex');
+
+            var newUser = {
+                login: login,
+                email: email,
+                password: hash,
+                group: "SimpleUser",
+                created: new Date(),
+                status: 1
+            };
+            users.insert(newUser, safe.sure(cb, function (_result) {
+                cb(null, true)
+            }));
+        }));
+    }));
+};
+
 /**
 * login to system
 */
@@ -19,7 +56,9 @@ exports.Authorise = function (_data, cb) {
     var password = params.password.toString().trim();
     dbHelper.collection("users", safe.sure(cb, function (users) {
         users.findOne({login: login}, safe.sure(cb, function (user) {
-            if (! user || (password != user.password)) {
+            var hash = crypto.createHash('sha1');
+            hash = hash.update(password).digest('hex');
+            if (! user || (hash != user.password)) {
                 return cb ("Wrong data");
             }
             delete user.password;
@@ -122,17 +161,18 @@ exports.getUserList = function (_data, cb) {
 */
 exports.getUserDetail = function (_data, cb) {
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        var _id;
         if (_.isEmpty(_params._id)) {
-            return cb ("Wrong form data");
+            _id = _user._id;
+        } else {
+            _id = _params._id.toString();
         }
-        var _id = _params._id.toString();
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.findOne({_id: new BSON.ObjectID(_id)}, {login:1, email: 1}, safe.sure(cb, function (_result) {
+            users.findOne({_id: BSON.ObjectID(_id)}, {login:1, email: 1, picture: 1}, safe.sure(cb, function (_result) {
                 cb (null, _result);
             }));
         }));
     }));
-
 };
 
 /**
@@ -230,12 +270,10 @@ exports.getFriendList = function (_data, cb) {
                 _.each(cUser.friends, function (val) {
                     friendIds.push(BSON.ObjectID(val._id));
                 });
-                console.log('friendIds ', friendIds);
                 users.find({_id: {$in: friendIds}}, {login: 1, email: 1}).toArray(safe.sure(cb, function (uArr) {
                     _.each(uArr, function (val) {
                         val.friend = true;
                     });
-                    console.log('uArr ', uArr)
                     cb(null, uArr)
                 }));
             }))

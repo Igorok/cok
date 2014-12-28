@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var fs = require('fs');
 var api = {
     "index": require(__dirname + '/../api/index.js'),
     "user": require(__dirname + '/../api/user.js'),
@@ -8,6 +9,7 @@ var api = {
 module.exports = function (app) {
     app.get('/', index);
     app.post('/jsonrpc', jsonrpc);
+    app.post('/upload', upload);
 };
 
 
@@ -33,7 +35,7 @@ function jsonrpc (req, res) {
     if (! _.isArray(params)) {
         params = [params];
     }
-    
+
     var func = jsonrpc.method.match(/^(.*)\.(.*)$/);
     var module = func[1];
     func = func[2];
@@ -61,4 +63,30 @@ function jsonrpc (req, res) {
 
     params.push(rf);
     fn.apply(api, params);
+}
+
+function upload(req, res) {
+    var _result = {};
+    if (_.isEmpty(req.files.file)) {
+        _result = {
+            error: {err: "The file is required", code: -1},
+            result: null
+        };
+        res.json(_result);
+    } else if (_.isEmpty(req.body.action) || _.isEmpty(req.body.token)) {
+        fs.unlink(req.files.file.path, function (err) {
+            if (err) {
+                console.trace(err);
+            }
+            _result = {
+                error: {err: 403, code: -1},
+                result: null
+            };
+            res.json(_result);
+        });
+    } else {
+        var api = req.body;
+        console.log(api)
+        res.json(api);
+    }
 }

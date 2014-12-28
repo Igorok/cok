@@ -30,7 +30,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     var checkedUser = cok_controller.prototype.checkedUser = function () {
         var _user = cok_core.getUser();
         if (_.isEmpty(_user)) {
-            window.location = "#!/login";
+            return window.location = "#!/login/index";
         } else {
             return _user;
         }
@@ -55,11 +55,12 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
             } else {
                 cok_core.setUser(result[0], function () {
                     menuRender();
-                    window.location = "#!/";
+                    return window.location = "#!/";
                 });
             }
         });
     };
+
 
     // logout
     var logout = cok_controller.prototype.logout = function () {
@@ -74,14 +75,14 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
         $("#navPanel").hide();
         $("#mainMenu").animate({'left': '-200px'}, 200).empty();
         $("#body").animate({'padding': '0'}, 200);
-        window.location = "#!/login";
+        return window.location = "#!/login/index";
     };
 
     // loin page
     cok_controller.prototype.login = function () {
         var _user = cok_core.getUser();
         if (! _.isEmpty(_user)) {
-            window.location = "#!/";
+            return window.location = "#!/";
         } else {
             cok_core.render ($("#body"), "loginIndex");
         }
@@ -90,25 +91,19 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     cok_controller.prototype.registrationRender = function () {
         var _user = cok_core.getUser();
         if (! _.isEmpty(_user)) {
-            window.location = "#!/";
+            return window.location = "#!/";
         } else {
             cok_core.render ($("#body"), "loginRegistration");
         }
     };
-    // registration
-    cok_controller.prototype.registration = function () {
-        cok_core.call ("user.Registration", data, function (result) {
-            window.location = "#!/login";
-        });
-    };
-
-
 
     // home page
     cok_controller.prototype.homepage = function () {
         var _user = checkedUser();
         var token = _user.token;
-        cok_core.render ($("#body"), "defaultIndex");
+        cok_core.call("user.getUserDetail", {token: token}, function (result) {
+            cok_core.render ($("#body"), "defaultIndex", {data: result[0]});
+        });
     };
 
     // user index page

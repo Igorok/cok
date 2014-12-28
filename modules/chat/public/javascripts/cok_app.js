@@ -1,4 +1,5 @@
 define (["jquery", "cok_core", "cok_controller"], function ($, cok_core, cok_controller) {
+
     // routes
     var routes = {
         default: {
@@ -27,7 +28,9 @@ define (["jquery", "cok_core", "cok_controller"], function ($, cok_core, cok_con
     // initialise
     cok_core.init(routes);
     cok_core.router(location.hash);
-    $(window).bind('hashchange', function() {
-        cok_core.router(location.hash);
+    $(function () {
+        $(window).bind('hashchange', function() {
+            cok_core.router(location.hash);
+        });
     });
 });

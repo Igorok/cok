@@ -1,6 +1,26 @@
-detail user
-{{#data}}
-    {{login}}
-    <br>
-    {{email}}
-{{/data}}
+<script>
+    require(["jquery", "cok_core"], function ($, cok_core) {
+        $(function () {
+            $("img").error(function () {
+                $(this).unbind("error").attr("src", "/images/no-avatar.jpg");
+            });
+        });
+    });
+</script>
+<div class="sub-container">
+    <div class="row">
+        <div class="col-md-3">
+            <img src="/images/{{picture}}" alt="" class="img-thumbnail">
+        </div>
+        <div class="col-md-9">
+            <br>
+            {{#data}}
+                <p>{{login}}</p>
+                <p>{{email}}</p>
+            {{/data}}
+            <div style="height:1500px; border-bottom:1px solid red;">
+                asdasd
+            </div>
+        </div>
+    </div>
+</div>

@@ -26,20 +26,23 @@
                 }
             };
 
-
             $('#btnMain').click(function () {
                 showMainMenu();
             });
             $('#btnSecond').click(function () {
                 showSecondMenu();
             });
+            $("img").error(function () {
+                $(this).unbind("error").attr("src", "/images/no-avatar.jpg");
+            });
         });
     });
 </script>
+<div style="position:relative; height: 15px"></div>
 <div id="body"></div>
+<div style="position:relative; height: 60px"></div>
 <div id="mainMenu"></div>
 <div id="secondMenu"></div>
-
 <div id="navPanel">
     <div class="clearfix nav-case">
         <button id="btnMain" class="btn btn-default btn-left"><span class="glyphicon glyphicon-th-list"></span></button>
