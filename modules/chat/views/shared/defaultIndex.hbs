@@ -1,5 +1,5 @@
 <script>
-require(["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok_core, cok_controller) {
+require(["jquery", "lodash", "cok_core", "cok_controller", "bootstrap"], function ($, _, cok_core, cok_controller) {
     $(function () {
         var _user = cok_controller.checkedUser();
         var token = _user.token;
@@ -19,7 +19,7 @@ require(["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok_
             if (file) {
                 formData = new FormData();
                 formData.append('file', file);
-                formData.append('action', "user.ChangePicture");
+                formData.append('action', "index.mainPicUpload");
                 formData.append('token', token);
                 $.ajax({
                     url: '/upload', //Server script to process data

@@ -3,6 +3,7 @@ var _ = require("lodash");
 var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
+var fs = require('fs');
 var BSON = mongo.BSONPure;
 var dbHelper = require(__dirname + '/../helpers/db_helper.js');
 var userApi = require(__dirname + '/user.js');
@@ -238,5 +239,60 @@ exports.leaveChat = function (_data, cb) {
                 cb(null, true);
             }));
         }));
+    }));
+};
+
+
+/**
+* upload pictire
+*/
+exports.mainPicUpload = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        var picExt = ["jpg", "jpeg", "png", "gif"];
+        if (_.isEmpty(_params) || _.isEmpty(_params.file)) {
+            return cb('Wrong data');
+        }
+        var newFileName = _user.login + Date.now() + "." + _params.file.extension;
+        var oldPath = __dirname + '/../../../' + _params.file.path;
+        var newPath = __dirname + '/../public/images/users/' + newFileName;
+        
+        if (! _.contains(picExt, _params.file.extension)) {
+            fs.unlink(oldPath, safe.sure(cb, function () {
+                cb('Wrong data');
+            }));
+        } else {
+            async.waterfall([
+                function existFile (cb) {
+                    fs.exists(oldPath, function (exists) {
+                        if (! exists) {
+                            return cb('Wrong data');
+                        } else {
+                            cb();
+                        }
+                    });
+                },
+                function renameFile (cb) {
+                    fs.rename(oldPath, newPath, safe.sure(cb, function () {
+                        cb();
+                    }));
+                },
+                function saveImage (cb) {
+                    dbHelper.collection("images", safe.sure(cb, function (images) {
+                        images.insert({userId: _user._id, created: new Date(), name: newFileName}, safe.sure(cb, function () {
+                            cb();
+                        }));
+                    }));
+                },
+                function saveUser (cb) {
+                    dbHelper.collection("users", safe.sure(cb, function (users) {
+                        users.update({_id: BSON.ObjectID(_user._id)}, {$set: { picture: newFileName}}, safe.sure(cb, function (_result) {
+                            cb();
+                        }));
+                    }));
+                },
+            ], safe.sure(cb, function () {
+                cb(null, true);
+            }));
+        }
     }));
 };

@@ -20,9 +20,9 @@ function index (req, res) {
 }
 
 function jsonrpc (req, res) {
-    if (! req.xhr) {
+    /*if (! req.xhr) {
         return res.send(400);
-    }
+    }*/
     var jsonrpc = req.body;
     res.header("Cache-Control", "no-cache");
     var params = jsonrpc.params;
@@ -35,7 +35,6 @@ function jsonrpc (req, res) {
     if (! _.isArray(params)) {
         params = [params];
     }
-
     var func = jsonrpc.method.match(/^(.*)\.(.*)$/);
     var module = func[1];
     func = func[2];
@@ -85,8 +84,32 @@ function upload(req, res) {
             res.json(_result);
         });
     } else {
-        var api = req.body;
-        console.log(api)
-        res.json(api);
+        var actionArr = req.body.action.toString();
+        var params = req.body;
+        params.file = req.files.file;
+        var data = {
+            params : [
+                req.body
+            ]
+        };
+        actionArr = actionArr.split(".");
+        if ((actionArr.length < 2) || ! api[actionArr[0]] || ! api[actionArr[0]][actionArr[1]]) {
+            console.trace(404, actionArr);
+            _result.error = {err: 404, code:-1};
+            _result.result = null;
+            return res.json(_result);
+        } else {
+            api[actionArr[0]][actionArr[1]].apply(api, [data, function (err, _data) {
+                if (err) {
+                    console.trace(err);
+                    _result.error = {err: err, code: -1};
+                    _result.result = null;
+                } else {
+                    _result.error = null;
+                    _result.result = _data;
+                }
+                res.json(_result);
+            }]);
+        }
     }
 }
