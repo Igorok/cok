@@ -7,16 +7,20 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
             hash: '#!/',
         },
         {
-            title: '<span class="glyphicon glyphicon-user"></span> Users',
-            hash: '#!/user/index',
+            title: '<span class="glyphicon glyphicon-picture"></span> Images',
+            hash: '#!/images/index',
         },
         {
             title: '<span class="glyphicon glyphicon-star"></span> Friends',
             hash: '#!/user/friends',
         },
         {
-            title: '<span class="glyphicon glyphicon-envelope"></span> Chats',
+            title: '<span class="glyphicon glyphicon-comment"></span> Chats',
             hash: '#!/chat/index',
+        },
+        {
+            title: '<span class="glyphicon glyphicon-user"></span> Users',
+            hash: '#!/user/index',
         },
         {
             title: '<span class="glyphicon glyphicon-off"></span> Logout',
@@ -105,6 +109,11 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     // user index page
     cok_controller.prototype.userIndex = function () {
         cok_core.render ($("#body"), "userIndex", {});
+    };
+    
+    // picture index page
+    cok_controller.prototype.imagesIndex = function () {
+        cok_core.render ($("#body"), "imagesIndex", {});
     };
     /**
     * friends list

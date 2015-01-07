@@ -5,6 +5,9 @@ define (["jquery", "cok_core", "cok_controller"], function ($, cok_core, cok_con
         default: {
             index: cok_controller.homepage
         },
+        images: {
+            index: cok_controller.imagesIndex
+        },
         login: {
             index: cok_controller.login,
             registration: cok_controller.registrationRender

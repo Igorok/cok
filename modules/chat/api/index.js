@@ -302,3 +302,23 @@ exports.mainPicUpload = function (_data, cb) {
         }));
     }));
 };
+
+
+/**
+* get user pictures
+*/
+exports.getUserPic = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        var _id;
+        if (_.isEmpty(_params._id)) {
+            _id = _user._id;
+        } else {
+            _id = _params._id.toString();
+        }
+        dbHelper.collection("images", safe.sure(cb, function (images) {
+            images.find({userId: _id}).toArray(safe.sure(cb, function (_result) {
+                cb(null, _result);
+            }));
+        }));
+    }));
+};
