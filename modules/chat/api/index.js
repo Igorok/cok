@@ -9,7 +9,6 @@ var dbHelper = require(__dirname + '/../helpers/db_helper.js');
 var userApi = require(__dirname + '/user.js');
 
 
-
 /**
 * all users
 */
@@ -243,20 +242,21 @@ exports.leaveChat = function (_data, cb) {
 };
 
 
+
 /**
 * upload pictire
 */
-exports.mainPicUpload = function (_data, cb) {
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+exports.picUpload = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params, _file) {
         var picExt = ["jpg", "jpeg", "png", "gif"];
-        if (_.isEmpty(_params) || _.isEmpty(_params.file)) {
+        if (_.isEmpty(_params) || _.isEmpty(_file)) {
             return cb('Wrong data');
         }
-        var newFileName = _user.login + Date.now() + "." + _params.file.extension;
-        var oldPath = __dirname + '/../../../' + _params.file.path;
+        var newFileName = _user.login + Date.now() + "." + _file.extension;
+        var oldPath = __dirname + '/../../../' + _file.path;
         var newPath = __dirname + '/../public/images/users/' + newFileName;
         
-        if (! _.contains(picExt, _params.file.extension)) {
+        if (! _.contains(picExt, _file.extension)) {
             fs.unlink(oldPath, safe.sure(cb, function () {
                 cb('Wrong data');
             }));
@@ -282,17 +282,23 @@ exports.mainPicUpload = function (_data, cb) {
                             cb();
                         }));
                     }));
-                },
-                function saveUser (cb) {
-                    dbHelper.collection("users", safe.sure(cb, function (users) {
-                        users.update({_id: BSON.ObjectID(_user._id)}, {$set: { picture: newFileName}}, safe.sure(cb, function (_result) {
-                            cb();
-                        }));
-                    }));
-                },
+                }
             ], safe.sure(cb, function () {
-                cb(null, true);
+                cb(null, newFileName, _user, _params);
             }));
         }
+    }));
+};
+
+/**
+* upload main picture for user
+*/
+exports.mainPicUpload = function (_data, cb) {
+    exports.picUpload(_data, safe.sure(cb, function (newFileName, _user, _params) {
+        dbHelper.collection("users", safe.sure(cb, function (users) {
+            users.update({_id: BSON.ObjectID(_user._id)}, {$set: { picture: newFileName}}, safe.sure(cb, function () {
+                cb(null, true)
+            }));
+        }));
     }));
 };

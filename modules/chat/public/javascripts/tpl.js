@@ -119,22 +119,9 @@ this["chat"]["chatList"] = Handlebars.template({"1":function(depth0,helpers,part
 
 
 
-this["chat"]["defaultIndex"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
-  var helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
-  return "                <p>"
-    + escapeExpression(((helper = (helper = helpers.login || (depth0 != null ? depth0.login : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"login","hash":{},"data":data}) : helper)))
-    + "</p>\n                <p>"
-    + escapeExpression(((helper = (helper = helpers.email || (depth0 != null ? depth0.email : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"email","hash":{},"data":data}) : helper)))
-    + "</p>\n";
-},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  var stack1, helper, options, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, blockHelperMissing=helpers.blockHelperMissing, buffer = "<script>\nrequire([\"jquery\", \"lodash\", \"cok_core\", \"cok_controller\", \"bootstrap\"], function ($, _, cok_core, cok_controller) {\n    $(function () {\n        var _user = cok_controller.checkedUser();\n        var token = _user.token;\n        $(\"img\").error(function () {\n            $(this).unbind(\"error\").attr(\"src\", \"/images/no-avatar.jpg\");\n        });\n\n\n        $(\"#showPicModal\").click(function () {\n            $(\"#picUploadModal\").modal(\"show\");\n        });\n\n        $(\"#picUploadBtn\").click(function () {\n            var formData;\n            var params;\n            var file = document.getElementById(\"newPic\").files[0];\n            if (file) {\n                formData = new FormData();\n                formData.append('file', file);\n                formData.append('action', \"index.mainPicUpload\");\n                formData.append('token', token);\n                $.ajax({\n                    url: '/upload', //Server script to process data\n                    type: 'POST',\n                    success: function (ret) {\n                        $(\"#newPic\").val(\"\");\n                        console.log('success', ret);\n                    },\n                    error: function (ret) {\n                        console.log('error', ret);\n                    },\n                    data: formData,\n                    cache: false,\n                    contentType: false,\n                    processData: false\n                });\n            }\n            return false;\n        });\n\n\n    });\n});\n</script>\n\n<div id=\"picUploadModal\" class=\"modal fade\">\n    <div class=\"modal-dialog\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\n                <h4 class=\"modal-title\">Modal title</h4>\n            </div>\n            <div class=\"modal-body\">\n                <form id=\"picUploadForm\" enctype=\"multipart/form-data\">\n                    <input type=\"file\" name=\"newPic\" id=\"newPic\" />\n                </form>\n            </div>\n            <div class=\"modal-footer\">\n                <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>\n                <button id=\"picUploadBtn\" type=\"button\" class=\"btn btn-primary\">Save</button>\n            </div>\n        </div>\n    </div>\n</div>\n\n\n\n<div class=\"sub-container\">\n    <div class=\"row\">\n        <div class=\"col-md-3\">\n            <img src=\"/images/"
-    + escapeExpression(((helper = (helper = helpers.picture || (depth0 != null ? depth0.picture : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"picture","hash":{},"data":data}) : helper)))
-    + "\" alt=\"\" class=\"img-thumbnail\">\n            <br><br>\n            <button id=\"showPicModal\" class=\"btn btn-default btn-block\">\n                <span class=\"glyphicon glyphicon-arrow-up\"></span>\n                Change picture\n            </button>\n        </div>\n        <div class=\"col-md-9\">\n            <br>\n";
-  stack1 = ((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : helperMissing),(options={"name":"data","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data}),(typeof helper === functionType ? helper.call(depth0, options) : helper));
-  if (!helpers.data) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
-  if (stack1 != null) { buffer += stack1; }
-  return buffer + "        </div>\n    </div>\n</div>\n";
-},"useData":true});
+this["chat"]["defaultIndex"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+  return "<script>\nrequire([\"jquery\", \"lodash\", \"cok_core\", \"cok_controller\", \"bootstrap\"], function ($, _, cok_core, cok_controller) {\n    $(function () {\n        var _user = cok_controller.checkedUser();\n        var token = _user.token;\n        var renderUser = function () {\n            cok_core.call(\"user.getUserDetail\", {token: token}, function (result) {\n                cok_core.render ($(\"#defaultIndex\"), \"userDetailPartition\", {data: result[0]});\n            });\n        };\n        \n        renderUser();\n        $(\"img\").error(function () {\n            $(this).unbind(\"error\").attr(\"src\", \"/images/no-avatar.jpg\");\n        });\n\n//        defaultIndex\n        $(\"#defaultIndex\").on(\"click\", \"#showPicModal\", function () {\n            $(\"#picUploadModal\").modal(\"show\");\n        });\n        $(\"#picUploadBtn\").click(function () {\n            var file = document.getElementById(\"newPic\").files[0];\n            cok_core.upload(\"index.mainPicUpload\", token, file, function (err, _result) {\n                $(\"#newPic\").val(\"\");\n                $(\"#picUploadModal\").modal(\"hide\");\n                if (err) {\n                    cok_core.error(err);\n                } else {\n                    renderUser();\n                }\n            });\n            return false;\n        });\n        \n    });\n});\n</script>\n\n<div id=\"picUploadModal\" class=\"modal fade\">\n    <div class=\"modal-dialog\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\n                <h4 class=\"modal-title\">Modal title</h4>\n            </div>\n            <div class=\"modal-body\">\n                <form id=\"picUploadForm\" enctype=\"multipart/form-data\">\n                    <input type=\"file\" name=\"newPic\" id=\"newPic\" />\n                </form>\n            </div>\n            <div class=\"modal-footer\">\n                <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>\n                <button id=\"picUploadBtn\" type=\"button\" class=\"btn btn-primary\">Save</button>\n            </div>\n        </div>\n    </div>\n</div>\n<div class=\"sub-container\" id=\"defaultIndex\"></div>\n";
+  },"useData":true});
 
 
 
@@ -200,6 +187,25 @@ this["chat"]["userDetail"] = Handlebars.template({"1":function(depth0,helpers,pa
   if (stack1 != null) { buffer += stack1; }
   return buffer + "            <div style=\"height:1500px; border-bottom:1px solid red;\">\n                asdasd\n            </div>\n        </div>\n    </div>\n</div>\n";
 },"useData":true});
+
+
+
+this["chat"]["userDetailPartition"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+  var helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
+  return "<div class=\"sub-container\" id=\"defaultIndex\">\n    <div class=\"row\">\n        <div class=\"col-md-3\">\n            <img src=\"/images/users/"
+    + escapeExpression(((helper = (helper = helpers.picture || (depth0 != null ? depth0.picture : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"picture","hash":{},"data":data}) : helper)))
+    + "\" alt=\"\" class=\"img-thumbnail\">\n            <br><br>\n            <button id=\"showPicModal\" class=\"btn btn-default btn-block\">\n                <span class=\"glyphicon glyphicon-arrow-up\"></span>\n                Change picture\n            </button>\n        </div>\n        <div class=\"col-md-9\">\n            <br>\n            <p>"
+    + escapeExpression(((helper = (helper = helpers.login || (depth0 != null ? depth0.login : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"login","hash":{},"data":data}) : helper)))
+    + "</p>\n            <p>"
+    + escapeExpression(((helper = (helper = helpers.email || (depth0 != null ? depth0.email : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"email","hash":{},"data":data}) : helper)))
+    + "</p>\n        </div>\n    </div>\n</div>\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+  var stack1, helper, options, functionType="function", helperMissing=helpers.helperMissing, blockHelperMissing=helpers.blockHelperMissing;
+  stack1 = ((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : helperMissing),(options={"name":"data","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data}),(typeof helper === functionType ? helper.call(depth0, options) : helper));
+  if (!helpers.data) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
+  if (stack1 != null) { return stack1; }
+  else { return ''; }
+  },"useData":true});
 
 
 

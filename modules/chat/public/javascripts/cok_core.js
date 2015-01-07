@@ -109,6 +109,32 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"],
             }
         );
     };
+    
+    // file upload
+    cok_core.prototype.upload = function (api, token, file, cb) {
+        if (! api || ! token || ! file || ! cb) {
+            cb("Wrong data");
+        } else {
+            var formData = new FormData();
+            formData.append('file', file);
+            formData.append('action', api);
+            formData.append('token', token);
+            $.ajax({
+                url: '/upload',
+                type: 'POST',
+                success: function (ret) {
+                    cb(null, ret);
+                },
+                error: function (ret) {
+                    cb(ret);
+                },
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    };
 
     cok_core.prototype.tableRender = function (_view, _selector, _data, _option, _rowCount, _pagerSelector) {
         var selfView = _view;

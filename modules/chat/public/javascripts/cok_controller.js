@@ -99,11 +99,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
 
     // home page
     cok_controller.prototype.homepage = function () {
-        var _user = checkedUser();
-        var token = _user.token;
-        cok_core.call("user.getUserDetail", {token: token}, function (result) {
-            cok_core.render ($("#body"), "defaultIndex", {data: result[0]});
-        });
+        cok_core.render ($("#body"), "defaultIndex", {});
     };
 
     // user index page
@@ -149,6 +145,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
             cok_core.render ($("#body"), "chatEdit", {data: result[0]});
         });
     };
+    
     menuRender();
     return new cok_controller();
 

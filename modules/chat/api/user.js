@@ -94,21 +94,23 @@ exports.Authorise = function (_data, cb) {
 * check authenticate
 */
 exports.checkAuth = function (_data, cb) {
+    var self = this;
     if (! _data || ! _data.params || ! cb || (typeof(cb) != 'function')) {
         return cb (403);
     }
-    var params = _data.params[0];
     var token;
-    if (! params || ! params.token) {
+    if (! _data.params[0] || ! _data.params[0].token) {
         return cb (403);
     }
-    token = params.token.toString();
+    token = _data.params[0].token.toString();
     dbHelper.redis.get(token, safe.sure(cb, function (_user) {
         if (! _user) {
             return cb (403);
         } else {
             _user = JSON.parse(_user);
-            cb(null, _user, params);
+            var startArr = [null, _user];
+            var params = startArr.concat(_data.params);
+            cb.apply(self, params);
         }
     }));
 }

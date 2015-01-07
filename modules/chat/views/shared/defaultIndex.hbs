@@ -3,44 +3,35 @@ require(["jquery", "lodash", "cok_core", "cok_controller", "bootstrap"], functio
     $(function () {
         var _user = cok_controller.checkedUser();
         var token = _user.token;
+        var renderUser = function () {
+            cok_core.call("user.getUserDetail", {token: token}, function (result) {
+                cok_core.render ($("#defaultIndex"), "userDetailPartition", {data: result[0]});
+            });
+        };
+        
+        renderUser();
         $("img").error(function () {
             $(this).unbind("error").attr("src", "/images/no-avatar.jpg");
         });
 
-
-        $("#showPicModal").click(function () {
+//        defaultIndex
+        $("#defaultIndex").on("click", "#showPicModal", function () {
             $("#picUploadModal").modal("show");
         });
-
         $("#picUploadBtn").click(function () {
-            var formData;
-            var params;
             var file = document.getElementById("newPic").files[0];
-            if (file) {
-                formData = new FormData();
-                formData.append('file', file);
-                formData.append('action', "index.mainPicUpload");
-                formData.append('token', token);
-                $.ajax({
-                    url: '/upload', //Server script to process data
-                    type: 'POST',
-                    success: function (ret) {
-                        $("#newPic").val("");
-                        console.log('success', ret);
-                    },
-                    error: function (ret) {
-                        console.log('error', ret);
-                    },
-                    data: formData,
-                    cache: false,
-                    contentType: false,
-                    processData: false
-                });
-            }
+            cok_core.upload("index.mainPicUpload", token, file, function (err, _result) {
+                $("#newPic").val("");
+                $("#picUploadModal").modal("hide");
+                if (err) {
+                    cok_core.error(err);
+                } else {
+                    renderUser();
+                }
+            });
             return false;
         });
-
-
+        
     });
 });
 </script>
@@ -64,25 +55,4 @@ require(["jquery", "lodash", "cok_core", "cok_controller", "bootstrap"], functio
         </div>
     </div>
 </div>
-
-
-
-<div class="sub-container">
-    <div class="row">
-        <div class="col-md-3">
-            <img src="/images/{{picture}}" alt="" class="img-thumbnail">
-            <br><br>
-            <button id="showPicModal" class="btn btn-default btn-block">
-                <span class="glyphicon glyphicon-arrow-up"></span>
-                Change picture
-            </button>
-        </div>
-        <div class="col-md-9">
-            <br>
-            {{#data}}
-                <p>{{login}}</p>
-                <p>{{email}}</p>
-            {{/data}}
-        </div>
-    </div>
-</div>
+<div class="sub-container" id="defaultIndex"></div>

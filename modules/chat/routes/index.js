@@ -86,10 +86,10 @@ function upload(req, res) {
     } else {
         var actionArr = req.body.action.toString();
         var params = req.body;
-        params.file = req.files.file;
         var data = {
             params : [
-                req.body
+                req.body,
+                req.files.file
             ]
         };
         actionArr = actionArr.split(".");
