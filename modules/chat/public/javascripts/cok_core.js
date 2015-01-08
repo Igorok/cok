@@ -1,4 +1,4 @@
-define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl"], function ($, jsonrpc, storageapi, _, hbs, tpl) {
+define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl", "hbHelper",], function ($, jsonrpc, storageapi, _, hbs, tpl) {
     function cok_core () {}
     var routes;
     var menu;

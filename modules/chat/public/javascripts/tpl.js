@@ -132,22 +132,50 @@ this["chat"]["friendsIndex"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta
 
 
 this["chat"]["imagesIndex"] = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  return "<script>\nrequire([\"jquery\", \"lodash\", \"cok_core\", \"cok_controller\", \"bootstrap\"], function ($, _, cok_core, cok_controller) {\n    $(function () {\n        var _user = cok_controller.checkedUser();\n        var token = _user.token;\n        var renderUser = function () {\n            cok_core.call(\"index.getUserPic\", {token: token}, function (result) {\n                cok_core.render ($(\"#imagesIndex\"), \"imagesList\", {data: result[0]});\n            });\n        };\n\n        renderUser();\n        $(\"img\").error(function () {\n            $(this).unbind(\"error\").attr(\"src\", \"/images/no-avatar.jpg\");\n        });\n        $(\"#imagesIndex\").on(\"click\", \"img\", function () {\n            \n            $(\"#imgLarge\").attr(\"src\", $(this).attr(\"src\"));\n            $(\"#picUploadModal\").modal(\"show\");\n        });\n        /*$(\"#picUploadBtn\").click(function () {\n            var file = document.getElementById(\"newPic\").files[0];\n            cok_core.upload(\"index.mainPicUpload\", token, file, function (err, _result) {\n                $(\"#newPic\").val(\"\");\n                $(\"#picUploadModal\").modal(\"hide\");\n                if (err) {\n                    cok_core.error(err);\n                } else {\n                    renderUser();\n                }\n            });\n            return false;\n        });*/\n        \n    });\n});\n</script>\n\n<div id=\"picUploadModal\" class=\"modal fade\">\n    <div class=\"modal-dialog\">\n        <div class=\"modal-content imgLargeCase\">\n            <div class=\"modal-header\">\n                <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\n                <span>&nbsp;</span>\n            </div>\n            <div class=\"modal-body\">\n                <img id=\"imgLarge\" src=\"/images/no-avatar.jpg\" alt=\"\" class=\"img-rounded\" />\n            </div>\n            <div class=\"modal-footer\">\n                <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>\n            </div>\n        </div>\n    </div>\n</div>\n<div class=\"sub-container\" id=\"imagesIndex\"></div>\n";
-  },"useData":true});
+  var helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
+  return "<script>\nrequire([\"jquery\", \"lodash\", \"cok_core\", \"cok_controller\", \"bootstrap\"], function ($, _, cok_core, cok_controller) {\n    $(function () {\n        var _user = cok_controller.checkedUser();\n        var token = _user.token;\n        var ownerId = \""
+    + escapeExpression(((helper = (helper = helpers.ownerId || (depth0 != null ? depth0.ownerId : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"ownerId","hash":{},"data":data}) : helper)))
+    + "\";\n        if (_.isEmpty(ownerId)) {\n            ownerId = _user._id;\n        }\n        var renderUser = function () {\n            cok_core.call(\"index.getUserPic\", {token: token, ownerId: ownerId}, function (result) {\n                cok_core.render ($(\"#imagesIndex\"), \"imagesList\", {data: result[0]});\n            });\n        };\n        var selectedPic = {};\n        renderUser();\n        $(\"img\").error(function () {\n            $(this).unbind(\"error\").attr(\"src\", \"/images/no-avatar.jpg\");\n        });\n        $(\"#imagesIndex\").on(\"click\", \"img\", function () {\n            selectedPic.src = $(this).attr(\"src\");\n            selectedPic._id = $(this).attr(\"data-id\");\n            \n            cok_core.render ($(\"#picUploadModal\"), \"imagesModal\", {imgSrc: selectedPic.src, imgId: selectedPic._id, ownerId: ownerId, userId: _user._id});\n            $(\"#picUploadModal\").modal(\"show\");\n        });\n        $(\"#btnRemove\").click(function () {\n            if (selectedPic._id) {\n                cok_core.call(\"index.deletePic\", {token: token, _id: selectedPic._id}, function (result) {\n                    $(\"#picUploadModal\").modal(\"hide\");\n                    renderUser();\n                });\n            }\n        });\n        $(\"#btnSetMain\").click(function () {\n            if (selectedPic._id) {\n                cok_core.call(\"index.setMainPic\", {token: token, _id: selectedPic._id}, function (result) {\n                    $(\"#picUploadModal\").modal(\"hide\");\n                });\n            }\n        });\n        \n    });\n});\n</script>\n\n<div id=\"picUploadModal\" class=\"modal fade\"></div>\n<div class=\"sub-container\" id=\"imagesIndex\"></div>\n";
+},"useData":true});
 
 
 
 this["chat"]["imagesList"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
-  var helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
-  return "    <div class=\"col-md-2\">\n        <img src=\"/images/users/"
-    + escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"name","hash":{},"data":data}) : helper)))
-    + "\" alt=\"\" class=\"img-thumbnail\" />\n    </div>\n";
-},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  var stack1, helper, options, functionType="function", helperMissing=helpers.helperMissing, blockHelperMissing=helpers.blockHelperMissing, buffer = "<div class=\"row\">\n";
-  stack1 = ((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : helperMissing),(options={"name":"data","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data}),(typeof helper === functionType ? helper.call(depth0, options) : helper));
-  if (!helpers.data) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
+  var stack1, helper, helperMissing=helpers.helperMissing, functionType="function", escapeExpression=this.escapeExpression, buffer = "";
+  stack1 = ((helpers.rowClose || (depth0 && depth0.rowClose) || helperMissing).call(depth0, (data && data.index), 6, {"name":"rowClose","hash":{},"fn":this.program(2, data),"inverse":this.noop,"data":data}));
   if (stack1 != null) { buffer += stack1; }
-  return buffer + "</div>";
+  stack1 = ((helpers.rowOpen || (depth0 && depth0.rowOpen) || helperMissing).call(depth0, (data && data.index), 6, {"name":"rowOpen","hash":{},"fn":this.program(4, data),"inverse":this.noop,"data":data}));
+  if (stack1 != null) { buffer += stack1; }
+  buffer += "    <div class=\"col-md-2\">\n        <img src=\"/images/users/"
+    + escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"name","hash":{},"data":data}) : helper)))
+    + "\" alt=\"\" class=\"img-thumbnail\" data-id=\""
+    + escapeExpression(((helper = (helper = helpers._id || (depth0 != null ? depth0._id : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"_id","hash":{},"data":data}) : helper)))
+    + "\" />\n    </div>\n";
+  stack1 = ((helpers.rowClose || (depth0 && depth0.rowClose) || helperMissing).call(depth0, (data && data.index), 6, {"name":"rowClose","hash":{},"fn":this.program(2, data),"inverse":this.noop,"data":data}));
+  if (stack1 != null) { buffer += stack1; }
+  return buffer;
+},"2":function(depth0,helpers,partials,data) {
+  return "        </div>\n";
+  },"4":function(depth0,helpers,partials,data) {
+  return "        <div class=\"row\">\n";
+  },"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+  var stack1;
+  stack1 = helpers.each.call(depth0, (depth0 != null ? depth0.data : depth0), {"name":"each","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data});
+  if (stack1 != null) { return stack1; }
+  else { return ''; }
+  },"useData":true});
+
+
+
+this["chat"]["imagesModal"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+  return "            <button type=\"button\" class=\"btn btn-success\" id=\"btnSetMain\"><span class=\"glyphicon glyphicon-star-empty\"></span></button>\n            <button type=\"button\" class=\"btn btn-danger\" id=\"btnRemove\"><span class=\"glyphicon glyphicon-trash\"></span></button>\n";
+  },"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+  var stack1, helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, buffer = "<div class=\"modal-dialog\">\n    <div class=\"modal-content imgLargeCase\">\n        <div class=\"modal-header\">\n            <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\n            <span>&nbsp;</span>\n        </div>\n        <div class=\"modal-body\">\n            <img id=\"imgLarge\" src=\""
+    + escapeExpression(((helper = (helper = helpers.imgSrc || (depth0 != null ? depth0.imgSrc : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"imgSrc","hash":{},"data":data}) : helper)))
+    + "\" alt=\"\" class=\"img-rounded\" />\n        </div>\n        <div class=\"modal-footer\">\n";
+  stack1 = ((helpers.ifMod || (depth0 && depth0.ifMod) || helperMissing).call(depth0, (depth0 != null ? depth0.ownerId : depth0), "=", (depth0 != null ? depth0.userId : depth0), {"name":"ifMod","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data}));
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "            <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>\n        </div>\n    </div>\n</div>";
 },"useData":true});
 
 
@@ -194,19 +222,21 @@ this["chat"]["systemMessage"] = Handlebars.template({"compiler":[6,">= 2.0.0-bet
 
 this["chat"]["userDetail"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
   var helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
-  return "                <p>"
-    + escapeExpression(((helper = (helper = helpers.login || (depth0 != null ? depth0.login : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"login","hash":{},"data":data}) : helper)))
-    + "</p>\n                <p>"
-    + escapeExpression(((helper = (helper = helpers.email || (depth0 != null ? depth0.email : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"email","hash":{},"data":data}) : helper)))
-    + "</p>\n";
-},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  var stack1, helper, options, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, blockHelperMissing=helpers.blockHelperMissing, buffer = "<script>\n    require([\"jquery\", \"cok_core\"], function ($, cok_core) {\n        $(function () {\n            $(\"img\").error(function () {\n                $(this).unbind(\"error\").attr(\"src\", \"/images/no-avatar.jpg\");\n            });\n        });\n    });\n</script>\n<div class=\"sub-container\">\n    <div class=\"row\">\n        <div class=\"col-md-3\">\n            <img src=\"/images/"
+  return "<div class=\"sub-container\">\n    <div class=\"row\">\n        <div class=\"col-md-3\">\n            <img src=\"/images/users/"
     + escapeExpression(((helper = (helper = helpers.picture || (depth0 != null ? depth0.picture : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"picture","hash":{},"data":data}) : helper)))
-    + "\" alt=\"\" class=\"img-thumbnail\">\n        </div>\n        <div class=\"col-md-9\">\n            <br>\n";
+    + "\" alt=\"\" class=\"img-thumbnail\">\n            <a href=\"#!/images/index/"
+    + escapeExpression(((helper = (helper = helpers._id || (depth0 != null ? depth0._id : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"_id","hash":{},"data":data}) : helper)))
+    + "\">Images</a>\n        </div>\n        <div class=\"col-md-9\">\n            <br>\n            <p>"
+    + escapeExpression(((helper = (helper = helpers.login || (depth0 != null ? depth0.login : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"login","hash":{},"data":data}) : helper)))
+    + "</p>\n            <p>"
+    + escapeExpression(((helper = (helper = helpers.email || (depth0 != null ? depth0.email : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"email","hash":{},"data":data}) : helper)))
+    + "</p>\n        </div>\n    </div>\n</div>\n";
+},"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+  var stack1, helper, options, functionType="function", helperMissing=helpers.helperMissing, blockHelperMissing=helpers.blockHelperMissing, buffer = "<script>\n    require([\"jquery\", \"cok_core\"], function ($, cok_core) {\n        $(function () {\n            $(\"img\").error(function () {\n                $(this).unbind(\"error\").attr(\"src\", \"/images/no-avatar.jpg\");\n            });\n        });\n    });\n</script>\n";
   stack1 = ((helper = (helper = helpers.data || (depth0 != null ? depth0.data : depth0)) != null ? helper : helperMissing),(options={"name":"data","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data}),(typeof helper === functionType ? helper.call(depth0, options) : helper));
   if (!helpers.data) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
   if (stack1 != null) { buffer += stack1; }
-  return buffer + "            <div style=\"height:1500px; border-bottom:1px solid red;\">\n                asdasd\n            </div>\n        </div>\n    </div>\n</div>\n";
+  return buffer;
 },"useData":true});
 
 

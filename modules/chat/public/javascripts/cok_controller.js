@@ -3,27 +3,27 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     // main menu for app
     var menu = [
         {
-            title: '<span class="glyphicon glyphicon-home"></span> Home',
+            title: '<span class="glyphicon glyphicon-home"></span>&nbsp;&nbsp;Home',
             hash: '#!/',
         },
         {
-            title: '<span class="glyphicon glyphicon-picture"></span> Images',
+            title: '<span class="glyphicon glyphicon-picture"></span>&nbsp;&nbsp;Images',
             hash: '#!/images/index',
         },
         {
-            title: '<span class="glyphicon glyphicon-star"></span> Friends',
+            title: '<span class="glyphicon glyphicon-star"></span>&nbsp;&nbsp;Friends',
             hash: '#!/user/friends',
         },
         {
-            title: '<span class="glyphicon glyphicon-comment"></span> Chats',
+            title: '<span class="glyphicon glyphicon-comment"></span>&nbsp;&nbsp;Chats',
             hash: '#!/chat/index',
         },
         {
-            title: '<span class="glyphicon glyphicon-user"></span> Users',
+            title: '<span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;Users',
             hash: '#!/user/index',
         },
         {
-            title: '<span class="glyphicon glyphicon-off"></span> Logout',
+            title: '<span class="glyphicon glyphicon-off"></span>&nbsp;&nbsp;Logout',
             hash: '#!/logout',
         },
     ];
@@ -112,8 +112,8 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     };
     
     // picture index page
-    cok_controller.prototype.imagesIndex = function () {
-        cok_core.render ($("#body"), "imagesIndex", {});
+    cok_controller.prototype.imagesIndex = function (ownerId) {
+        cok_core.render ($("#body"), "imagesIndex", {ownerId: ownerId});
     };
     /**
     * friends list

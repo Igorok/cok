@@ -309,15 +309,69 @@ exports.mainPicUpload = function (_data, cb) {
 */
 exports.getUserPic = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        var _id;
-        if (_.isEmpty(_params._id)) {
+        var ownerId;
+        if (_.isEmpty(_params.ownerId)) {
             _id = _user._id;
         } else {
-            _id = _params._id.toString();
+            _id = _params.ownerId.toString();
         }
         dbHelper.collection("images", safe.sure(cb, function (images) {
             images.find({userId: _id}).toArray(safe.sure(cb, function (_result) {
                 cb(null, _result);
+            }));
+        }));
+    }));
+};
+
+
+/**
+* remove pictures
+*/
+exports.deletePic = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
+            return cb('Wrong data');
+        }
+        var _id = _params._id;
+        var userId = _user._id;
+        dbHelper.collection("images", safe.sure(cb, function (images) {
+            images.findOne({_id: BSON.ObjectID(_id), userId: userId}, safe.sure(cb, function (_result) {
+                if (_.isEmpty(_result)) {
+                    cb('Wrong data');
+                } else {
+                    var filePath = __dirname + '/../public/images/users/' + _result.name;
+                    images.remove({_id: BSON.ObjectID(_id)}, safe.sure(cb, function () {
+                        fs.unlink(filePath, safe.sure(cb, function () {
+                            cb();
+                        }));
+                    }));
+                }
+            }));
+        }));
+    }));
+};
+
+/**
+* set main picture
+*/
+exports.setMainPic = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
+            return cb('Wrong data');
+        }
+        var _id = _params._id;
+        var userId = _user._id;
+        dbHelper.collection("images", safe.sure(cb, function (images) {
+            images.findOne({_id: BSON.ObjectID(_id), userId: userId}, safe.sure(cb, function (_result) {
+                if (_.isEmpty(_result)) {
+                    cb('Wrong data');
+                } else {
+                    dbHelper.collection("users", safe.sure(cb, function (users) {
+                        users.update({_id: BSON.ObjectID(_user._id)}, {$set: { picture: _result.name}}, safe.sure(cb, function () {
+                            cb();
+                        }));
+                    }));
+                }
             }));
         }));
     }));

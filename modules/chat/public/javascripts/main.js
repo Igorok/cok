@@ -7,6 +7,7 @@ require.config({
         "storageapi": "storageapi",
         "lodash": "lodash",
         "handlebars": "handlebars",
+        "hbHelper": "hbHelper",
         "tpl": "tpl",
         "jsonrpcclient": "jsonrpcclient",
         "io": "io",
@@ -19,6 +20,9 @@ require.config({
         },
         "tpl": {
             deps:["handlebars"]
+        },
+        "hbHelper": {
+            deps:["lodash", "handlebars"]
         },
         "jsonrpcclient": {
             deps:["jquery"]
