@@ -24,7 +24,7 @@ require(["jquery", "lodash", "cok_core", "cok_controller", "bootstrap"], functio
             cok_core.render ($("#picUploadModal"), "imagesModal", {imgSrc: selectedPic.src, imgId: selectedPic._id, ownerId: ownerId, userId: _user._id});
             $("#picUploadModal").modal("show");
         });
-        $("#btnRemove").click(function () {
+        $("#picUploadModal").on("click", "#btnRemove", function () {
             if (selectedPic._id) {
                 cok_core.call("index.deletePic", {token: token, _id: selectedPic._id}, function (result) {
                     $("#picUploadModal").modal("hide");
@@ -32,14 +32,13 @@ require(["jquery", "lodash", "cok_core", "cok_controller", "bootstrap"], functio
                 });
             }
         });
-        $("#btnSetMain").click(function () {
+        $("#picUploadModal").on("click", "#btnSetMain", function () {
             if (selectedPic._id) {
                 cok_core.call("index.setMainPic", {token: token, _id: selectedPic._id}, function (result) {
                     $("#picUploadModal").modal("hide");
                 });
             }
         });
-        
     });
 });
 </script>

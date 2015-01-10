@@ -209,13 +209,13 @@ exports.removeChat = function (_data, cb) {
                     }
                     async.parallel([
                         function (cb) {
-                            chatmessages.remove({chatId: _id}, cb)
+                            chatmessages.remove({chatId: _id}, cb);
                         },
                         function (cb) {
-                            chatgroups.remove({_id: BSON.ObjectID(_id)}, cb)
+                            chatgroups.remove({_id: BSON.ObjectID(_id)}, cb);
                         },
                     ], safe.sure(cb, function() {
-                        cb(null, true)
+                        cb(null, true);
                     }));
                 }));
             }));
@@ -297,7 +297,7 @@ exports.mainPicUpload = function (_data, cb) {
     exports.picUpload(_data, safe.sure(cb, function (newFileName, _user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
             users.update({_id: BSON.ObjectID(_user._id)}, {$set: { picture: newFileName}}, safe.sure(cb, function () {
-                cb(null, true)
+                cb(null, true);
             }));
         }));
     }));
@@ -311,12 +311,12 @@ exports.getUserPic = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         var ownerId;
         if (_.isEmpty(_params.ownerId)) {
-            _id = _user._id;
+        	ownerId = _user._id;
         } else {
-            _id = _params.ownerId.toString();
+        	ownerId = _params.ownerId.toString();
         }
         dbHelper.collection("images", safe.sure(cb, function (images) {
-            images.find({userId: _id}).toArray(safe.sure(cb, function (_result) {
+            images.find({userId: ownerId}).toArray(safe.sure(cb, function (_result) {
                 cb(null, _result);
             }));
         }));

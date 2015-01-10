@@ -35,7 +35,7 @@ var hbs = app.engine('hbs', exphbs({
 
 
 app.set('view engine', 'hbs');
-app.set('views', __dirname + '/modules/chat/views')
+app.set('views', __dirname + '/modules/chat/views');
 app.use(express.static(__dirname + '/modules/chat/public'));
 app.use(errorhandler());
 
