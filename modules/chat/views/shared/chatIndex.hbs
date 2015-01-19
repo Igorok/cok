@@ -6,7 +6,7 @@
             var chatTable;
             var chatRender = function () {
                 cok_core.call("index.getChatList", {token: token}, function (result) {
-                    chatTable = new cok_core.tableRender("chatList", $("#chatCase tbody"), result[0], {}, 10, $('#chatCasePager'));
+                    chatTable = new cok_core.tableRender("chatList", $("#chatCase tbody"), result[0], {}, 10);
                     chatTable.render();
                 });
             }
@@ -38,13 +38,13 @@
         });
     });
 </script>
-<br>
 <div id="messageCase"></div>
 <div class="sub-container">
-    <a class="btn btn-primary" href="#!/chat/create"><span class="glyphicon glyphicon-file"></span> Add</a>
-</div>
-<br>
-<div class="sub-container">
+    <div class="row">
+        <div class="col-md-1"><a class="btn btn-primary" href="#!/chat/create"><span class="glyphicon glyphicon-file"></span> Add</a></div>
+        <div class="col-md-8"><div class="cokPager"></div></div>
+        <div class="col-md-3"><div class="cokSearch"></div></div>
+    </div>
     <table id="chatCase" class="table table-hover">
         <thead>
             <tr>
@@ -55,5 +55,5 @@
         </thead>
         <tbody></tbody>
     </table>
-    <div id="chatCasePager"></div>
+    
 </div>

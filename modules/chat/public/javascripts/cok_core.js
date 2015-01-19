@@ -136,29 +136,31 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl", 
         }
     };
 
-    cok_core.prototype.tableRender = function (_view, _selector, _data, _option, _rowCount, _pagerSelector) {
+    cok_core.prototype.tableRender = function (_view, _selector, _data, _option, _rowCount) {
         var selfView = _view;
         var selfSelector = _selector;
         var selfData = _data;
         var selfOption = _option;
         var selfRowCount = _rowCount ? _rowCount : 10;
         var selfCurentPage = 1;
-        var selfPagerSelector = _pagerSelector;
+        var selfPagerSelector = $('.cokPager');
+        var selfSearchSelector = $('.cokSearch');
 
-        var selfRender = function (cb) {
-            var pageCount = selfData.length / selfRowCount;
-            if (selfData.length % selfRowCount != 0) {
+        var selfRender = function (_data) {
+            var renderData = _data ? _data : selfData;
+            var pageCount = renderData.length / selfRowCount;
+            if (renderData.length % selfRowCount != 0) {
                 pageCount = parseInt(pageCount) + 1;
             }
             var startRenderIndex = (selfCurentPage -1) * selfRowCount;
-            if (startRenderIndex > selfData.length) {
-                startRenderIndex = selfData.length - selfRowCount;
+            if (startRenderIndex > renderData.length) {
+                startRenderIndex = renderData.length - selfRowCount;
             }
             var endRenderIndex = selfCurentPage * selfRowCount;
-            if (endRenderIndex > selfData.length) {
-                endRenderIndex = selfData.length;
+            if (endRenderIndex > renderData.length) {
+                endRenderIndex = renderData.length;
             }
-            var renderData = selfData.slice(startRenderIndex, endRenderIndex);
+            var renderData = renderData.slice(startRenderIndex, endRenderIndex);
             var pagerTemplate = '<ul class="pagination">';
             if (pageCount > 1) {
                 for (var i = 1; i <= pageCount; i++) {
@@ -170,15 +172,10 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl", 
                 }
             }
             pagerTemplate += '</ul>';
-
+            
+            selfPagerSelector.html(pagerTemplate);
+            render(selfSearchSelector, 'cokSearch', {});
             render(selfSelector, selfView, {data: renderData, option: selfOption});
-
-            if (selfPagerSelector) {
-                selfPagerSelector.html(pagerTemplate);
-            }
-            if (cb) {
-                cb();
-            }
         }
         var sort = function (key, asc) {
             var self = this;
@@ -188,9 +185,29 @@ define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl", 
             }
             selfRender();
         }
+        var search = function (_data, _field) {
+            var searchData = _data.toString();
+            var searchField = _field;
+            var searchRes = [];
+            
+            if (selfData && searchData && searchData.length > 1) {
+                _.each(selfData, function (val) {
+                    if (val[searchField].toString().indexOf(searchData) != -1) {
+                        searchRes.push(val);
+                    }
+                });
+                selfRender(searchRes);
+            } else {
+                selfRender();
+            }
+        }
+        
         // public method
-        this.render = function (cb) {
-            return selfRender(cb);
+        this.render = function () {
+            return selfRender();
+        }
+        this.search = function (_data, _field) {
+            return search(_data, _field);
         }
         this.pageChange = function (_pageNum) {
             if (_pageNum) {
