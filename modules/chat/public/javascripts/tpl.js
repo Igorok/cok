@@ -269,8 +269,10 @@ this["chat"]["userDetailPartition"] = Handlebars.template({"1":function(depth0,h
     + escapeExpression(((helper = (helper = helpers.email || (depth0 != null ? depth0.email : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"email","hash":{},"data":data}) : helper)))
     + "</p>\n    </div>\n</div>\n";
 },"2":function(depth0,helpers,partials,data) {
-  return "/images/users/";
-  },"4":function(depth0,helpers,partials,data) {
+  var lambda=this.lambda, escapeExpression=this.escapeExpression;
+  return "/images/users/"
+    + escapeExpression(lambda(depth0, depth0));
+},"4":function(depth0,helpers,partials,data) {
   return "/images/no-avatar.jpg";
   },"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
   var stack1, helper, options, functionType="function", helperMissing=helpers.helperMissing, blockHelperMissing=helpers.blockHelperMissing;

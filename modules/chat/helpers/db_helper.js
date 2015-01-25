@@ -17,7 +17,7 @@ function dbHelper () {
         console.log("Connecting to: " + cfg.mongo.host);
         var dbc = new mongo.Db(
             cfg.mongo.db,
-            new mongo.Server(cfg.mongo.host, cfg.mongo.port, cfg.mongo.opts), {native_parser: false, safe:true, maxPoolSize: 100}
+            new mongo.Server(cfg.mongo.host, cfg.mongo.port, cfg.mongo.opts), {native_parser: false, safe:true, w: 1}
         );
         dbc.open(safe.sure(cb, function(db) {
             _db = db;

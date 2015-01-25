@@ -18,6 +18,8 @@
         "compression": "",
         "body-parser": "",
         "safe": "",
+        "nodeunit": "",
+        "nodeunit-async": "",
         "uglify": "",
         "less-middleware": "",
         "grunt": "",
