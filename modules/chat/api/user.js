@@ -282,3 +282,20 @@ exports.getFriendList = function (_data, cb) {
         }));
     }));
 };
+
+/**
+* detail user
+*/
+exports.deleteUser = function (_data, cb) {
+    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isEmpty(_params._id)) {
+            return cb ("Wrong form data");
+        }
+        var _id = _params._id.toString();
+        dbHelper.collection("users", safe.sure(cb, function (users) {
+            users.remove({_id: BSON.ObjectID(_id)}, safe.sure(cb, function (_result) {
+                cb (null, _result);
+            }));
+        }));
+    }));
+};

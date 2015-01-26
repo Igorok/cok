@@ -1,17 +1,10 @@
-var nodeunit  = require('nodeunit');
-var nodeunitAsync  = require('nodeunit-async');
-
-var doubled = require('./double');
-var userApi = require(__dirname + '/../api/user.js');
-
 var th = require(__dirname + '/testHelper.js');
-
-//var userApi = require(__dirname + '/user.js');
+var userApi = require(__dirname + '/../api/user.js');
 var user;
 
-exports.asyncAutoTest = function(test) {
+exports.userTest = function (test) {
 
-    test.expect(2);
+    test.expect(4);
     th.runTest(test, [
         function registration (next) {
             console.log('userApi.Registration');
@@ -30,7 +23,7 @@ exports.asyncAutoTest = function(test) {
                 } else {
                     throw new Error(err);
                 }
-                next(null);
+                next();
             });
             
         },
@@ -47,7 +40,51 @@ exports.asyncAutoTest = function(test) {
             userApi.Authorise(data, function(err, result) {
                 if (! err) {
                     user = result;
-                    console.log(user)
+                    test.ok(true);
+                } else {
+                    throw new Error(err);
+                }
+
+                next();
+            });
+        },
+        function checkAuth (next) {
+            console.log('userApi.checkAuth');
+            var params = {
+                token: 'spam',
+                login: 'spam',
+                password: 'spam',
+            };
+            var data = {
+                params:[params]
+            };
+            userApi.checkAuth(data, function(err, result) {
+                if (! err) {
+                    test.fail(result);
+                } else {
+                    test.throws(
+                        function() {
+                            throw new Error(err);
+                        },
+                        Error
+                    );
+                }
+                next();
+            });
+        },
+        function deleteUser (next) {
+            console.log('userApi.deleteUser');
+            var params = {
+                token: user.token,
+                _id: user._id.toHexString(),
+            };
+            var data = {
+                params:[params]
+            };
+
+            
+            userApi.deleteUser(data, function(err, result) {
+                if (! err) {
                     test.ok(true);
                 } else {
                     throw new Error(err);
@@ -58,26 +95,5 @@ exports.asyncAutoTest = function(test) {
         },
     ]);
 };
-
-/*
-
-exports.asyncWaterfallTest = function(test) {
-
-    test.expect(1);
-
-    th.runTest(test, [
-        function(next) {
-            console.log('Test Method');
-            next(null, 2);
-        },
-        function(result, next) {
-            console.log('Assertions');
-            test.equal(2, result);
-            next();
-        }
-    ]);
-
-};
-*/
 
 
