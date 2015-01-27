@@ -1,11 +1,15 @@
+var _ = require('lodash');
 var th = require(__dirname + '/testHelper.js');
 var userApi = require(__dirname + '/../api/user.js');
 var user;
 
-exports.userTest = function (test) {
+exports.chatUserTest = function (test) {
 
-    test.expect(4);
+    test.expect(6);
     th.runTest(test, [
+        /*
+        * userApi.Registration
+        */
         function registration (next) {
             console.log('userApi.Registration');
             var params = {
@@ -16,17 +20,19 @@ exports.userTest = function (test) {
             var data = {
                 params:[params]
             };
-
             userApi.Registration(data, function(err, result) {
                 if (! err) {
                     test.ok(true);
                 } else {
-                    throw new Error(err);
+                    test.fail(err);
                 }
                 next();
             });
             
         },
+        /*
+        * userApi.Authorise
+        */
         function authorise (next) {
             console.log('userApi.Authorise');
             var params = {
@@ -42,12 +48,15 @@ exports.userTest = function (test) {
                     user = result;
                     test.ok(true);
                 } else {
-                    throw new Error(err);
+                    test.fail(err);
                 }
 
                 next();
             });
         },
+        /*
+        * userApi.checkAuth
+        */
         function checkAuth (next) {
             console.log('userApi.checkAuth');
             var params = {
@@ -72,6 +81,55 @@ exports.userTest = function (test) {
                 next();
             });
         },
+        /*
+        * userApi.getUserList
+        */
+        function getUserList (next) {
+            console.log('userApi.getUserList');
+            var params = {
+                token: user.token,
+            };
+            var data = {
+                params: [params]
+            };
+            userApi.getUserList(data, function(err, result) {
+                if (! err && _.isArray(result) && result[0].login && result[0].email) {
+                    test.ok(true);
+                } else {
+                    test.fail(err);
+                }
+                next();
+            });
+        },
+        /*
+        * userApi.getUserDetail
+        */
+        function getUserDetail (next) {
+            console.log('userApi.getUserDetail');
+            var params = {
+                token: user.token,
+                _id: user._id.toHexString(),
+            };
+            var data = {
+                params: [params]
+            };
+            userApi.getUserDetail(data, function(err, result) {
+                if (! err && result && (result.login == 'unittest') && (result.email == 'unittest@unittest.ru')) {
+                    test.ok(true);
+                } else {
+                    test.fail(err);
+                }
+                next();
+            });
+        },
+        
+        
+        
+        
+        
+        /*
+        * userApi.deleteUser
+        */
         function deleteUser (next) {
             console.log('userApi.deleteUser');
             var params = {
@@ -81,13 +139,11 @@ exports.userTest = function (test) {
             var data = {
                 params:[params]
             };
-
-            
             userApi.deleteUser(data, function(err, result) {
                 if (! err) {
                     test.ok(true);
                 } else {
-                    throw new Error(err);
+                    test.fail(err);
                 }
 
                 next();
