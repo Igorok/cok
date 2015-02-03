@@ -104,7 +104,7 @@ exports.editChat = function (_data, cb) {
             _.each(_params.users, function (val) {
                 userArr.push({_id: val.toString()});
             });
-            var cGroup;
+            var cGroup = null;
             async.waterfall([
                 function (cb) {
                     chatgroups.findOne({_id: BSON.ObjectID(_id), creator: _user._id}, safe.sure(cb, function (_cGroup) {
@@ -138,7 +138,7 @@ exports.getEditChat = function (_data, cb) {
         }
         var cUser = _user;
         var _id = _params._id.toString();
-        var cGroup;
+        var cGroup = null;
         var friendIds = [];
         var groupUsrIds = [];
         var usrIds = [];
