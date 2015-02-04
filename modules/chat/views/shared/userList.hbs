@@ -5,10 +5,16 @@
     </td>
     <td class="action-column">
         {{#friend}}
-            <button data-id="{{_id}}" class="btn btn-sm btn-danger delFriendBtn"><span class="glyphicon glyphicon-remove"></span></button>
+            <button data-id="{{_id}}" class="btn btn-sm btn-danger delFriendBtn">
+                <span class="glyphicon glyphicon-remove"></span>
+                remove from friends
+            </button>
         {{/friend}}
         {{^friend}}
-            <button data-id="{{_id}}" class="btn btn-sm btn-success addFriendBtn"><span class="glyphicon glyphicon-plus"></span></button>
+            <button data-id="{{_id}}" class="btn btn-sm btn-success addFriendBtn">
+                <span class="glyphicon glyphicon-plus"></span>
+                add to friends
+            </button>
         {{/friend}}
     </td>
 </tr>

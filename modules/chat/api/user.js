@@ -321,14 +321,13 @@ exports.deleteFriend = function (_data, cb) {
                         var cUser = _cUser;
                         var removedId = _.difference(usersIds, [uId]);
                         removedId = removedId[0];
-                        var fIds = _.pluck(cUser.friends, "_id");
-                        if (! _.contains(fIds, removedId)) {
+                        users.update({_id: cUser._id}, { $pull: {
+                            friends: {_id: removedId},
+                            selfFriendRequests: {_id: removedId}, 
+                            friendRequests: {_id: removedId}
+                        }}, safe.sure(cb, function (_delRes, info) {
                             cb();
-                        } else {
-                            users.update({_id: cUser._id}, {$pull: {friends: {_id: removedId}}}, safe.sure(cb, function () {
-                                cb();
-                            }));
-                        }
+                        }));
                     }
                 }));
             }, safe.sure(cb, function () {

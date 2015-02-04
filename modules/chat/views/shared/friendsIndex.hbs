@@ -5,47 +5,57 @@ require (["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok
         var token = _user.token;
         var friendListArr = [];
         var friendReqArr = [];
+        var friendsCall = function (cb) {
+            cok_core.call("user.getFriendList", {token: token}, function (result) {
+                friendListArr = result[0];
+                friendReqArr = result[1];
+                cb();
+            });
+        }
         var renderFriendList = function () {
-            if (! _.isEmpty(friendListArr)) {
-                cok_core.render ($("#friendsCase tbody"), "userList", {data: friendListArr});
-            } else {
-                $("#friendsCase tbody").empty();
-            }
-        };
-        var renderFriendReq = function () {
-            if (! _.isEmpty(friendReqArr)) {
-                cok_core.render ($("#friendsCase tbody"), "userList", {data: friendReqArr});
-            } else {
-                $("#friendsCase tbody").empty();
-            }
+            friendsCall(function () {
+                if (! _.isEmpty(friendListArr)) {
+                    cok_core.render ($("#friendsCase tbody"), "userList", {data: friendListArr});
+                } else {
+                    $("#friendsCase tbody").empty();
+                }
+            });
         };
         
-        cok_core.call("user.getFriendList", {token: token}, function (result) {
-            friendListArr = result[0];
-            friendReqArr = result[1];
-            renderFriendList();
-        });
+        var renderFriendReq = function () {
+            friendsCall(function () {
+                if (! _.isEmpty(friendReqArr)) {
+                    cok_core.render ($("#friendsCase tbody"), "userList", {data: friendReqArr});
+                } else {
+                    $("#friendsCase tbody").empty();
+                }
+            });
+        };
+        
+        
         
         $('#friendsCase').on('click', '.delFriendBtn', function () {
             var btn = $(this);
             var _id = btn.attr('data-id');
             cok_core.call("user.deleteFriend", {token: token, _id: _id}, function (result) {
-                renderFriends();
+                renderFriendList();
             });
         });
         
         $('#friendsCase').on('click', '.addFriendBtn', function () {
             var _id = $(this).attr('data-id');
             cok_core.call("user.addFriend", {token: token, _id: _id}, function (result) {
-                renderFriends();
+                renderFriendList();
             });
         });
         
         $('#getFrientList').click(function () {
+            $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
             renderFriendList();
         });
         
         $('#getFrientRequests').click(function () {
+            $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
             renderFriendReq();
         });
         
