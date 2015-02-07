@@ -118,9 +118,25 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     /**
     * friends list
     */
-    cok_controller.prototype.userFriends = function () {
+    cok_controller.prototype.userFriendsRender = function () {
         cok_core.render ($("#body"), "friendsIndex", {});
-    };
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     // user detail page
     cok_controller.prototype.userDetail = function (_id) {
         var _user = checkedUser();

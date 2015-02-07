@@ -174,7 +174,7 @@ exports.getUserDetail = function (_data, cb) {
             _id = _params._id.toString();
         }
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.findOne({_id: BSON.ObjectID(_id)}, {login:1, email: 1, picture: 1}, safe.sure(cb, function (_result) {
+            users.findOne({_id: BSON.ObjectID(_id)}, {login:1, email: 1, picture: 1, friends: 1}, safe.sure(cb, function (_result) {
                 cb (null, _result);
             }));
         }));

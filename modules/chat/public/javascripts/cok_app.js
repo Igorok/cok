@@ -18,7 +18,7 @@ define (["jquery", "cok_core", "cok_controller"], function ($, cok_core, cok_con
         user: {
             index: cok_controller.userIndex,
             detail: cok_controller.userDetail,
-            friends: cok_controller.userFriends,
+            friends: cok_controller.userFriendsRender,
         },
         chat: {
             index: cok_controller.chatIndex,

@@ -1,11 +1,13 @@
 var _ = require('lodash');
+var async = require('async');
 var th = require(__dirname + '/testHelper.js');
 var userApi = require(__dirname + '/../api/user.js');
 var user;
+var userFriend;
 
 exports.chatUserTest = function (test) {
 
-    test.expect(6);
+    test.expect(12);
     th.runTest(test, [
         /*
         * userApi.Registration
@@ -123,7 +125,126 @@ exports.chatUserTest = function (test) {
             });
         },
         
-        
+        /*
+        * test friends
+        */
+        function getUserDetail (next) {
+            async.waterfall([
+                function registration (cb) {
+                    var params = {
+                        login: 'unitfriend',
+                        email: 'unitfriend@unitfriend.ru',
+                        password: 'unitfriend',
+                    };
+                    var data = {
+                        params:[params]
+                    };
+                    userApi.Registration(data, function(err, result) {
+                        if (err) {
+                            test.fail(err);
+                        } else {
+                            test.ok(true);
+                        }
+                        cb();
+                    });
+
+                },
+                function authorise (cb) {
+                    var params = {
+                        login: 'unitfriend',
+                        password: 'unitfriend',
+                    };
+                    var data = {
+                        params:[params]
+                    };
+
+                    userApi.Authorise(data, function(err, result) {
+                        if (err) {
+                            test.fail(err);
+                        } else {
+                            userFriend = result;
+                            test.ok(true);
+                        }
+
+                        cb();
+                    });
+                },
+                function addFriendRequest (cb) {
+                    console.log('userApi.addFriendRequest');
+                    var params = {
+                        token: user.token,
+                        _id: userFriend._id.toHexString(),
+                    };
+                    var data = {
+                        params: [params]
+                    };
+                    userApi.addFriendRequest(data, function(err, result) {
+                        if (err) {
+                            test.fail(err);
+                        } else {
+                            test.ok(true);
+                        }
+                        cb();
+                    });
+                },
+                function addFriend (cb) {
+                    console.log('userApi.addFriend');
+                    var params = {
+                        token: userFriend.token,
+                        _id: user._id.toHexString(),
+                    };
+                    var data = {
+                        params: [params]
+                    };
+                    userApi.addFriend(data, function(err, result) {
+                        if (err) {
+                            test.fail(err);
+                        } else {
+                            test.ok(true);
+                        }
+                        cb();
+                    });
+                },
+                function checkUsers (cb) {
+                    async.parallel([
+                        function (cb) {
+                            var params = {
+                                token: user.token,
+                                _id: user._id.toHexString(),
+                            };
+                            var data = {
+                                params: [params]
+                            };
+                            userApi.getUserDetail(data, cb);
+                        },
+                        function (cb) {
+                            var params = {
+                                token: userFriend.token,
+                                _id: userFriend._id.toHexString(),
+                            };
+                            var data = {
+                                params: [params]
+                            };
+                            userApi.getUserDetail(data, cb);
+                        },
+                    ], function (err, _result) {
+                        if (err || ! _result[0] || ! _result[0].friends || ! _result[1] || ! _result[1].friends) {
+                            test.fail(err || 'users not found');
+                        } else {
+                            var uFriends = _.pluck(_result[0].friends, "_id");
+                            var ufFriends = _.pluck(_result[1].friends, "_id");
+                            
+                            if (! _.contains(uFriends, userFriend._id.toString()) || ! _.contains(ufFriends, user._id.toString())) {
+                                test.fail(new Error('wrong friends'));
+                            } else {
+                                test.ok(true);
+                            }
+                        }
+                        cb();
+                    });
+                },
+            ], next);
+        },
         
         
         
@@ -132,24 +253,46 @@ exports.chatUserTest = function (test) {
         */
         function deleteUser (next) {
             console.log('userApi.deleteUser');
-            var params = {
-                token: user.token,
-                _id: user._id.toHexString(),
-            };
-            var data = {
-                params:[params]
-            };
-            userApi.deleteUser(data, function(err, result) {
-                if (! err) {
-                    test.ok(true);
-                } else {
-                    test.fail(err);
-                }
+            async.parallel([
+                function (cb) {
+                    var params = {
+                        token: user.token,
+                        _id: user._id.toHexString(),
+                    };
+                    var data = {
+                        params:[params]
+                    };
+                    userApi.deleteUser(data, function(err, result) {
+                        if (! err) {
+                            test.ok(true);
+                        } else {
+                            test.fail(err);
+                        }
 
-                next();
-            });
+                        cb();
+                    });
+                },
+                function (cb) {
+                    var params = {
+                        token: userFriend.token,
+                        _id: userFriend._id.toHexString(),
+                    };
+                    var data = {
+                        params:[params]
+                    };
+                    userApi.deleteUser(data, function(err, result) {
+                        if (! err) {
+                            test.ok(true);
+                        } else {
+                            test.fail(err);
+                        }
+
+                        cb();
+                    });
+                },
+            ], next);
+            
         },
     ]);
 };
-
 

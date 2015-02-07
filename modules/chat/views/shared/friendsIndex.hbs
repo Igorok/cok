@@ -3,6 +3,7 @@ require (["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok
     $(function () {
         var _user = cok_controller.checkedUser();
         var token = _user.token;
+        
         var friendListArr = [];
         var friendReqArr = [];
         var friendsCall = function (cb) {
@@ -12,8 +13,10 @@ require (["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok
                 cb();
             });
         }
+        
         var renderFriendList = function () {
             friendsCall(function () {
+                $('#getFrientList').addClass('btn-primary').siblings().removeClass('btn-primary');
                 if (! _.isEmpty(friendListArr)) {
                     cok_core.render ($("#friendsCase tbody"), "userList", {data: friendListArr});
                 } else {
@@ -24,6 +27,7 @@ require (["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok
         
         var renderFriendReq = function () {
             friendsCall(function () {
+                $('#getFrientRequests').addClass('btn-primary').siblings().removeClass('btn-primary');
                 if (! _.isEmpty(friendReqArr)) {
                     cok_core.render ($("#friendsCase tbody"), "userList", {data: friendReqArr});
                 } else {
@@ -31,6 +35,11 @@ require (["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok
                 }
             });
         };
+        
+        
+        
+        
+        
         
         
         
@@ -50,15 +59,15 @@ require (["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok
         });
         
         $('#getFrientList').click(function () {
-            $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
             renderFriendList();
         });
         
         $('#getFrientRequests').click(function () {
-            $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
             renderFriendReq();
         });
         
+        
+        renderFriendList();
     });
 });
 </script>
