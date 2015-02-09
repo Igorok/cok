@@ -12,7 +12,7 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var exphbs = require('express-handlebars');
 var lessMiddleware = require('less-middleware');
-var dbHelper = require(__dirname + '/modules/chat/helpers/db_helper.js');
+var dbHelper = require('cok_db');
 
 // Configuration
 app.use(compression());

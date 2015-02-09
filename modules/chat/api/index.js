@@ -5,7 +5,7 @@ var moment = require('moment');
 var mongo = require('mongodb');
 var fs = require('fs');
 var BSON = mongo.BSONPure;
-var dbHelper = require(__dirname + '/../helpers/db_helper.js');
+var dbHelper = require('cok_db');
 var userApi = require(__dirname + '/user.js');
 
 

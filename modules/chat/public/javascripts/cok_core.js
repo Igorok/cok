@@ -1,7 +1,6 @@
 define(["jquery", "jsonrpcclient", "storageapi", "lodash", "handlebars", "tpl", "hbHelper",], function ($, jsonrpc, storageapi, _, hbs, tpl) {
     function cok_core () {}
     var routes;
-    var menu;
     var user;
     var storage = $.localStorage;
     // get current user

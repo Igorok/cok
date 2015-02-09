@@ -1,7 +1,7 @@
 var safe = require('safe');
 var mongo = require('mongodb');
 var requireRedis = require("redis");
-var cfg = require('./config_helper');
+var cfg = require('cok_config');
 var _db;
 var _redis;
 

@@ -3,20 +3,31 @@ var fs = require('fs');
 var api = {
     "index": require(__dirname + '/../api/index.js'),
     "user": require(__dirname + '/../api/user.js'),
+    "admin": require(__dirname + '/../api/admin.js'),
 };
 
 // routes
 module.exports = function (app) {
     app.get('/', index);
+    app.get('/amin', amin);
     app.post('/jsonrpc', jsonrpc);
     app.post('/upload', upload);
 };
 
 
 
-// actions
+/*
+* main page
+*/
 function index (req, res) {
     res.render('index');
+}
+
+/*
+* admin page
+*/
+function amin (req, res) {
+    res.render('amin');
 }
 
 function jsonrpc (req, res) {

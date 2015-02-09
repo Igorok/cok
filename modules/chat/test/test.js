@@ -7,7 +7,7 @@ var userFriend;
 
 exports.chatUserTest = function (test) {
 
-    test.expect(12);
+    test.expect(13);
     th.runTest(test, [
         /*
         * userApi.Registration
@@ -246,7 +246,63 @@ exports.chatUserTest = function (test) {
             ], next);
         },
         
-        
+        /*
+        * userApi.deleteUser
+        */
+        function deleteFriend (next) {
+            console.log('userApi.deleteFriend');
+            var params = {
+                token: user.token,
+                _id: userFriend._id.toString(),
+            };
+            var data = {
+                params: [params]
+            };
+            userApi.deleteFriend(data, function (err, _result) {
+                if (err) {
+                    test.fail(err);
+                    next();
+                } else {
+                    async.parallel([
+                        function (cb) {
+                            var params = {
+                                token: user.token,
+                                _id: user._id.toString(),
+                            };
+                            var data = {
+                                params: [params]
+                            };
+                            userApi.getUserDetail(data, cb);
+                        },
+                        function (cb) {
+                            var params = {
+                                token: userFriend.token,
+                                _id: userFriend._id.toString(),
+                            };
+                            var data = {
+                                params: [params]
+                            };
+                            userApi.getUserDetail(data, cb);
+                        },
+                    ], function (err, _result) {
+                        if (err || ! _result[0] || ! _result[0].friends || ! _result[1] || ! _result[1].friends) {
+                            test.fail(err || 'users not found');
+                        } else {
+                            var uFriends = _.pluck(_result[0].friends, "_id");
+                            var ufFriends = _.pluck(_result[1].friends, "_id");
+
+                            if (_.contains(uFriends, userFriend._id.toString()) || _.contains(ufFriends, user._id.toString())) {
+                                test.fail(new Error('friends not deleted'));
+                            } else {
+                                test.ok(true);
+                            }
+                        }
+                        next();
+                    });
+                }
+            
+            });
+        },
         
         /*
         * userApi.deleteUser

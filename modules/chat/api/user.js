@@ -5,7 +5,7 @@ var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
 var BSON = mongo.BSONPure;
-var dbHelper = require(__dirname + '/../helpers/db_helper.js');
+var dbHelper = require('cok_db');
 var self = this;
 
 
@@ -245,7 +245,6 @@ exports.addFriendRequest = function (_data, cb) {
 * add friends for user
 */
 exports.addFriend = function (_data, cb) {
-    console.log('addFriend');
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         var cUser = _user;
         if (_.isEmpty(_params._id)) {
