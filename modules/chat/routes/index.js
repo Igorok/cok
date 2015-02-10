@@ -20,7 +20,8 @@ module.exports = function (app) {
 * main page
 */
 function index (req, res) {
-    res.render('index');
+    var apphost = process.env.apphost;
+    res.render('index', {apphost: apphost});
 }
 
 /*

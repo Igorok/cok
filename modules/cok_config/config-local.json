@@ -1,4 +1,5 @@
 {
+    "prod": true,
     "mongo":{
         "host":"ds041831.mongolab.com",
         "port":41831,

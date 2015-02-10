@@ -13,7 +13,7 @@ var multer = require('multer');
 var exphbs = require('express-handlebars');
 var lessMiddleware = require('less-middleware');
 var dbHelper = require('cok_db');
-
+var cfg = require('cok_config');
 // Configuration
 app.use(compression());
 app.use(bodyParser.json());
@@ -53,8 +53,11 @@ dbHelper.redis(function (err, _redis) {
         require('./modules/chat/routes/socket.js')(app, io);
         // start server
         var port = process.env.PORT || 3000;
+        var host = cfg.prod ? "igor-ok.herokuapp.com" : "localhost";
+        host = host + ":" + port;
+        process.env.apphost = host;
         server.listen(port, function () {
-            console.log('Example app listening at ', port);
+            console.log('Example app listening at ', host);
         });
     });
 });

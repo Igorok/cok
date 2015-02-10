@@ -3,6 +3,7 @@
 # Example .gitignore files: https://github.com/github/gitignore
 node_modules
 tmp
+modules/cok_config/config-local.json
 modules/chat/public/images/users/*.png
 modules/chat/public/images/users/*.jpg
 modules/chat/public/images/users/*.jpeg
