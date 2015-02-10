@@ -14,14 +14,20 @@ function dbHelper () {
         if (_db) {
             return cb(null, _db);
         }
-        console.log("Connecting to: " + cfg.mongo.host);
+        console.log("Connecting to: " , cfg.mongo);
         var dbc = new mongo.Db(
             cfg.mongo.db,
             new mongo.Server(cfg.mongo.host, cfg.mongo.port, cfg.mongo.opts), {native_parser: false, safe:true, w: 1}
         );
         dbc.open(safe.sure(cb, function(db) {
             _db = db;
-            cb(null, _db);
+            if (! cfg.mongo.auth) {
+                cb(null, _db);
+            } else {
+                _db.authenticate(cfg.mongo.user, cfg.mongo.password, safe.sure(cb, function() {
+                    cb(null, _db);
+                }));
+            }
         }));
     };
 
@@ -33,10 +39,21 @@ function dbHelper () {
         }));
     };
 
-    if (! _redis) {
-        _redis = requireRedis.createClient();
-    }
-    self.redis = _redis;
+    self.redis = function (cb) {
+        if (! _redis) {
+            if (! cfg.redis.auth) {
+                _redis = requireRedis.createClient();
+                cb(null, _redis);
+            } else {
+                _redis = requireRedis.createClient(cfg.redis.port, cfg.redis.host);
+                _redis.auth(cfg.redis.password, safe.sure(cb, function() {
+                    cb(null, _redis);
+                }));
+            }
+        } else {
+            cb(null, _redis);
+        }
+    };
 }
 
 // export

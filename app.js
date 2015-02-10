@@ -40,14 +40,22 @@ app.use(express.static(__dirname + '/modules/chat/public'));
 app.use(errorhandler());
 
 
-dbHelper.db(function () {
-    // Routes
-    require('./modules/chat/routes/index.js')(app);
-    require('./modules/chat/routes/socket.js')(app, io);
-    // start server
-    server.listen(3000, function () {
-        var host = server.address().address;
-        var port = server.address().port;
-        console.log('Example app listening at http://%s:%s', host, port);
+dbHelper.redis(function (err, _redis) {
+    if (err) {
+        console.trace(err);
+    }
+    dbHelper.db(function (err, _mongo) {
+        if (err) {
+            console.trace(err);
+        }
+        // Routes
+        require('./modules/chat/routes/index.js')(app);
+        require('./modules/chat/routes/socket.js')(app, io);
+        // start server
+        server.listen(80, function () {
+            var host = server.address().address;
+            var port = server.address().port;
+            console.log('Example app listening at http://%s:%s', host, port);
+        });
     });
 });

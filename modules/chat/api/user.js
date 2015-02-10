@@ -54,6 +54,7 @@ exports.Authorise = function (_data, cb) {
     }
     var login = params.login.toString().trim();
     var password = params.password.toString().trim();
+    var redis = null;
     dbHelper.collection("users", safe.sure(cb, function (users) {
         users.findOne({login: login}, safe.sure(cb, function (user) {
             var hash = crypto.createHash('sha1');
@@ -72,12 +73,16 @@ exports.Authorise = function (_data, cb) {
                 },
                 function (cb) {
                     var ruser = JSON.stringify(user);
-                    dbHelper.redis.set(userToken, ruser, safe.sure(cb, function () {
-                        cb();
+                    dbHelper.redis(safe.sure(cb, function (_redis) {
+                        redis = _redis;
+                        redis.set(userToken, ruser, safe.sure(cb, function () {
+                            cb();
+                        }));
                     }));
+                    
                 },
                 function (cb) {
-                    dbHelper.redis.expire(userToken, 24*60*60, safe.sure(cb, function () {
+                    redis.expire(userToken, 24*60*60, safe.sure(cb, function () {
                         cb();
                     }));
                 }
@@ -103,7 +108,19 @@ exports.checkAuth = function (_data, cb) {
         return cb (403);
     }
     token = _data.params[0].token.toString();
-    dbHelper.redis.get(token, safe.sure(cb, function (_user) {
+    dbHelper.redis(safe.sure(cb, function (_redis) {
+        _redis.get(token, safe.sure(cb, function (_user) {
+            if (! _user) {
+                return cb (403);
+            } else {
+                _user = JSON.parse(_user);
+                var startArr = [null, _user];
+                var params = startArr.concat(_data.params);
+                cb.apply(self, params);
+            }
+        }));
+    }));
+    /*dbHelper.redis.get(token, safe.sure(cb, function (_user) {
         if (! _user) {
             return cb (403);
         } else {
@@ -112,7 +129,7 @@ exports.checkAuth = function (_data, cb) {
             var params = startArr.concat(_data.params);
             cb.apply(self, params);
         }
-    }));
+    }));*/
 };
 
 /**
@@ -120,7 +137,9 @@ exports.checkAuth = function (_data, cb) {
 */
 exports.logout = function (_data, cb) {
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        dbHelper.redis.del(_params.token, {}, cb);
+        dbHelper.redis(safe.sure(cb, function (_redis) {
+            _redis.del(_params.token, {}, cb);
+        }));
     }));
 };
 /**
