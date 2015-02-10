@@ -52,7 +52,7 @@ dbHelper.redis(function (err, _redis) {
         require('./modules/chat/routes/index.js')(app);
         require('./modules/chat/routes/socket.js')(app, io);
         // start server
-        var port = (process.env.NODE_ENV == 'production') ? process.env.PORT : 3000;
+        var port = (process.env.NODE_ENV == 'production') ? process.env.PORT : 80;
         server.listen(port, function () {
             console.log('Example app listening at ', port);
         });
