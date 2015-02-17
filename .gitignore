@@ -9,3 +9,4 @@ modules/chat/public/images/users/*.jpg
 modules/chat/public/images/users/*.jpeg
 modules/chat/public/images/users/*.gif
 .project
+.idea
