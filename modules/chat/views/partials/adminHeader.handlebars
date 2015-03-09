@@ -1,0 +1,59 @@
+<script>
+    var require = {
+        baseUrl: "/javascripts",
+        waitSeconds: 20,
+        paths: {
+            "jquery": "jquery",
+            "storageapi": "storageapi",
+            "bootstrap": "bootstrap",
+            "underscore": "underscore",
+            "backbone": "backbone",
+            "app": "/javascripts/admin/app",
+            "modelUsr": "/javascripts/admin/users/model",
+            "viewUserList": "/javascripts/admin/users/viewUserList",
+            "viewUserDetail": "/javascripts/admin/users/viewUserDetail",
+            "dust": "dust-full",
+            "dust-helpers": "dust-helpers",
+            "tpl": "/javascripts/admin/tpl",
+            /*
+            marionette: "backbone.marionette",
+            AppController: "/javascripts/admin/AppController",
+            usersApp: "/javascripts/admin/users/App",
+            usersRoute: "/javascripts/admin/users/route",
+            permissionsApp: "/javascripts/admin/permissionsApp",
+            permissionsRoute: "/javascripts/admin/permissionsRoute"
+            */
+        },
+        shim: {
+            underscore: {
+                exports: '_'
+            },
+            backbone: {
+                exports: 'backbone',
+                deps: ['jquery', 'lodash']
+            },
+            marionette: {
+                exports: 'backbone.marionette',
+                deps: ['backbone']
+            },
+            bootstrap: {
+                deps:["jquery"]
+            },
+            storageapi: {
+                deps:["jquery"]
+            },
+            dust: {
+                exports: 'dust',
+            },
+            "dust-helpers": {
+                deps:["dust"],
+                exports: 'dust-helpers',
+            },
+            tpl: {
+                deps:["dust","dust-helpers"]
+            },
+        },
+        deps: ['jquery', 'lodash']
+    };
+</script>
+<script src="/javascripts/require.js"></script>

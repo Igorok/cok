@@ -20,6 +20,16 @@
         "express":"",
         "errorhandler": "",
         "express-handlebars":"",
+
+
+
+        "require-dust":"",
+        "dustjs-linkedin":"",
+        "dustjs-helpers":"",
+
+
+
+
         "multer": "",
         "socket.io": "",
         "redis": "",
@@ -31,6 +41,7 @@
         "uglify": "",
         "less-middleware": "",
         "grunt": "",
+        "grunt-dust": "",
         "grunt-contrib-handlebars": "",
         "grunt-contrib-requirejs": "",
         "grunt-contrib-uglify": "",

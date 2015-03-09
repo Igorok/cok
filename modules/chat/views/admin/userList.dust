@@ -1,0 +1,10 @@
+<ul>
+{# data }
+    <li>
+        <a href="#users/{_id}">
+            {login}
+        </a>
+        email: {email}
+    </li>
+{/ data }
+</ul>

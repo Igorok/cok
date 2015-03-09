@@ -1,5 +1,8 @@
-var _ = require('lodash');
 var fs = require('fs');
+var _ = require('lodash');
+
+
+
 var api = {
     "index": require(__dirname + '/../api/index.js'),
     "user": require(__dirname + '/../api/user.js'),
@@ -9,7 +12,7 @@ var api = {
 // routes
 module.exports = function (app) {
     app.get('/', index);
-    app.get('/amin', amin);
+    app.get('/admin', admin);
     app.post('/jsonrpc', jsonrpc);
     app.post('/upload', upload);
 };
@@ -27,8 +30,8 @@ function index (req, res) {
 /*
 * admin page
 */
-function amin (req, res) {
-    res.render('amin');
+function admin (req, res) {
+    res.render('admin', { layout: __dirname + '/../views/adminLayout.hbs' });
 }
 
 function jsonrpc (req, res) {

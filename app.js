@@ -30,9 +30,9 @@ app.use(lessMiddleware(__dirname + '/modules/chat/less', {
 
 var hbs = app.engine('hbs', exphbs({
     defaultLayout: __dirname + '/modules/chat/views/layout.hbs',
+    partialsDir: __dirname + '/modules/chat/views/partials/',
     //helpers: helpers,
 }));
-
 
 app.set('view engine', 'hbs');
 app.set('views', __dirname + '/modules/chat/views');
