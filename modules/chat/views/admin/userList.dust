@@ -1,10 +1,11 @@
 <ul>
 {# data }
     <li>
-        <a href="#users/{_id}">
+        <!-- a href="#users/{_id}">
             {login}
-        </a>
-        email: {email}
+        </a-->
+        <span class="detailView" data-id="{_id}">{login} </span>
+        <span> email: {email}</span>
     </li>
 {/ data }
 </ul>

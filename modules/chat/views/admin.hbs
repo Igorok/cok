@@ -1,16 +1,32 @@
-<div class="container">
-<div class="row">
-    <div class="col-md-2">
-        <ul id="navigation" class="nav nav-pills nav-stacked">
-            <li><a href="#permissions">permissions</a></li>
-            <li><a href="#groups">groups</a></li>
-            <li><a href="#users">users</a></li>
-        </ul>
-    </div>
-    <!-- -->
-    <div id="main" class="col-md-10">
-        <h1>Admin</h1>
-    </div>
-</div>
-</div>
-
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link href="/stylesheets/chat.css" rel="stylesheet">
+        {{> adminHeader }}
+    </head>
+    <body>
+        <!-- -->
+        <div id="errorCase"></div>
+        <!-- -->
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2">
+                    <ul id="navigation" class="nav nav-pills nav-stacked">
+                        <li><a href="#permissions">permissions</a></li>
+                        <li><a href="#groups">groups</a></li>
+                        <li><a href="#users">users</a></li>
+                    </ul>
+                </div>
+                <div id="main" class="col-md-10">
+                    <h1>Admin</h1>
+                </div>
+            </div>
+        </div>
+        <script>
+            require (["route"], function (Route) {
+                'use strict';
+                Route.init();
+            });
+        </script>
+    </body>
+</html>

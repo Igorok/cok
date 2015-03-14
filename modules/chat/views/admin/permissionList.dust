@@ -1,0 +1,10 @@
+<ul>
+{# data }
+    <li>
+        <a href="#permissions/{_id}">{key}</a>
+        <span> {title}</span>
+    </li>
+{/ data }
+</ul>
+
+<a href="#permissions/-1" class="btn btn-default">New permission</a>

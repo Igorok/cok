@@ -22,15 +22,17 @@ exports.checkAuth = function (_data, cb) {
         return cb (403);
     }
     token = _data.params[0].token.toString();
-    dbHelper.redis.get(token, safe.sure(cb, function (_user) {
-        if (! _user) {
-            return cb (403);
-        } else {
-            _user = JSON.parse(_user);
-            var startArr = [null, _user];
-            var params = startArr.concat(_data.params);
-            cb.apply(self, params);
-        }
+    dbHelper.redis(safe.sure(cb, function (_redis) {
+        _redis.get(token, safe.sure(cb, function (_user) {
+            if (! _user) {
+                return cb (403);
+            } else {
+                _user = JSON.parse(_user);
+                var startArr = [null, _user];
+                var params = startArr.concat(_data.params);
+                cb.apply(self, params);
+            }
+        }));
     }));
 };
 
@@ -43,3 +45,14 @@ exports.getUserList = function (_data, cb) {
         users.find({}, {login: 1, email: 1}).toArray(cb);
     }));
 };
+
+
+/**
+* all permissions
+*/
+exports.getPermissionList = function (_data, cb) {
+    dbHelper.collection("permissions", safe.sure(cb, function (permissions) {
+        permissions.find({}).toArray(cb);
+    }));
+};
+

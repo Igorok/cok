@@ -1,12 +1,12 @@
-define (["jquery", "underscore", "backbone", "app"], function ($, _, backbone, App) {
+define (["jquery", "underscore", "backbone"], function ($, _, backbone) {
     'use strict';
-    App.UserModel = Backbone.Model.extend({
+    var UserModel = Backbone.Model.extend({
         // you can set any defaults you would like here
-        defaults: [{
+        defaults: {
             _id: "",
             login: "",
             email: ""
-        }],
+        },
         idAttribute: "_id",
         /*validate: function (attrs) {
             var errors = {};
@@ -20,8 +20,10 @@ define (["jquery", "underscore", "backbone", "app"], function ($, _, backbone, A
         }*/
     });
 
-    App.UserCollection = Backbone.Collection.extend({
+    var UserCollection = Backbone.Collection.extend({
         // Reference to this collection's model.
-        model: App.UserModel,
+        model: UserModel,
     });
+
+    return UserCollection;
 });

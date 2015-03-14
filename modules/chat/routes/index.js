@@ -31,7 +31,7 @@ function index (req, res) {
 * admin page
 */
 function admin (req, res) {
-    res.render('admin', { layout: __dirname + '/../views/adminLayout.hbs' });
+    res.render('admin', {layout: false});
 }
 
 function jsonrpc (req, res) {
@@ -59,7 +59,8 @@ function jsonrpc (req, res) {
         console.trace(404, module, func);
         jsonres.error = {err: 404, code:-1};
         jsonres.result = null;
-        return res.json(jsonres);
+//        return res.json(jsonres);
+        return res.sendStatus(404);
     }
     var fn = api[module][func];
     var rf = function () {
@@ -67,7 +68,7 @@ function jsonrpc (req, res) {
         if (arguments[0]) {
             var err = arguments[0];
             console.trace(err, module, func);
-            jsonres.error = {err: err, code:-1};
+            jsonres.error = {message: err.toString(), err: err, code:-1};
             jsonres.result = null;
         } else {
             jsonres.result = Array.prototype.slice.call(arguments, 1);
@@ -112,7 +113,8 @@ function upload(req, res) {
             console.trace(404, actionArr);
             _result.error = {err: 404, code:-1};
             _result.result = null;
-            return res.json(_result);
+//            return res.json(_result);
+            return res.sendStatus(404);
         } else {
             api[actionArr[0]][actionArr[1]].apply(api, [data, function (err, _data) {
                 if (err) {

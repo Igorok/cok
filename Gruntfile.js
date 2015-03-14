@@ -27,9 +27,10 @@ module.exports = function(grunt) {
         dust: {
             compile: {
                 options: {
+                    useBaseName: true,
                     wrapper: "amd",
                     wrapperOptions: {
-                        packageName: null, // disable packageName
+                        packageName: null,
                         deps: {
                             dust: "dust",
                             "dust-helpers": "dust-helpers"
@@ -45,7 +46,7 @@ module.exports = function(grunt) {
             options: {
                 livereload: true,
             },
-            files: ['modules/chat/views/shared/**.hbs'],
+            files: ['modules/chat/views/shared/**.hbs', 'modules/chat/views/admin/**.dust'],
             tasks: ['handlebars', 'dust'],
         },
     });

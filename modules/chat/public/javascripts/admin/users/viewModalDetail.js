@@ -1,6 +1,6 @@
-define (["jquery", "underscore", "backbone", "dust", "tpl", "app", "viewModalDetail"], function ($, _, backbone, dust, tpl, App, viewModalDetail) {
+define (["jquery", "underscore", "backbone", "dust", "tpl"], function ($, _, backbone, dust, tpl) {
     'use strict';
-    App.viewUserDetail = Backbone.View.extend({
+    var viewModalDetail = Backbone.View.extend({
         // the constructor
         initialize: function (options) {
             // model is passed through
@@ -10,19 +10,22 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "app", "viewModalDet
         // populate the html to the dom
         render: function () {
             this.$el.html($('#main').html());
-            this.showModal();
+            this.addOne();
             return this;
         },
 
-        showModal: function (cb) {
+        addOne: function (cb) {
             var self = this;
             console.log(self.user.attributes);
-            dust.render("userDetail", self.user.attributes, function (err, result) {
+            dust.render("userModalDetail", self.user.attributes, function (err, result) {
                 if (err) {
                     console.trace(err);
                 }
-                self.$el.html(result);
+                console.log(result);
+                self.$el.append(result);
             });
         }
     });
+
+    return viewModalDetail;
 });

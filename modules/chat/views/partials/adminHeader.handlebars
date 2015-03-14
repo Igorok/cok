@@ -8,21 +8,29 @@
             "bootstrap": "bootstrap",
             "underscore": "underscore",
             "backbone": "backbone",
-            "app": "/javascripts/admin/app",
-            "modelUsr": "/javascripts/admin/users/model",
-            "viewUserList": "/javascripts/admin/users/viewUserList",
-            "viewUserDetail": "/javascripts/admin/users/viewUserDetail",
             "dust": "dust-full",
             "dust-helpers": "dust-helpers",
             "tpl": "/javascripts/admin/tpl",
-            /*
-            marionette: "backbone.marionette",
-            AppController: "/javascripts/admin/AppController",
-            usersApp: "/javascripts/admin/users/App",
-            usersRoute: "/javascripts/admin/users/route",
-            permissionsApp: "/javascripts/admin/permissionsApp",
-            permissionsRoute: "/javascripts/admin/permissionsRoute"
-            */
+
+
+            "api": "/javascripts/admin/api",
+            "message": "/javascripts/admin/message",
+            "vMessage": "/javascripts/admin/message/viewMessage",
+
+            "route": "/javascripts/admin/route",
+
+            "mUser": "/javascripts/admin/users/model",
+            "cUser": "/javascripts/admin/users/controller",
+            "vUserList": "/javascripts/admin/users/viewUserList",
+            "vModalDetail": "/javascripts/admin/users/viewModalDetail",
+            "vUserDetail": "/javascripts/admin/users/viewUserDetail",
+
+
+            "mPermission": "/javascripts/admin/permissions/model",
+            "cPermission": "/javascripts/admin/permissions/controller",
+            "vPermissionList": "/javascripts/admin/permissions/viewIndex",
+            "vPermissionDetail": "/javascripts/admin/permissions/viewDetail",
+
         },
         shim: {
             underscore: {
@@ -30,11 +38,7 @@
             },
             backbone: {
                 exports: 'backbone',
-                deps: ['jquery', 'lodash']
-            },
-            marionette: {
-                exports: 'backbone.marionette',
-                deps: ['backbone']
+                deps: ['jquery', 'underscore']
             },
             bootstrap: {
                 deps:["jquery"]
@@ -53,7 +57,7 @@
                 deps:["dust","dust-helpers"]
             },
         },
-        deps: ['jquery', 'lodash']
+        deps: ['jquery', 'underscore']
     };
 </script>
 <script src="/javascripts/require.js"></script>

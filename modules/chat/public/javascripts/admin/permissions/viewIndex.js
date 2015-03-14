@@ -1,12 +1,11 @@
-define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "vModalDetail", ], function ($, _, backbone, dust, tpl, Msg, vModalDetail) {
+define (["jquery", "underscore", "backbone", "dust", "tpl", "message", ], function ($, _, backbone, dust, tpl, Msg) {
     'use strict';
-    var viewUserList = Backbone.View.extend({
+    var viewIndex = Backbone.View.extend({
         // the constructor
         initialize: function (options) {
-            console.log("options ", options.users);
             // model is passed through
-            this.users = options.users;
-            this.users.bind('reset', this.addAll, this);
+            this.permissions = options.permissions;
+            this.permissions.bind('reset', this.addAll, this);
         },
 
         events: {
@@ -22,8 +21,8 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "vModalDe
 
         addAll: function () {
             var self = this;
-            var usrData = _.pluck(this.users.models, "attributes");
-            dust.render("userList", {data: usrData}, function (err, result) {
+            var data = _.pluck(this.permissions.models, "attributes");
+            dust.render("permissionList", {data: data}, function (err, result) {
                 if (err) {
                     new Msg.showError(null, err);
                 }
@@ -37,12 +36,12 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "vModalDe
             var _id = $(e.currentTarget).attr("data-id");
             var currentUser = this.users._byId[_id];
 
-            self.currentView = new vModalDetail({
+            self.currentView = new viewModalDetail({
                 user: currentUser
             });
             $('#main').html(self.currentView.render().el);*/
         }
     });
 
-    return viewUserList;
+    return viewIndex;
 });
