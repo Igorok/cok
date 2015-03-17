@@ -29,13 +29,22 @@ define (["jquery", "underscore", "backbone", "message"], function ($, _, Backbon
                 if (ret.error) {
                     console.log("ret.error", JSON.stringify(ret.error));
                     var err = ret.error.message ? ret.error.message : JSON.stringify(ret.error);
-                    new Msg.showError(null, err);
+
+                    if (err == "403") {
+                        return window.location.hash = "login";
+                    } else {
+                        new Msg.showError(null, err);
+                    }
                 } else {
                     cb(null, ret);
                 }
             },
             error: function (err) {
-                new Msg.showError(null, JSON.stringify(err));
+                if (err == "403") {
+                    return window.location.hash = "login";
+                } else {
+                    new Msg.showError(null, JSON.stringify(err));
+                }
             }
         });
     };

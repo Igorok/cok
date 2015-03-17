@@ -18,11 +18,26 @@ define (["jquery", "underscore", "backbone", "vMessage"], function ($, _, Backbo
         */
         var showError = function (_title, _text) {
             return show("danger", _title, _text);
-        }
+        };
+
+        /*
+        * show errors for inputs
+        */
+        var inputError = function (_errArr) {
+            _.each(_errArr, function (_val, _key) {
+                var elem = $("#" + _key).parent(".form-group");
+                var errCount = elem.find("span.control-label").length;
+                if (errCount == 0) {
+                    var val ='<span class="control-label">' + _val + '</span>';
+                    elem.append(val).addClass("has-error");
+                }
+            });
+        };
 
         // public
         this.show = show;
         this.showError = showError;
+        this.inputError = inputError;
     };
 
     return new Msg();

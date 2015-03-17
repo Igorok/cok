@@ -1,4 +1,14 @@
 define(["dust", "dust-helpers"], function(dust, dust_helpers) {
+  // modules/chat/views/admin/login.dust
+  (function() {
+    dust.register("login", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<form id=\"loginForm\"><div class=\"form-group\"><label for=\"login\" class=\"control-label\">Login</label><input type=\"text\" class=\"form-control\" id=\"login\" placeholder=\"Login\" value=\"").f(ctx.get(["login"], false), ctx, "h").w("\" /></div><div class=\"form-group\"><label for=\"password\" class=\"control-label\">Title</label><input type=\"text\" class=\"form-control\" id=\"password\" placeholder=\"Password\" value=\"").f(ctx.get(["password"], false), ctx, "h").w("\" /></div><button type=\"submit\" class=\"btn btn-default\">Login</button></form>");
+    }
+    body_0.__dustBody = !0;
+    return body_0;
+  })();
   // modules/chat/views/admin/message.dust
   (function() {
     dust.register("message", body_0);
@@ -21,7 +31,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("permissionDetail", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<form id=\"permissionForm\"><div class=\"form-group\"><label for=\"key\">Key</label><input type=\"text\" class=\"form-control\" id=\"key\" placeholder=\"Key\" value=\"").f(ctx.get(["key"], false), ctx, "h").w("\" /></div><div class=\"form-group\"><label for=\"title\">Title</label><input type=\"text\" class=\"form-control\" id=\"title\" placeholder=\"Title\" value=\"").f(ctx.get(["title"], false), ctx, "h").w("\" /></div><button type=\"submit\" class=\"btn btn-default\">Submit</button></form>");
+      return chk.w("<form id=\"permissionForm\"><div class=\"form-group\"><label for=\"key\" class=\"control-label\">Key</label><input type=\"text\" class=\"form-control\" id=\"key\" placeholder=\"Key\" value=\"").f(ctx.get(["key"], false), ctx, "h").w("\" /></div><div class=\"form-group\"><label for=\"title\" class=\"control-label\">Title</label><input type=\"text\" class=\"form-control\" id=\"title\" placeholder=\"Title\" value=\"").f(ctx.get(["title"], false), ctx, "h").w("\" /></div><button type=\"submit\" class=\"btn btn-default\">Submit</button></form>");
     }
     body_0.__dustBody = !0;
     return body_0;
@@ -80,6 +90,27 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_0.__dustBody = !0;
     return body_0;
   })();
+  define("login", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("login", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
   define("message", function() {
     return function(locals, callback) {
       var rendered;
@@ -206,5 +237,5 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["message", "permissionDetail", "permissionList", "userDetail", "userList", "userModalDetail"];
+  return ["login", "message", "permissionDetail", "permissionList", "userDetail", "userList", "userModalDetail"];
 });

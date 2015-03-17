@@ -1,10 +1,12 @@
-define (["jquery", "underscore", "backbone", "cUser", "cPermission"], function ($, _, Backbone, _cUser, _cPermission) {
+define (["jquery", "underscore", "backbone", "cUser", "cPermission", "cAuth"], function ($, _, Backbone, _cUser, _cPermission, _cAuth) {
     'use strict';
     var cUser = new _cUser();
     var cPermission = new _cPermission();
+    var cAuth = new _cAuth();
 
     var Route = Backbone.Router.extend({
         routes: {
+            "login": "auth",
             "users": "userList",
             "users/:id": "userDetail",
             "permissions": "permissionList",
@@ -21,6 +23,9 @@ define (["jquery", "underscore", "backbone", "cUser", "cPermission"], function (
         },
 
 
+        auth: function (options) {
+            cAuth.index(options);
+        },
 
         permissionList: function (options) {
             cPermission.index(options);

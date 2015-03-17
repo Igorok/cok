@@ -1,28 +1,26 @@
-define (["jquery", "underscore", "backbone", "dust", "tpl", "api", "message", ], function ($, _, backbone, dust, tpl, Api, Msg) {
+define (["jquery", "underscore", "backbone", "dust", "api", "message", "tpl"], function ($, _, backbone, dust, Api, Msg, tpl) {
     'use strict';
-    var view = Backbone.View.extend({
+    var viewIndex = Backbone.View.extend({
         // the constructor
         initialize: function (options) {
             // model is passed through
-            this.model = options;
+            this.model = options.model;
         },
 
         events: {
-            "submit #permissionForm": "formSubmit",
-//            "click .btn": "formSubmit",
+            "submit #loginForm": "formSubmit",
         },
 
         // populate the html to the dom
         render: function () {
             this.$el.html($('#main').html());
-            this.formRender();
+            this.index();
             return this;
         },
 
-        formRender: function () {
-            // e.preventDefault();
+        index: function () {
             var self = this;
-            dust.render("permissionDetail", this.model.attributes, function (err, result) {
+            dust.render("login", {}, function (err, result) {
                 if (err) {
                     new Msg.showError(null, err);
                 }
@@ -33,9 +31,22 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "api", "message", ],
         formSubmit: function (e) {
             e.preventDefault();
             this.model.set({
-                key: $("#key").val(),
-                title: $("#title").val()
+                login: $("#login").val(),
+                password: $("#password").val()
             });
+
+            Api.call("user.Authorise", this.model.attributes, function (err, ret) {
+                if (ret) {
+                    mPermission.set(ret.result[0]);
+                    if (mPermission._byId[opt]) {
+                        model = mPermission._byId[opt];
+                    }
+                }
+                cb(err, model);
+            });
+
+
+
 
             if (! this.model.isValid()) {
                 Msg.inputError(this.model.validationError);
@@ -52,5 +63,5 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "api", "message", ],
         }
     });
 
-    return view;
+    return viewIndex;
 });
