@@ -2,10 +2,11 @@ define (["jquery", "underscore", "backbone", "api", "message", "mAuth", "vAuth"]
     'use strict';
 
     var mAuth = new _mAuth();
+    mAuth.add({_id: "-1"});
     var controller = function () {
         this.index = function (options) {
             var view = new vAuth({
-                model: mAuth,
+                model: mAuth._byId["-1"],
             });
             $('#main').html(view.render().el);
         };

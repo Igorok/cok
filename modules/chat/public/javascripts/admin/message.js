@@ -17,6 +17,9 @@ define (["jquery", "underscore", "backbone", "vMessage"], function ($, _, Backbo
         * render error message
         */
         var showError = function (_title, _text) {
+            if (_text.toString() == "403") {
+                return window.location.hash = "login";
+            }
             return show("danger", _title, _text);
         };
 

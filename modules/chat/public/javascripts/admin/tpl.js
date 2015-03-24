@@ -4,7 +4,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("login", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<form id=\"loginForm\"><div class=\"form-group\"><label for=\"login\" class=\"control-label\">Login</label><input type=\"text\" class=\"form-control\" id=\"login\" placeholder=\"Login\" value=\"").f(ctx.get(["login"], false), ctx, "h").w("\" /></div><div class=\"form-group\"><label for=\"password\" class=\"control-label\">Title</label><input type=\"text\" class=\"form-control\" id=\"password\" placeholder=\"Password\" value=\"").f(ctx.get(["password"], false), ctx, "h").w("\" /></div><button type=\"submit\" class=\"btn btn-default\">Login</button></form>");
+      return chk.w("<form id=\"loginForm\"><div class=\"form-group\"><label for=\"login\" class=\"control-label\">Login</label><input type=\"text\" class=\"form-control\" id=\"login\" placeholder=\"Login\" value=\"").f(ctx.get(["login"], false), ctx, "h").w("\" /></div><div class=\"form-group\"><label for=\"password\" class=\"control-label\">Password</label><input type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\" value=\"").f(ctx.get(["password"], false), ctx, "h").w("\" /></div><button type=\"submit\" class=\"btn btn-default\">Login</button></form>");
     }
     body_0.__dustBody = !0;
     return body_0;
@@ -41,14 +41,14 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("permissionList", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<ul>").s(ctx.get(["data"], false), ctx, {
+      return chk.w("<a href=\"#permissions/-1\" class=\"btn btn-default\">New permission</a><table class=\"table table-striped table-hover\">").s(ctx.get(["data"], false), ctx, {
         "block": body_1
-      }, {}).w("</ul><a href=\"#permissions/-1\" class=\"btn btn-default\">New permission</a>");
+      }, {}).w("</table>");
     }
     body_0.__dustBody = !0;
 
     function body_1(chk, ctx) {
-      return chk.w("<li><a href=\"#permissions/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["key"], false), ctx, "h").w("</a><span> ").f(ctx.get(["title"], false), ctx, "h").w("</span></li>");
+      return chk.w("<tr><td><a href=\"#permissions/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["key"], false), ctx, "h").w("</a></td><td><span> ").f(ctx.get(["title"], false), ctx, "h").w("</span></td></tr>");
     }
     body_1.__dustBody = !0;
     return body_0;

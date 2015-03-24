@@ -4,6 +4,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "api", "message", ],
         // the constructor
         initialize: function (options) {
             // model is passed through
+            this.user = Api.getUser();
             this.model = options;
         },
 
@@ -40,14 +41,19 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "api", "message", ],
             if (! this.model.isValid()) {
                 Msg.inputError(this.model.validationError);
             } else {
-                return window.location.hash = "permissions";
-
-                /*Api.call("admin.editPermission", this.model.get("_id"), this.model.get("key"), this.model.get("title"), function (err, ret) {
+                
+                
+                Api.call("admin.editPermission", {
+                    token: this.user.token,
+                    _id: this.model.get("_id"),
+                    key: this.model.get("key"),
+                    title: this.model.get("title")
+                }, function (err, ret) {
                     if (err) {
                         new Msg.showError(null, err);
                     }
                     return window.location.hash = "permissions";
-                });*/
+                });
             }
         }
     });

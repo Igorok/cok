@@ -3,9 +3,13 @@ define (["jquery", "underscore", "backbone"], function ($, _, Backbone) {
     var model = Backbone.Model.extend({
         // you can set any defaults you would like here
         defaults: {
+            _id: "-1",
             login: "",
             password: ""
         },
+        
+        idAttribute: "_id",
+        
         validate: function (attrs) {
             var errors = {};
             if (! attrs.login) {

@@ -1,7 +1,8 @@
-define (["jquery", "underscore", "backbone", "message"], function ($, _, Backbone, Msg) {
+define (["jquery", "underscore", "backbone", "message", "storageapi"], function ($, _, Backbone, Msg, storageapi) {
     'use strict';
     var Api = function () {};
-
+    var Storage = $.localStorage;
+    var user = null;
     /*
     * ajax rest api
     */
@@ -27,30 +28,34 @@ define (["jquery", "underscore", "backbone", "message"], function ($, _, Backbon
             cache: false,
             success: function (ret) {
                 if (ret.error) {
-                    console.log("ret.error", JSON.stringify(ret.error));
                     var err = ret.error.message ? ret.error.message : JSON.stringify(ret.error);
-
-                    if (err == "403") {
-                        return window.location.hash = "login";
-                    } else {
-                        new Msg.showError(null, err);
-                    }
+                    new Msg.showError(null, err);
                 } else {
                     cb(null, ret);
                 }
             },
             error: function (err) {
-                if (err == "403") {
-                    return window.location.hash = "login";
-                } else {
-                    new Msg.showError(null, JSON.stringify(err));
-                }
+                new Msg.showError(null, JSON.stringify(err));
             }
         });
     };
 
-    Api.prototype.models = {};
-
+    Api.prototype.setUser = function (_user) {
+        user = _user;
+        Storage.set('user', _user);
+        return user;
+    };
+    
+    Api.prototype.getUser = function () {
+        if (! user) {
+            user = Storage.get('user');
+        }
+        if (! user) {
+            return new Msg.showError(null, "403");
+        } else {
+            return user;
+        }
+    };
 
     return new Api();
 });

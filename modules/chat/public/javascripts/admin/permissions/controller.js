@@ -2,18 +2,17 @@ define (["jquery", "underscore", "backbone", "api", "message", "mPermission", "v
     'use strict';
     var controller = function () {};
     var mPermission = new _mPermission();
-
     // get permissions from server and return model;
     var renderPermission = function (opt, cb) {
         var model = null;
-
+        var user = Api.getUser();
         if (opt == "-1") {
             mPermission.add({_id: "-1"});
             model = mPermission._byId[opt];
             return cb(null, model);
         }
 
-        Api.call("admin.getPermissionList", function (err, ret) {
+        Api.call("admin.getPermissionList", {token: user.token}, function (err, ret) {
             if (ret) {
                 mPermission.set(ret.result[0]);
                 if (mPermission._byId[opt]) {
@@ -30,7 +29,8 @@ define (["jquery", "underscore", "backbone", "api", "message", "mPermission", "v
     * public
     */
     controller.prototype.index = function (options) {
-        Api.call("admin.getPermissionList", function (err, ret) {
+        var user = Api.getUser();
+        Api.call("admin.getPermissionList", {token: user.token}, function (err, ret) {
             if (err) {
                 new Msg.showError(null, err);
             }

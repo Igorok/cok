@@ -20,7 +20,7 @@ require(["jquery", "lodash", "io", "cok_core", "cok_controller"], function ($, _
     if (window.socket) {
         window.socket.destroy()
     }
-    window.socket = new io('//' + apphost, { forceNew: true });
+    window.socket = new io(window.location.origin, { forceNew: true });
 
     window.socket.connect();
     window.socket.emit("join", {token: token, chatId: chatId});

@@ -29,36 +29,22 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "tpl"], f
         },
 
         formSubmit: function (e) {
+            var self = this;
             e.preventDefault();
-            this.model.set({
+            self.model.set({
                 login: $("#login").val(),
                 password: $("#password").val()
             });
-
-            Api.call("user.Authorise", this.model.attributes, function (err, ret) {
-                if (ret) {
-                    mPermission.set(ret.result[0]);
-                    if (mPermission._byId[opt]) {
-                        model = mPermission._byId[opt];
-                    }
-                }
-                cb(err, model);
-            });
-
-
-
-
-            if (! this.model.isValid()) {
-                Msg.inputError(this.model.validationError);
+            
+            if (! self.model.isValid()) {
+                Msg.inputError(self.model.validationError);
             } else {
-                return window.location.hash = "permissions";
-
-                /*Api.call("admin.editPermission", this.model.get("_id"), this.model.get("key"), this.model.get("title"), function (err, ret) {
-                    if (err) {
-                        new Msg.showError(null, err);
+                Api.call("user.Authorise", self.model.attributes, function (err, ret) {
+                    if (!! ret) {
+                        Api.setUser(ret.result[0]);
                     }
                     return window.location.hash = "permissions";
-                });*/
+                });
             }
         }
     });
