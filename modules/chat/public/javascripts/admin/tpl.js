@@ -31,7 +31,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("permissionDetail", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<form id=\"permissionForm\"><div class=\"form-group\"><label for=\"key\" class=\"control-label\">Key</label><input type=\"text\" class=\"form-control\" id=\"key\" placeholder=\"Key\" value=\"").f(ctx.get(["key"], false), ctx, "h").w("\" /></div><div class=\"form-group\"><label for=\"title\" class=\"control-label\">Title</label><input type=\"text\" class=\"form-control\" id=\"title\" placeholder=\"Title\" value=\"").f(ctx.get(["title"], false), ctx, "h").w("\" /></div><button type=\"submit\" class=\"btn btn-default\">Submit</button></form>");
+      return chk.w("<br /><div class=\"widget\"><form id=\"permissionForm\"><div class=\"form-group\"><label for=\"key\" class=\"control-label\">Key</label><input type=\"text\" class=\"form-control\" id=\"key\" placeholder=\"Key\" value=\"").f(ctx.get(["key"], false), ctx, "h").w("\" /></div><div class=\"form-group\"><label for=\"title\" class=\"control-label\">Title</label><input type=\"text\" class=\"form-control\" id=\"title\" placeholder=\"Title\" value=\"").f(ctx.get(["title"], false), ctx, "h").w("\" /></div><button type=\"submit\" class=\"btn btn-default\">Submit</button></form></div>");
     }
     body_0.__dustBody = !0;
     return body_0;
@@ -41,9 +41,9 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("permissionList", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<a href=\"#permissions/-1\" class=\"btn btn-default\">New permission</a><table class=\"table table-striped table-hover\">").s(ctx.get(["data"], false), ctx, {
+      return chk.w("<br /><div class=\"widget\"><a href=\"#permissions/-1\" class=\"btn btn-default\">New permission</a><table class=\"table table-striped table-hover\">").s(ctx.get(["data"], false), ctx, {
         "block": body_1
-      }, {}).w("</table>");
+      }, {}).w("</table></div>");
     }
     body_0.__dustBody = !0;
 
