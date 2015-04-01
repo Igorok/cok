@@ -1,4 +1,4 @@
-define (["jquery", "underscore", "backbone", "cUser", "cPermission", "cAuth"], function ($, _, Backbone, _cUser, _cPermission, _cAuth) {
+define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", "cPermission", "cAuth"], function ($, _, Backbone, dust, Api, Msg, _cUser, _cPermission, _cAuth) {
     'use strict';
     var cUser = new _cUser();
     var cPermission = new _cPermission();
@@ -6,6 +6,7 @@ define (["jquery", "underscore", "backbone", "cUser", "cPermission", "cAuth"], f
 
     var Route = Backbone.Router.extend({
         routes: {
+            "": "permissionList",
             "login": "auth",
             "users": "userList",
             "users/:id": "userDetail",
@@ -14,12 +15,12 @@ define (["jquery", "underscore", "backbone", "cUser", "cPermission", "cAuth"], f
         },
 
         initialize: function (options) {
+            var self = this;
             //this.notes = options.notes;
             //// this is debug only to demonstrate how the backbone collection / models work
             //this.notes.bind('reset', this.updateDebug, this);
             //this.notes.bind('add', this.updateDebug, this);
             //this.notes.bind('remove', this.updateDebug, this);
-            //this.userList();
         },
 
 
@@ -28,14 +29,36 @@ define (["jquery", "underscore", "backbone", "cUser", "cPermission", "cAuth"], f
         },
 
         permissionList: function (options) {
-            cPermission.index(options);
+            var self = this;
+            self.checkAuth(function () {
+                cPermission.index(self.user, options);
+            });
         },
 
         permissionDetail: function (options) {
-            cPermission.detail(options);
+            var self = this;
+            self.checkAuth(function () {
+                cPermission.detail(self.user, options);
+            });
         },
 
-
+        checkAuth: function (cb) {
+            var self = this;
+            self.user = Api.getUser();
+            if (! self.user) {
+                self.user = Api.getUser();
+            } else {
+                if (! $("#main").length) {
+                    dust.render("adminLayout", {}, function (err, result) {
+                        if (err) {
+                            new Msg.showError(null, err);
+                        }
+                        $("#content").html(result);
+                    });
+                }
+                cb();
+            }
+        }
 
         /*
         userList: function (options) {

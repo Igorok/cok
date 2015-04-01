@@ -61,3 +61,19 @@ exports.editPermission = function (_data, cb) {
         }));
     }));
 };
+
+/**
+* remove permission
+*/
+exports.removePermission = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (! _params._id) {
+            return cb(new Error("Wrong data!"));
+        }
+        var id = _params._id.toString();
+
+        dbHelper.collection("permissions", safe.sure(cb, function (permissions) {
+            permissions.remove({_id: BSON.ObjectID(id)}, cb)
+        }));
+    }));
+};

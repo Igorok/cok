@@ -1,10 +1,20 @@
 define(["dust", "dust-helpers"], function(dust, dust_helpers) {
+  // modules/chat/views/admin/adminLayout.dust
+  (function() {
+    dust.register("adminLayout", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#permMenu\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-tower\"></span>&nbsp;&nbsp;Permissions</a><ul id=\"permMenu\" class=\"nav nav-pills nav-stacked collapse\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#groups\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-folder-open\"></span>&nbsp;&nbsp;Groups</a><ul id=\"groups\" class=\"nav nav-pills nav-stacked collapse\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#users\"  aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>&nbsp;&nbsp;Users</a><ul id=\"users\" class=\"nav nav-pills nav-stacked collapse\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li></ul></div><div id=\"main\" class=\"col-md-10\"><div id=\"errorCase\"></div></div>");
+    }
+    body_0.__dustBody = !0;
+    return body_0;
+  })();
   // modules/chat/views/admin/login.dust
   (function() {
     dust.register("login", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<form id=\"loginForm\"><div class=\"form-group\"><label for=\"login\" class=\"control-label\">Login</label><input type=\"text\" class=\"form-control\" id=\"login\" placeholder=\"Login\" value=\"").f(ctx.get(["login"], false), ctx, "h").w("\" /></div><div class=\"form-group\"><label for=\"password\" class=\"control-label\">Password</label><input type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\" value=\"").f(ctx.get(["password"], false), ctx, "h").w("\" /></div><button type=\"submit\" class=\"btn btn-default\">Login</button></form>");
+      return chk.w("<div class=\"col-md-offset-4 col-md-4\"><div class=\"widget\"><form id=\"loginForm\"><div class=\"form-group\"><label for=\"login\" class=\"control-label\">Login</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon-user\"></span></div><input type=\"text\" class=\"form-control\" id=\"login\" placeholder=\"Login\" value=\"").f(ctx.get(["login"], false), ctx, "h").w("\" /></div></div><div class=\"form-group\"><label for=\"password\" class=\"control-label\">Password</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon glyphicon-lock\"></span></div><input type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\" value=\"").f(ctx.get(["password"], false), ctx, "h").w("\" /></div></div><button type=\"submit\" class=\"btn btn-default btn-block\">Login</button></form></div></div>");
     }
     body_0.__dustBody = !0;
     return body_0;
@@ -41,14 +51,14 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("permissionList", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<br /><div class=\"widget\"><a href=\"#permissions/-1\" class=\"btn btn-default\">New permission</a><table class=\"table table-striped table-hover\">").s(ctx.get(["data"], false), ctx, {
+      return chk.w("<br /><div class=\"widget\"><table class=\"table table-striped table-hover\">").s(ctx.get(["data"], false), ctx, {
         "block": body_1
       }, {}).w("</table></div>");
     }
     body_0.__dustBody = !0;
 
     function body_1(chk, ctx) {
-      return chk.w("<tr><td><a href=\"#permissions/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["key"], false), ctx, "h").w("</a></td><td><span> ").f(ctx.get(["title"], false), ctx, "h").w("</span></td></tr>");
+      return chk.w("<tr><td><a href=\"#permissions/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["key"], false), ctx, "h").w("</a></td><td><span> ").f(ctx.get(["title"], false), ctx, "h").w("</span></td><td><a href=\"#\" class=\"removePermission\" data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\"><span class=\"glyphicon glyphicon-trash\"></span></a></td></tr>");
     }
     body_1.__dustBody = !0;
     return body_0;
@@ -90,6 +100,27 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_0.__dustBody = !0;
     return body_0;
   })();
+  define("adminLayout", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("adminLayout", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
   define("login", function() {
     return function(locals, callback) {
       var rendered;
@@ -237,5 +268,5 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["login", "message", "permissionDetail", "permissionList", "userDetail", "userList", "userModalDetail"];
+  return ["adminLayout", "login", "message", "permissionDetail", "permissionList", "userDetail", "userList", "userModalDetail"];
 });

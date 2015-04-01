@@ -2,17 +2,17 @@ define (["jquery", "underscore", "backbone", "api", "message", "mPermission", "v
     'use strict';
     var controller = function () {};
     var mPermission = new _mPermission();
+    var user = null;
     // get permissions from server and return model;
-    var renderPermission = function (opt, cb) {
+    var renderPermission = function (_user, opt, cb) {
         var model = null;
-        var user = Api.getUser();
         if (opt == "-1") {
             mPermission.add({_id: "-1"});
             model = mPermission._byId[opt];
             return cb(null, model);
         }
 
-        Api.call("admin.getPermissionList", {token: user.token}, function (err, ret) {
+        Api.call("admin.getPermissionList", {token: _user.token}, function (err, ret) {
             if (ret) {
                 mPermission.set(ret.result[0]);
                 if (mPermission._byId[opt]) {
@@ -28,15 +28,15 @@ define (["jquery", "underscore", "backbone", "api", "message", "mPermission", "v
     /*
     * public
     */
-    controller.prototype.index = function (options) {
-        var user = Api.getUser();
-        Api.call("admin.getPermissionList", {token: user.token}, function (err, ret) {
+    controller.prototype.index = function (_user, options) {
+        Api.call("admin.getPermissionList", {token: _user.token}, function (err, ret) {
             if (err) {
                 new Msg.showError(null, err);
             }
             if (ret) {
                 mPermission.set(ret.result[0]);
                 var view = new vPermissionList({
+                    user: _user,
                     permissions: mPermission
                 });
                 $('#main').html(view.render().el);
@@ -44,13 +44,12 @@ define (["jquery", "underscore", "backbone", "api", "message", "mPermission", "v
         });
     };
 
-    controller.prototype.detail = function (options) {
-        var view = null;
-        renderPermission(options, function (err, _model) {
+    controller.prototype.detail = function (_user, options) {
+        renderPermission(_user, options, function (err, _model) {
             if (err) {
                 new Msg.showError(null, err);
             }
-            view = new vPermissionDetail(_model);
+            var view = new vPermissionDetail(_user, _model);
             $('#main').html(view.render().el);
         });
     };

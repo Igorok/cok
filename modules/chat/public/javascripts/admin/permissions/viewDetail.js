@@ -2,9 +2,9 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "api", "message", ],
     'use strict';
     var view = Backbone.View.extend({
         // the constructor
-        initialize: function (options) {
+        initialize: function (user, options) {
             // model is passed through
-            this.user = Api.getUser();
+            this.user = user;
             this.model = options;
         },
 
@@ -32,22 +32,23 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "api", "message", ],
         },
 
         formSubmit: function (e) {
+            var self = this;
             e.preventDefault();
-            this.model.set({
+            self.model.set({
                 key: $("#key").val(),
                 title: $("#title").val()
             });
 
-            if (! this.model.isValid()) {
-                Msg.inputError(this.model.validationError);
+            if (! self.model.isValid()) {
+                Msg.inputError(self.model.validationError);
             } else {
                 
                 
                 Api.call("admin.editPermission", {
-                    token: this.user.token,
-                    _id: this.model.get("_id"),
-                    key: this.model.get("key"),
-                    title: this.model.get("title")
+                    token: self.user.token,
+                    _id: self.model.get("_id"),
+                    key: self.model.get("key"),
+                    title: self.model.get("title")
                 }, function (err, ret) {
                     if (err) {
                         new Msg.showError(null, err);

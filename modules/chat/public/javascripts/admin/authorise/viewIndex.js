@@ -6,7 +6,6 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "tpl"], f
             // model is passed through
             this.model = options.model;
         },
-
         events: {
             "submit #loginForm": "formSubmit",
         },
@@ -20,7 +19,7 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "tpl"], f
 
         index: function () {
             var self = this;
-            dust.render("login", {}, function (err, result) {
+            dust.render("login", {login: "", password: ""}, function (err, result) {
                 if (err) {
                     new Msg.showError(null, err);
                 }
@@ -40,10 +39,14 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "tpl"], f
                 Msg.inputError(self.model.validationError);
             } else {
                 Api.call("user.Authorise", self.model.attributes, function (err, ret) {
+                    if (!! err) {
+                        Msg.showError(null, err);
+                    }
                     if (!! ret) {
                         Api.setUser(ret.result[0]);
+                        window.location.hash = "permissions";
                     }
-                    return window.location.hash = "permissions";
+                    
                 });
             }
         }

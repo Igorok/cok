@@ -8,7 +8,7 @@ define (["jquery", "underscore", "backbone", "api", "message", "mAuth", "vAuth"]
             var view = new vAuth({
                 model: mAuth._byId["-1"],
             });
-            $('#main').html(view.render().el);
+            $('#content').html(view.render().el);
         };
     };
 
