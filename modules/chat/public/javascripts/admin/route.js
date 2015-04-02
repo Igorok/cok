@@ -1,4 +1,4 @@
-define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", "cPermission", "cAuth"], function ($, _, Backbone, dust, Api, Msg, _cUser, _cPermission, _cAuth) {
+define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", "cPermission", "cAuth", "vGroupList"], function ($, _, Backbone, dust, Api, Msg, _cUser, _cPermission, _cAuth, vGroupList) {
     'use strict';
     var cUser = new _cUser();
     var cPermission = new _cPermission();
@@ -12,6 +12,7 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", 
             "users/:id": "userDetail",
             "permissions": "permissionList",
             "permissions/:id": "permissionDetail",
+            "groups": "groupList",
         },
 
         initialize: function (options) {
@@ -22,7 +23,24 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", 
             //this.notes.bind('add', this.updateDebug, this);
             //this.notes.bind('remove', this.updateDebug, this);
         },
-
+        
+        checkAuth: function (cb) {
+            var self = this;
+            self.user = Api.getUser();
+            if (! self.user) {
+                self.user = Api.getUser();
+            } else {
+                if (! $("#main").length) {
+                    dust.render("adminLayout", {}, function (err, result) {
+                        if (err) {
+                            new Msg.showError(null, err);
+                        }
+                        $("#content").html(result);
+                    });
+                }
+                cb();
+            }
+        },
 
         auth: function (options) {
             cAuth.index(options);
@@ -42,23 +60,16 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", 
             });
         },
 
-        checkAuth: function (cb) {
+        groupList: function (options) {
             var self = this;
-            self.user = Api.getUser();
-            if (! self.user) {
-                self.user = Api.getUser();
-            } else {
-                if (! $("#main").length) {
-                    dust.render("adminLayout", {}, function (err, result) {
-                        if (err) {
-                            new Msg.showError(null, err);
-                        }
-                        $("#content").html(result);
-                    });
-                }
-                cb();
-            }
-        }
+            self.checkAuth(function () {
+                var view = new vGroupList({
+                    user: self.user,
+                    params: options
+                });
+                $('#main').html(view.render().el);
+            });
+        },
 
         /*
         userList: function (options) {

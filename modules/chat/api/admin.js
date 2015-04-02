@@ -77,3 +77,14 @@ exports.removePermission = function (_data, cb) {
         }));
     }));
 };
+
+/**
+* all groups
+*/
+exports.getGroupList = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        dbHelper.collection("usergroups", safe.sure(cb, function (usergroups) {
+            usergroups.find({}).toArray(cb);
+        }));
+    }));
+};

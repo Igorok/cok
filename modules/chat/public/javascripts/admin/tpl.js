@@ -4,9 +4,33 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("adminLayout", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#permMenu\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-tower\"></span>&nbsp;&nbsp;Permissions</a><ul id=\"permMenu\" class=\"nav nav-pills nav-stacked collapse\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#groups\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-folder-open\"></span>&nbsp;&nbsp;Groups</a><ul id=\"groups\" class=\"nav nav-pills nav-stacked collapse\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#users\"  aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>&nbsp;&nbsp;Users</a><ul id=\"users\" class=\"nav nav-pills nav-stacked collapse\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li></ul></div><div id=\"main\" class=\"col-md-10\"><div id=\"errorCase\"></div></div>");
+      return chk.w("<div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#permMenu\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-tower\"></span>&nbsp;&nbsp;Permissions</a><ul id=\"permMenu\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#groupMenu\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-folder-open\"></span>&nbsp;&nbsp;Groups</a><ul id=\"groupMenu\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#groups\">Groups List</a></li><li><a href=\"#groups/-1\">New group</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#users\"  aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>&nbsp;&nbsp;Users</a><ul id=\"users\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li></ul></div><div id=\"main\" class=\"col-md-10\"><div id=\"errorCase\"></div></div>");
     }
     body_0.__dustBody = !0;
+    return body_0;
+  })();
+  // modules/chat/views/admin/groupList.dust
+  (function() {
+    dust.register("groupList", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div class=\"widget\"><table class=\"table table-striped table-hover\">").s(ctx.get(["data"], false), ctx, {
+        "block": body_1
+      }, {}).w("</table></div>");
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("<tr><td><a href=\"#groups/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["title"], false), ctx, "h").w("</a></td><td><span>").f(ctx.get(["description"], false), ctx, "h").w("</span></td><td><span>").s(ctx.get(["permission"], false), ctx, {
+        "block": body_2
+      }, {}).w("</span></td><td><a href=\"#\" class=\"removeGroup\" data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\"><span class=\"glyphicon glyphicon-trash\"></span></a></td></tr>");
+    }
+    body_1.__dustBody = !0;
+
+    function body_2(chk, ctx) {
+      return chk.f(ctx.getPath(true, []), ctx, "h").w(",&nbsp;");
+    }
+    body_2.__dustBody = !0;
     return body_0;
   })();
   // modules/chat/views/admin/login.dust
@@ -51,7 +75,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("permissionList", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<br /><div class=\"widget\"><table class=\"table table-striped table-hover\">").s(ctx.get(["data"], false), ctx, {
+      return chk.w("<div class=\"widget\"><table class=\"table table-striped table-hover\">").s(ctx.get(["data"], false), ctx, {
         "block": body_1
       }, {}).w("</table></div>");
     }
@@ -105,6 +129,27 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       var rendered;
 
       dust.render("adminLayout", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
+  define("groupList", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("groupList", locals, function(err, result) {
         if (typeof callback === "function") {
           try {
             callback(err, result);
@@ -268,5 +313,5 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["adminLayout", "login", "message", "permissionDetail", "permissionList", "userDetail", "userList", "userModalDetail"];
+  return ["adminLayout", "groupList", "login", "message", "permissionDetail", "permissionList", "userDetail", "userList", "userModalDetail"];
 });
