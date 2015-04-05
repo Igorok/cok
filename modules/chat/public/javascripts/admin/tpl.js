@@ -4,9 +4,40 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("adminLayout", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#permMenu\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-tower\"></span>&nbsp;&nbsp;Permissions</a><ul id=\"permMenu\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#groupMenu\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-folder-open\"></span>&nbsp;&nbsp;Groups</a><ul id=\"groupMenu\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#groups\">Groups List</a></li><li><a href=\"#groups/-1\">New group</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#users\"  aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>&nbsp;&nbsp;Users</a><ul id=\"users\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li></ul></div><div id=\"main\" class=\"col-md-10\"><div id=\"errorCase\"></div></div>");
+      return chk.w("<div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#permMenu\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-tower\"></span>Permissions</a><ul id=\"permMenu\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#groupMenu\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-folder-open\"></span>Groups</a><ul id=\"groupMenu\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#groups\">Groups List</a></li><li><a href=\"#groups/-1\">New group</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#users\"  aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"users\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li></ul></div><div id=\"main\" class=\"col-md-10\"><div id=\"errorCase\"></div></div>");
     }
     body_0.__dustBody = !0;
+    return body_0;
+  })();
+  // modules/chat/views/admin/groupDetail.dust
+  (function() {
+    dust.register("groupDetail", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.s(ctx.get(["data"], false), ctx, {
+        "block": body_1
+      }, {});
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("<div class=\"widget\"><form id=\"groupForm\"><div class=\"form-group\"><label for=\"title\" class=\"control-label\">Title</label><input type=\"text\" class=\"form-control\" id=\"title\" placeholder=\"Title\" value=\"").f(ctx.get(["title"], false), ctx, "h").w("\" /></div><div class=\"form-group\"><label for=\"description\" class=\"control-label\">Description</label><input type=\"text\" class=\"form-control\" id=\"description\" placeholder=\"Description\" value=\"").f(ctx.get(["description"], false), ctx, "h").w("\" /></div>").s(ctx.get(["formPermission"], false), ctx, {
+        "block": body_2
+      }, {}).w("<button type=\"submit\" class=\"btn btn-default\">Submit</button></form></div>");
+    }
+    body_1.__dustBody = !0;
+
+    function body_2(chk, ctx) {
+      return chk.w("<div class=\"checkbox\"><label for=\"").f(ctx.get(["key"], false), ctx, "h").w("\" class=\"control-label\"><input type=\"checkbox\" id=\"").f(ctx.get(["key"], false), ctx, "h").w("\" ").s(ctx.get(["checked"], false), ctx, {
+        "block": body_3
+      }, {}).w(" /> ").f(ctx.get(["key"], false), ctx, "h").w("</label></div>");
+    }
+    body_2.__dustBody = !0;
+
+    function body_3(chk, ctx) {
+      return chk.w("checked=\"true\"");
+    }
+    body_3.__dustBody = !0;
     return body_0;
   })();
   // modules/chat/views/admin/groupList.dust
@@ -129,6 +160,27 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       var rendered;
 
       dust.render("adminLayout", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
+  define("groupDetail", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("groupDetail", locals, function(err, result) {
         if (typeof callback === "function") {
           try {
             callback(err, result);
@@ -313,5 +365,5 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["adminLayout", "groupList", "login", "message", "permissionDetail", "permissionList", "userDetail", "userList", "userModalDetail"];
+  return ["adminLayout", "groupDetail", "groupList", "login", "message", "permissionDetail", "permissionList", "userDetail", "userList", "userModalDetail"];
 });

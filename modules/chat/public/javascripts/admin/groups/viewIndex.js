@@ -6,7 +6,6 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "api", "m
             this.user = options.user;
             this.params = options.params;
             this.mGroup = new mGroup();
-//            this.permissions.bind('reset', this.renderAll, this);
         },
 
         events: {
@@ -22,14 +21,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "api", "m
 
         renderAll: function () {
             var self = this;
-            self.mGroup.getGroupList({token: self.user.token}, function (err, ret) {
-                if (err) {
-                    new Msg.showError(null, err);
-                }
-                if (!! ret && !! ret.result) {
-                    self.mGroup.set(ret.result[0]);
-                }
-                
+            self.mGroup.getAll({token: self.user.token}, function () {
                 var data = _.pluck(self.mGroup.models, "attributes");
                 dust.render("groupList", {data: data}, function (err, result) {
                     if (err) {

@@ -1,4 +1,4 @@
-define (["jquery", "underscore", "backbone"], function ($, _, backbone) {
+define (["jquery", "underscore", "backbone", "api", "message"], function ($, _, Backbone, Api, Msg) {
     'use strict';
     var model = Backbone.Model.extend({
         // you can set any defaults you would like here
@@ -28,6 +28,19 @@ define (["jquery", "underscore", "backbone"], function ($, _, backbone) {
     var collection = Backbone.Collection.extend({
         // Reference to this collection's model.
         model: model,
+        getAll: function (_data, cb) {
+            var self = this;
+            Api.call("admin.getPermissionList", _data, function (err, ret) {
+                if (err) {
+                    return Msg.showError(null, err);
+                }
+                if (!! ret && !! ret.result) {
+                    self.set(ret.result[0]);
+                }
+
+                cb();
+            });
+        },
     });
 
     return collection;

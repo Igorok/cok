@@ -2,7 +2,7 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
     'use strict';
     var model = Backbone.Model.extend({
         defaults: {
-            _id : -1,
+            _id : "-1",
             title : "",
             description : "",
             permission : []
@@ -30,8 +30,18 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
 
     var collection = Backbone.Collection.extend({
         model: model,
-        getGroupList: function (_data, cb) {
-            Api.call("admin.getGroupList", {token: _data.token}, cb);
+        getAll: function (_data, cb) {
+            var self = this;
+            Api.call("admin.getGroupList", {token: _data.token}, function (err, ret) {
+                if (err) {
+                    return Msg.showError(null, err);
+                }
+                if (!! ret && !! ret.result) {
+                    self.set(ret.result[0]);
+                }
+                
+                cb();
+            });
         }
     });
     

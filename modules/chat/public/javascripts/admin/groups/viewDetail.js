@@ -1,63 +1,82 @@
-define (["jquery", "underscore", "backbone", "dust", "tpl", "api", "message", ], function ($, _, backbone, dust, tpl, Api, Msg) {
+define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "api", "mGroup", "mPermission"], function ($, _, backbone, dust, tpl, Msg, Api, _mGroup, _mPermission) {
     'use strict';
-    var view = Backbone.View.extend({
+    var mGroup = new _mGroup();
+    var mPermission = new _mPermission();
+    var viewIndex = Backbone.View.extend({
         // the constructor
-        initialize: function (user, options) {
-            // model is passed through
-            this.user = user;
-            this.model = options;
+        initialize: function (options) {
+            var self = this;
+            self.user = options.user;
+            self.params = options.params;
+            self.model = null;
         },
 
         events: {
-            "submit #permissionForm": "formSubmit",
-//            "click .btn": "formSubmit",
+            "submit #groupForm": "saveOne",
         },
 
         // populate the html to the dom
         render: function () {
             this.$el.html($('#main').html());
-            this.formRender();
+            this.renderOne();
             return this;
         },
 
-        formRender: function () {
-            // e.preventDefault();
+        renderOne: function () {
             var self = this;
-            dust.render("permissionDetail", this.model.attributes, function (err, result) {
-                if (err) {
-                    new Msg.showError(null, err);
+            mPermission.getAll({token: self.user.token}, function () {
+            mGroup.getAll({token: self.user.token}, function () {
+                if (self.params == "-1") {
+                    self.model = new mGroup.model();
+                } else {
+                    self.model = mGroup.get(self.params);
                 }
-                self.$el.html(result);
+                var allPerm = mPermission.pluck("key");
+                var modelPerm = self.model.get("permission");
+                var formPermission = [];
+                _.each(allPerm, function (val) {
+                    if (_.include(modelPerm, val)) {
+                        formPermission.push({
+                            key: val,
+                            checked: true,
+                        });
+                    } else {
+                        formPermission.push({
+                            key: val,
+                            checked: false,
+                        });
+                    }
+                });
+                self.model.set("formPermission", formPermission);
+                dust.render("groupDetail", {data: self.model.attributes}, function (err, result) {
+                    if (err) {
+                        return Msg.showError(null, err);
+                    }
+                    self.$el.html(result);
+                });
+            });
             });
         },
 
-        formSubmit: function (e) {
-            var self = this;
+        saveOne: function (e) {
             e.preventDefault();
-            self.model.set({
-                key: $("#key").val(),
-                title: $("#title").val()
+            var self = this;
+            var title = $("#title").val();
+            var description = $("#description").val();
+            var permission = [];
+            $("input:checked").each(function (i) {
+                permission.push($(this).attr("id"));
             });
-
+            self.model.set("title", title);
+            self.model.set("description", description);
+            self.model.set("permission", permission);
             if (! self.model.isValid()) {
                 Msg.inputError(self.model.validationError);
             } else {
-                
-                
-                Api.call("admin.editPermission", {
-                    token: self.user.token,
-                    _id: self.model.get("_id"),
-                    key: self.model.get("key"),
-                    title: self.model.get("title")
-                }, function (err, ret) {
-                    if (err) {
-                        new Msg.showError(null, err);
-                    }
-                    return window.location.hash = "permissions";
-                });
+                console.log(self.model);
             }
-        }
+        },
     });
 
-    return view;
+    return viewIndex;
 });

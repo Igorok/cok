@@ -1,4 +1,4 @@
-define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", "cPermission", "cAuth", "vGroupList"], function ($, _, Backbone, dust, Api, Msg, _cUser, _cPermission, _cAuth, vGroupList) {
+define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", "cPermission", "cAuth", "vGroupList", "vGroupDetail"], function ($, _, Backbone, dust, Api, Msg, _cUser, _cPermission, _cAuth, vGroupList, vGroupDetail) {
     'use strict';
     var cUser = new _cUser();
     var cPermission = new _cPermission();
@@ -13,6 +13,7 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", 
             "permissions": "permissionList",
             "permissions/:id": "permissionDetail",
             "groups": "groupList",
+            "groups/:id": "groupDetail",
         },
 
         initialize: function (options) {
@@ -64,6 +65,17 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", 
             var self = this;
             self.checkAuth(function () {
                 var view = new vGroupList({
+                    user: self.user,
+                    params: options
+                });
+                $('#main').html(view.render().el);
+            });
+        },
+        
+        groupDetail: function (options) {
+            var self = this;
+            self.checkAuth(function () {
+                var view = new vGroupDetail({
                     user: self.user,
                     params: options
                 });
