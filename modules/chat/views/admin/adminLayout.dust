@@ -35,6 +35,6 @@
         </li>
     </ul>
 </div>
+<div id="errorCase"></div>
 <div id="main" class="col-md-10">
-    <div id="errorCase"></div>
 </div>

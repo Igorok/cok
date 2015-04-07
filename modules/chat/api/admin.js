@@ -48,7 +48,7 @@ exports.editPermission = function (_data, cb) {
 
         dbHelper.collection("permissions", safe.sure(cb, function (permissions) {
             if (id == '-1') {
-                permissions.find({key: key}).toArray(safe.sure(cb, function (_result) {
+                permissions.find({key: key}, {key: 1}).toArray(safe.sure(cb, function (_result) {
                     if (!! _result && _result.length > 0) {
                         return cb(new Error("Permission already exist!"));
                     } else {
@@ -56,7 +56,13 @@ exports.editPermission = function (_data, cb) {
                     }
                 }));
             } else {
-                permissions.update({_id: BSON.ObjectID(id)}, {$set: {key: key, title: title}}, cb);
+                permissions.find({key: key}, {key: 1}).toArray(safe.sure(cb, function (_result) {
+                    if (!! _result && (_result[0]._id.toString() != id)) {
+                        return cb(new Error("Permission already exist!"));
+                    } else {
+                        permissions.update({_id: BSON.ObjectID(id)}, {$set: {key: key, title: title}}, cb);
+                    }
+                }));
             }
         }));
     }));
@@ -85,6 +91,65 @@ exports.getGroupList = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("usergroups", safe.sure(cb, function (usergroups) {
             usergroups.find({}).toArray(cb);
+        }));
+    }));
+};
+
+/**
+* edit group
+*/
+exports.editGroup = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (! _params._id || ! _params.title || ! _params.description || ! _params.permission || ! _.isArray(_params.permission)) {
+            return cb(new Error("Wrong data!"));
+        }
+        var id = _params._id.toString();
+        var title = _params.title.toString();
+        var description = _params.description.toString();
+        var permission = [];
+        _.each(_params.permission, function (val) {
+            permission.push(val.toString());
+        });
+
+        dbHelper.collection("permissions", safe.sure(cb, function (permissions) {
+        dbHelper.collection("usergroups", safe.sure(cb, function (usergroups) {
+            async.series([
+                function (cb) {
+                    permissions.find({}, {key: 1}).toArray(safe.sure(cb, function (_permArr) {
+                        permission = _.intersection(_.pluck(_permArr, "key"), permission);
+                        console.log("permission ", permission);
+                        cb();
+                    }));
+                },
+                function (cb) {
+                    if (id == '-1') {
+                        usergroups.find({title: title}).toArray(safe.sure(cb, function (_result) {
+                            if (!! _result && !! _result.length) {
+                                return cb(new Error("Permission already exist!"));
+                            } else {
+                                usergroups.insert({
+                                    title: title,
+                                    description: description,
+                                    permission: permission,
+                                }, cb);
+                            }
+                        }));
+                    } else {
+                        usergroups.find({title: title}, {title: 1}).toArray(safe.sure(cb, function (_result) {
+                            if (!! _result && (_result[0]._id.toString() != id)) {
+                                return cb(new Error("Permission already exist!"));
+                            } else {
+                                usergroups.update({_id: BSON.ObjectID(id)}, {$set: {
+                                    title: title,
+                                    description: description,
+                                    permission: permission,
+                                }}, cb);
+                            }
+                        }));
+                    }
+                },
+            ], cb);
+        }));
         }));
     }));
 };

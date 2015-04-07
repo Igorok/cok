@@ -73,7 +73,16 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "api", "m
             if (! self.model.isValid()) {
                 Msg.inputError(self.model.validationError);
             } else {
-                console.log(self.model);
+                var data = {
+                    token: self.user.token,
+                    _id: self.model.get("_id"),
+                    title: self.model.get("title"),
+                    description: self.model.get("description"),
+                    permission: self.model.get("permission"),
+                };
+                mGroup.setOne(data, function (err, ret) {
+                    console.log(err, ret);
+                });
             }
         },
     });

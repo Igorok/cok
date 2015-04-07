@@ -5,12 +5,17 @@ define (["jquery", "underscore", "backbone", "vMessage"], function ($, _, Backbo
         * render message
         */
         var show = function (_type, _title, _text) {
+            console.log(_type, _title, _text);
             var view = new vMessage({
                 type: (_type || "info"),
                 title: _title,
                 text: _text,
             });
-            $('#errorCase').html(view.render().el);
+            if ($('#errorCase').length) {
+                $('#errorCase').html(view.render().el);
+            } else {
+                $('body').prepend(view.render().el);
+            }
         };
 
         /*

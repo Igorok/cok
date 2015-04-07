@@ -42,6 +42,16 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
                 
                 cb();
             });
+        },
+        setOne: function (_data, cb) {
+            var self = this;
+            Api.call("admin.editGroup", _data, function (err, ret) {
+                console.log("admin.editGroup", err, ret);
+                if (err) {
+                    return Msg.showError(null, err);
+                }
+                cb(err, ret);
+            });
         }
     });
     

@@ -29,13 +29,14 @@ define (["jquery", "underscore", "backbone", "message", "storageapi"], function 
             success: function (ret) {
                 if (ret.error) {
                     var err = ret.error.message ? ret.error.message : JSON.stringify(ret.error);
-                    new Msg.showError(null, err);
+                    console.log(err);
+                    return Msg.showError(null, err);
                 } else {
                     cb(null, ret);
                 }
             },
             error: function (err) {
-                new Msg.showError(null, JSON.stringify(err));
+                return Msg.showError(null, JSON.stringify(err));
             }
         });
     };
@@ -51,7 +52,7 @@ define (["jquery", "underscore", "backbone", "message", "storageapi"], function 
             user = Storage.get('user');
         }
         if (! user) {
-            return new Msg.showError(null, "403");
+            return Msg.showError(null, "403");
         } else {
             return user;
         }
