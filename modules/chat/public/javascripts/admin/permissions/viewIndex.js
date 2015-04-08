@@ -36,10 +36,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "api"], f
             e.preventDefault();
             var _id = $(e.currentTarget).attr("data-id");
             if (_id) {
-                Api.call("admin.removePermission", {token: self.user.token, _id: _id}, function (err, ret) {
-                    if (err) {
-                        new Msg.showError(null, err);
-                    }
+                Api.call("admin.removePermission", {token: self.user.token, _id: _id}, function (ret) {
                     self.permissions.remove(_id);
                     self.renderAll();
                 });

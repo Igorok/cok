@@ -12,14 +12,11 @@ define (["jquery", "underscore", "backbone", "api", "message", "mPermission", "v
             return cb(null, model);
         }
 
-        Api.call("admin.getPermissionList", {token: _user.token}, function (err, ret) {
-            if (ret) {
-                mPermission.set(ret.result[0]);
-                if (mPermission._byId[opt]) {
-                    model = mPermission._byId[opt];
-                }
+        mPermission.getAll({token: _user.token}, function () {
+            if (mPermission.get(opt)) {
+                model = mPermission._byId[opt];
             }
-            cb(err, model);
+            cb(model);
         });
     };
 
@@ -29,26 +26,17 @@ define (["jquery", "underscore", "backbone", "api", "message", "mPermission", "v
     * public
     */
     controller.prototype.index = function (_user, options) {
-        Api.call("admin.getPermissionList", {token: _user.token}, function (err, ret) {
-            if (err) {
-                new Msg.showError(null, err);
-            }
-            if (ret) {
-                mPermission.set(ret.result[0]);
-                var view = new vPermissionList({
-                    user: _user,
-                    permissions: mPermission
-                });
-                $('#main').html(view.render().el);
-            }
+        mPermission.getAll({token: _user.token}, function () {
+            var view = new vPermissionList({
+                user: _user,
+                permissions: mPermission
+            });
+            $('#main').html(view.render().el);
         });
     };
 
     controller.prototype.detail = function (_user, options) {
-        renderPermission(_user, options, function (err, _model) {
-            if (err) {
-                new Msg.showError(null, err);
-            }
+        renderPermission(_user, options, function (_model) {
             var view = new vPermissionDetail(_user, _model);
             $('#main').html(view.render().el);
         });

@@ -23,7 +23,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "api", "message", ],
         formRender: function () {
             // e.preventDefault();
             var self = this;
-            dust.render("permissionDetail", this.model.attributes, function (err, result) {
+            dust.render("permissionDetail", self.model.attributes, function (err, result) {
                 if (err) {
                     new Msg.showError(null, err);
                 }
@@ -42,17 +42,12 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "api", "message", ],
             if (! self.model.isValid()) {
                 Msg.inputError(self.model.validationError);
             } else {
-                
-                
                 Api.call("admin.editPermission", {
                     token: self.user.token,
                     _id: self.model.get("_id"),
                     key: self.model.get("key"),
                     title: self.model.get("title")
-                }, function (err, ret) {
-                    if (err) {
-                        new Msg.showError(null, err);
-                    }
+                }, function (ret) {
                     return window.location.hash = "permissions";
                 });
             }

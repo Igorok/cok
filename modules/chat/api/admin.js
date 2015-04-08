@@ -57,7 +57,7 @@ exports.editPermission = function (_data, cb) {
                 }));
             } else {
                 permissions.find({key: key}, {key: 1}).toArray(safe.sure(cb, function (_result) {
-                    if (!! _result && (_result[0]._id.toString() != id)) {
+                    if (!! _result.length && (_result[0]._id.toString() != id)) {
                         return cb(new Error("Permission already exist!"));
                     } else {
                         permissions.update({_id: BSON.ObjectID(id)}, {$set: {key: key, title: title}}, cb);
@@ -117,7 +117,6 @@ exports.editGroup = function (_data, cb) {
                 function (cb) {
                     permissions.find({}, {key: 1}).toArray(safe.sure(cb, function (_permArr) {
                         permission = _.intersection(_.pluck(_permArr, "key"), permission);
-                        console.log("permission ", permission);
                         cb();
                     }));
                 },
@@ -136,7 +135,7 @@ exports.editGroup = function (_data, cb) {
                         }));
                     } else {
                         usergroups.find({title: title}, {title: 1}).toArray(safe.sure(cb, function (_result) {
-                            if (!! _result && (_result[0]._id.toString() != id)) {
+                            if (!! _result.length && (_result[0]._id.toString() != id)) {
                                 return cb(new Error("Permission already exist!"));
                             } else {
                                 usergroups.update({_id: BSON.ObjectID(id)}, {$set: {
@@ -150,6 +149,22 @@ exports.editGroup = function (_data, cb) {
                 },
             ], cb);
         }));
+        }));
+    }));
+};
+
+/**
+* remove group
+*/
+exports.removeGroup = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (! _params._id) {
+            return cb(new Error("Wrong data!"));
+        }
+        var id = _params._id.toString();
+
+        dbHelper.collection("usergroups", safe.sure(cb, function (usergroups) {
+            usergroups.remove({_id: BSON.ObjectID(id)}, cb)
         }));
     }));
 };

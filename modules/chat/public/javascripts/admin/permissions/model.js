@@ -30,10 +30,7 @@ define (["jquery", "underscore", "backbone", "api", "message"], function ($, _, 
         model: model,
         getAll: function (_data, cb) {
             var self = this;
-            Api.call("admin.getPermissionList", _data, function (err, ret) {
-                if (err) {
-                    return Msg.showError(null, err);
-                }
+            Api.call("admin.getPermissionList", _data, function (ret) {
                 if (!! ret && !! ret.result) {
                     self.set(ret.result[0]);
                 }

@@ -32,7 +32,7 @@ define (["jquery", "underscore", "backbone", "message", "storageapi"], function 
                     console.log(err);
                     return Msg.showError(null, err);
                 } else {
-                    cb(null, ret);
+                    cb(ret);
                 }
             },
             error: function (err) {

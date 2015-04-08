@@ -9,7 +9,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "api", "m
         },
 
         events: {
-            "click .removePermission": "removePermission",
+            "click .removeGroup": "removeGroup",
         },
 
         // populate the html to the dom
@@ -32,6 +32,19 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "api", "m
             });
         },
 
+        removeGroup: function (e) {
+            var self = this;
+            e.preventDefault();
+            var _id = $(e.currentTarget).attr("data-id");
+            if (_id) {
+                self.mGroup.removeOne({token: self.user.token, _id: _id}, function () {
+//                    self.mGroups.remove(_id);
+                    self.renderAll();
+                });
+            }
+        },
+        
+        
 //        removePermission: function (e) {
 //            var self = this;
 //            e.preventDefault();

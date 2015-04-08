@@ -32,10 +32,7 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
         model: model,
         getAll: function (_data, cb) {
             var self = this;
-            Api.call("admin.getGroupList", {token: _data.token}, function (err, ret) {
-                if (err) {
-                    return Msg.showError(null, err);
-                }
+            Api.call("admin.getGroupList", {token: _data.token}, function (ret) {
                 if (!! ret && !! ret.result) {
                     self.set(ret.result[0]);
                 }
@@ -45,12 +42,14 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
         },
         setOne: function (_data, cb) {
             var self = this;
-            Api.call("admin.editGroup", _data, function (err, ret) {
-                console.log("admin.editGroup", err, ret);
-                if (err) {
-                    return Msg.showError(null, err);
-                }
-                cb(err, ret);
+            Api.call("admin.editGroup", _data, function (ret) {
+                cb(ret);
+            });
+        },
+        removeOne: function (_data, cb) {
+            var self = this;
+            Api.call("admin.removeGroup", _data, function (ret) {
+                cb(ret);
             });
         }
     });

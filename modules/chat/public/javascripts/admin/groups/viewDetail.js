@@ -80,8 +80,8 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "api", "m
                     description: self.model.get("description"),
                     permission: self.model.get("permission"),
                 };
-                mGroup.setOne(data, function (err, ret) {
-                    console.log(err, ret);
+                mGroup.setOne(data, function (ret) {
+                    return window.location.hash = "groups"
                 });
             }
         },
