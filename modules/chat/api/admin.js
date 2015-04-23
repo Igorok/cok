@@ -5,7 +5,6 @@ var _ = require("lodash");
 var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
-var BSON = mongo.BSONPure;
 var dbHelper = require('cok_db');
 var userApi = require(__dirname + '/user.js');
 var self = this;
@@ -17,7 +16,18 @@ var self = this;
 exports.getUserList = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.find({}, {login: 1, email: 1}).toArray(cb);
+            users.find({}, {login: 1, email: 1, group: 1, status: 1}).toArray(cb);
+        }));
+    }));
+};
+
+/**
+* detail user
+*/
+exports.deactivateUser = function (_data, cb) {
+    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        dbHelper.collection("users", safe.sure(cb, function (users) {
+            users.find({}, {login: 1, email: 1, status: 1}).toArray(cb);
         }));
     }));
 };
@@ -60,7 +70,7 @@ exports.editPermission = function (_data, cb) {
                     if (!! _result.length && (_result[0]._id.toString() != id)) {
                         return cb(new Error("Permission already exist!"));
                     } else {
-                        permissions.update({_id: BSON.ObjectID(id)}, {$set: {key: key, title: title}}, cb);
+                        permissions.update({_id: mongo.ObjectID(id)}, {$set: {key: key, title: title}}, cb);
                     }
                 }));
             }
@@ -79,7 +89,7 @@ exports.removePermission = function (_data, cb) {
         var id = _params._id.toString();
 
         dbHelper.collection("permissions", safe.sure(cb, function (permissions) {
-            permissions.remove({_id: BSON.ObjectID(id)}, cb)
+            permissions.remove({_id: mongo.ObjectID(id)}, cb)
         }));
     }));
 };
@@ -138,7 +148,7 @@ exports.editGroup = function (_data, cb) {
                             if (!! _result.length && (_result[0]._id.toString() != id)) {
                                 return cb(new Error("Permission already exist!"));
                             } else {
-                                usergroups.update({_id: BSON.ObjectID(id)}, {$set: {
+                                usergroups.update({_id: mongo.ObjectID(id)}, {$set: {
                                     title: title,
                                     description: description,
                                     permission: permission,
@@ -164,7 +174,7 @@ exports.removeGroup = function (_data, cb) {
         var id = _params._id.toString();
 
         dbHelper.collection("usergroups", safe.sure(cb, function (usergroups) {
-            usergroups.remove({_id: BSON.ObjectID(id)}, cb)
+            usergroups.remove({_id: mongo.ObjectID(id)}, cb)
         }));
     }));
 };

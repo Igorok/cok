@@ -1,6 +1,5 @@
-define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", "cPermission", "cAuth", "vGroupList", "vGroupDetail"], function ($, _, Backbone, dust, Api, Msg, _cUser, _cPermission, _cAuth, vGroupList, vGroupDetail) {
+define (["jquery", "underscore", "backbone", "dust", "api", "message", "vUserList", "vUserDetail", "cPermission", "cAuth", "vGroupList", "vGroupDetail"], function ($, _, Backbone, dust, Api, Msg, vUserList, vUserDetail, _cPermission, _cAuth, vGroupList, vGroupDetail) {
     'use strict';
-    var cUser = new _cUser();
     var cPermission = new _cPermission();
     var cAuth = new _cAuth();
 
@@ -24,7 +23,7 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", 
             //this.notes.bind('add', this.updateDebug, this);
             //this.notes.bind('remove', this.updateDebug, this);
         },
-        
+
         checkAuth: function (cb) {
             var self = this;
             self.user = Api.getUser();
@@ -71,11 +70,32 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "cUser", 
                 $('#main').html(view.render().el);
             });
         },
-        
+
         groupDetail: function (options) {
             var self = this;
             self.checkAuth(function () {
                 var view = new vGroupDetail({
+                    user: self.user,
+                    params: options
+                });
+                $('#main').html(view.render().el);
+            });
+        },
+        // users routes
+        userList: function (options) {
+            var self = this;
+            self.checkAuth(function () {
+                var view = new vUserList({
+                    user: self.user,
+                    params: options
+                });
+                $('#main').html(view.render().el);
+            });
+        },
+        userDetail: function (options) {
+            var self = this;
+            self.checkAuth(function () {
+                var view = new vUserDetail({
                     user: self.user,
                     params: options
                 });

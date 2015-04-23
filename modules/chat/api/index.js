@@ -4,7 +4,6 @@ var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
 var fs = require('fs');
-var BSON = mongo.BSONPure;
 var dbHelper = require('cok_db');
 var userApi = require(__dirname + '/user.js');
 
@@ -24,8 +23,8 @@ exports.getChatList = function (_data, cb) {
                         chatgroups.find({"users._id": _user._id}, {sort: {date: -1}}).toArray(safe.sure(cb, function (groupsArr) {
                             _.each(groupsArr, function (curentGroup) {
                                 _.each(curentGroup.users, function (curentUser) {
-                                    if (! _.contains(userIds, BSON.ObjectID(curentUser._id))) {
-                                        userIds.push(BSON.ObjectID(curentUser._id));
+                                    if (! _.contains(userIds, mongo.ObjectID(curentUser._id))) {
+                                        userIds.push(mongo.ObjectID(curentUser._id));
                                     }
                                 });
                             });
@@ -107,7 +106,7 @@ exports.editChat = function (_data, cb) {
             var cGroup = null;
             async.waterfall([
                 function (cb) {
-                    chatgroups.findOne({_id: BSON.ObjectID(_id), creator: _user._id}, safe.sure(cb, function (_cGroup) {
+                    chatgroups.findOne({_id: mongo.ObjectID(_id), creator: _user._id}, safe.sure(cb, function (_cGroup) {
                         if (_.isEmpty(_cGroup)) {
                             return cb(403);
                         } else {
@@ -117,7 +116,7 @@ exports.editChat = function (_data, cb) {
                     }));
                 },
                 function (cb) {
-                    chatgroups.update({_id: BSON.ObjectID(_id)}, {$set: {users: userArr}}, safe.sure(cb, function () {
+                    chatgroups.update({_id: mongo.ObjectID(_id)}, {$set: {users: userArr}}, safe.sure(cb, function () {
                         cb();
                     }));
                 }
@@ -150,7 +149,7 @@ exports.getEditChat = function (_data, cb) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
             async.waterfall([
                 function (cb) {
-                    chatgroups.findOne({_id: BSON.ObjectID(_id), creator: cUser._id}, safe.sure(cb, function (_cGroup) {
+                    chatgroups.findOne({_id: mongo.ObjectID(_id), creator: cUser._id}, safe.sure(cb, function (_cGroup) {
                         if (_.isEmpty(_cGroup)) {
                             return cb(403);
                         } else {
@@ -166,7 +165,7 @@ exports.getEditChat = function (_data, cb) {
                         var usrObjIds = [];
                         _.each(usrIds, function (val) {
                             if (val != cUser._id) {
-                                usrObjIds.push(BSON.ObjectID(val));
+                                usrObjIds.push(mongo.ObjectID(val));
                             }
                         });
                         users.find({_id: {$in : usrObjIds}}, {login: 1}).toArray(safe.sure(cb, function (_uArr) {
@@ -203,7 +202,7 @@ exports.removeChat = function (_data, cb) {
         var _id = _params._id.toString();
         dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
             dbHelper.collection("chatmessages", safe.sure(cb, function (chatmessages) {
-                chatgroups.findOne({_id: BSON.ObjectID(_id)}, safe.sure(cb, function (_group) {
+                chatgroups.findOne({_id: mongo.ObjectID(_id)}, safe.sure(cb, function (_group) {
                     if (_group.creator != _user._id) {
                         return cb(403);
                     }
@@ -212,7 +211,7 @@ exports.removeChat = function (_data, cb) {
                             chatmessages.remove({chatId: _id}, cb);
                         },
                         function (cb) {
-                            chatgroups.remove({_id: BSON.ObjectID(_id)}, cb);
+                            chatgroups.remove({_id: mongo.ObjectID(_id)}, cb);
                         },
                     ], safe.sure(cb, function() {
                         cb(null, true);
@@ -234,7 +233,7 @@ exports.leaveChat = function (_data, cb) {
         }
         var _id = _params._id.toString();
         dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-            chatgroups.update({_id: BSON.ObjectID(_id), "users._id": _user._id}, {$pull: { users: {_id: _user._id}}}, {multi: true}, safe.sure(cb, function (_result) {
+            chatgroups.update({_id: mongo.ObjectID(_id), "users._id": _user._id}, {$pull: { users: {_id: _user._id}}}, {multi: true}, safe.sure(cb, function (_result) {
                 cb(null, true);
             }));
         }));
@@ -255,7 +254,7 @@ exports.picUpload = function (_data, cb) {
         var newFileName = _user.login + Date.now() + "." + _file.extension;
         var oldPath = __dirname + '/../../../' + _file.path;
         var newPath = __dirname + '/../public/images/users/' + newFileName;
-        
+
         if (! _.contains(picExt, _file.extension)) {
             fs.unlink(oldPath, safe.sure(cb, function () {
                 cb('Wrong data');
@@ -296,7 +295,7 @@ exports.picUpload = function (_data, cb) {
 exports.mainPicUpload = function (_data, cb) {
     exports.picUpload(_data, safe.sure(cb, function (newFileName, _user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.update({_id: BSON.ObjectID(_user._id)}, {$set: { picture: newFileName}}, safe.sure(cb, function () {
+            users.update({_id: mongo.ObjectID(_user._id)}, {$set: { picture: newFileName}}, safe.sure(cb, function () {
                 cb(null, true);
             }));
         }));
@@ -335,12 +334,12 @@ exports.deletePic = function (_data, cb) {
         var _id = _params._id;
         var userId = _user._id;
         dbHelper.collection("images", safe.sure(cb, function (images) {
-            images.findOne({_id: BSON.ObjectID(_id), userId: userId}, safe.sure(cb, function (_result) {
+            images.findOne({_id: mongo.ObjectID(_id), userId: userId}, safe.sure(cb, function (_result) {
                 if (_.isEmpty(_result)) {
                     cb('Wrong data');
                 } else {
                     var filePath = __dirname + '/../public/images/users/' + _result.name;
-                    images.remove({_id: BSON.ObjectID(_id)}, safe.sure(cb, function () {
+                    images.remove({_id: mongo.ObjectID(_id)}, safe.sure(cb, function () {
                         fs.unlink(filePath, safe.sure(cb, function () {
                             cb();
                         }));
@@ -362,12 +361,12 @@ exports.setMainPic = function (_data, cb) {
         var _id = _params._id;
         var userId = _user._id;
         dbHelper.collection("images", safe.sure(cb, function (images) {
-            images.findOne({_id: BSON.ObjectID(_id), userId: userId}, safe.sure(cb, function (_result) {
+            images.findOne({_id: mongo.ObjectID(_id), userId: userId}, safe.sure(cb, function (_result) {
                 if (_.isEmpty(_result)) {
                     cb('Wrong data');
                 } else {
                     dbHelper.collection("users", safe.sure(cb, function (users) {
-                        users.update({_id: BSON.ObjectID(_user._id)}, {$set: { picture: _result.name}}, safe.sure(cb, function () {
+                        users.update({_id: mongo.ObjectID(_user._id)}, {$set: { picture: _result.name}}, safe.sure(cb, function () {
                             cb();
                         }));
                     }));

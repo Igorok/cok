@@ -4,7 +4,6 @@ var _ = require("lodash");
 var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
-var BSON = mongo.BSONPure;
 var dbHelper = require('cok_db');
 var self = this;
 
@@ -56,7 +55,7 @@ exports.Authorise = function (_data, cb) {
     var password = params.password.toString().trim();
     var redis = null;
     dbHelper.collection("users", safe.sure(cb, function (users) {
-        users.findOne({login: login}, safe.sure(cb, function (user) {
+        users.findOne({login: login, status: 1}, safe.sure(cb, function (user) {
             var hash = crypto.createHash('sha1');
             hash = hash.update(password).digest('hex');
             if (! user || (hash != user.password)) {
@@ -79,7 +78,7 @@ exports.Authorise = function (_data, cb) {
                             cb();
                         }));
                     }));
-                    
+
                 },
                 function (cb) {
                     redis.expire(userToken, 24*60*60, safe.sure(cb, function () {
@@ -120,16 +119,6 @@ exports.checkAuth = function (_data, cb) {
             }
         }));
     }));
-    /*dbHelper.redis.get(token, safe.sure(cb, function (_user) {
-        if (! _user) {
-            return cb (403);
-        } else {
-            _user = JSON.parse(_user);
-            var startArr = [null, _user];
-            var params = startArr.concat(_data.params);
-            cb.apply(self, params);
-        }
-    }));*/
 };
 
 /**
@@ -153,7 +142,7 @@ exports.getUserList = function (_data, cb) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
             async.waterfall([
                 function (cb) {
-                    users.findOne({_id: BSON.ObjectID(_user._id)}, safe.sure(cb, function (_cUser) {
+                    users.findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (_cUser) {
                         cUser = _cUser;
                         friendIds = _.pluck(cUser.friends, "_id");
                         var selfFriendReqIds = _.pluck(cUser.selfFriendRequests, "_id");
@@ -164,7 +153,7 @@ exports.getUserList = function (_data, cb) {
                     }));
                 },
                 function (cb) {
-                    users.find({_id: {$ne: BSON.ObjectID(_user._id)}}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (_uArr) {
+                    users.find({_id: {$ne: mongo.ObjectID(_user._id)}, {status: 1}}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (_uArr) {
                         uArr = _uArr;
                         _.each(uArr, function (val) {
                             if (_.contains(friendIds, val._id.toHexString())) {
@@ -193,7 +182,7 @@ exports.getUserDetail = function (_data, cb) {
             _id = _params._id.toString();
         }
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.findOne({_id: BSON.ObjectID(_id)}, {login:1, email: 1, picture: 1, friends: 1}, safe.sure(cb, function (_result) {
+            users.findOne({_id: mongo.ObjectID(_id), status: 1}, {login:1, email: 1, picture: 1, friends: 1}, safe.sure(cb, function (_result) {
                 cb (null, _result);
             }));
         }));
@@ -215,7 +204,7 @@ exports.addFriendRequest = function (_data, cb) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
             async.parallel([
                 function (cb) {
-                    users.findOne({_id: BSON.ObjectID(cUser._id)}, safe.sure(cb, function (_cUser) {
+                    users.findOne({_id: mongo.ObjectID(cUser._id)}, safe.sure(cb, function (_cUser) {
                         if (_.isEmpty(_cUser)) {
                             return cb(404);
                         } else {
@@ -234,7 +223,7 @@ exports.addFriendRequest = function (_data, cb) {
                     }));
                 },
                 function (cb) {
-                    users.findOne({_id: BSON.ObjectID(fid)}, safe.sure(cb, function (_fUser) {
+                    users.findOne({_id: mongo.ObjectID(fid)}, safe.sure(cb, function (_fUser) {
                         if (_.isEmpty(_fUser)) {
                             return cb(404);
                         } else {
@@ -252,7 +241,7 @@ exports.addFriendRequest = function (_data, cb) {
                         }
                     }));
                 },
-            
+
             ], safe.sure(cb, function () {
                 cb(null, true);
             }));
@@ -273,7 +262,7 @@ exports.addFriend = function (_data, cb) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
             async.waterfall([
                 function (cb) {
-                    users.findOne({_id: BSON.ObjectID(cUser._id)}, safe.sure(cb, function (_cUser) {
+                    users.findOne({_id: mongo.ObjectID(cUser._id)}, safe.sure(cb, function (_cUser) {
                         if (_.isEmpty(_cUser)) {
                             return cb("Wrong data");
                         } else {
@@ -294,7 +283,7 @@ exports.addFriend = function (_data, cb) {
                     }));
                 },
                 function (cb) {
-                    users.findOne({_id: BSON.ObjectID(fid)}, safe.sure(cb, function (_fUser) {
+                    users.findOne({_id: mongo.ObjectID(fid)}, safe.sure(cb, function (_fUser) {
                         if (_.isEmpty(_fUser)) {
                             return cb("Wrong data");
                         } else {
@@ -311,7 +300,7 @@ exports.addFriend = function (_data, cb) {
                         }
                     }));
                 },
-            
+
             ], safe.sure(cb, function () {
                 cb(null, true);
             }));
@@ -321,8 +310,8 @@ exports.addFriend = function (_data, cb) {
 
 
 /**
-* delete friends for user
-*/
+ * delete friends for user
+ */
 exports.deleteFriend = function (_data, cb) {
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params._id)) {
@@ -332,7 +321,7 @@ exports.deleteFriend = function (_data, cb) {
         var usersIds = [_id, _user._id];
         dbHelper.collection("users", safe.sure(cb, function (users) {
             async.each(usersIds, function (uId, cb) {
-                users.findOne({_id: BSON.ObjectID(uId)}, safe.sure(cb, function (_cUser) {
+                users.findOne({_id: mongo.ObjectID(uId)}, safe.sure(cb, function (_cUser) {
                     if (_.isEmpty(_cUser)) {
                         return cb(404);
                     } else {
@@ -341,7 +330,7 @@ exports.deleteFriend = function (_data, cb) {
                         removedId = removedId[0];
                         users.update({_id: cUser._id}, { $pull: {
                             friends: {_id: removedId},
-                            selfFriendRequests: {_id: removedId}, 
+                            selfFriendRequests: {_id: removedId},
                             friendRequests: {_id: removedId}
                         }}, safe.sure(cb, function (_delRes, info) {
                             cb();
@@ -361,19 +350,19 @@ exports.deleteFriend = function (_data, cb) {
 exports.getFriendList = function (_data, cb) {
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.findOne({_id: BSON.ObjectID(_user._id)}, safe.sure(cb, function (cUser) {
+            users.findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (cUser) {
                 if (_.isEmpty(cUser.friendRequests) && _.isEmpty(cUser.friends)) {
                     return cb();
                 }
                 var friendIds = [];
                 var friendReqIds = [];
                 _.each(cUser.friends, function (val) {
-                    friendIds.push(BSON.ObjectID(val._id));
+                    friendIds.push(mongo.ObjectID(val._id));
                 });
                 _.each(cUser.friendRequests, function (val) {
-                    friendReqIds.push(BSON.ObjectID(val._id));
+                    friendReqIds.push(mongo.ObjectID(val._id));
                 });
-                
+
                 var friendList = [];
                 var friendReq = [];
                 async.parallel([
@@ -413,7 +402,7 @@ exports.deleteUser = function (_data, cb) {
         }
         var _id = _params._id.toString();
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.remove({_id: BSON.ObjectID(_id)}, safe.sure(cb, function (_result) {
+            users.remove({_id: mongo.ObjectID(_id)}, safe.sure(cb, function (_result) {
                 cb (null, _result);
             }));
         }));

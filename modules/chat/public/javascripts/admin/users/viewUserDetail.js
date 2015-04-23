@@ -1,6 +1,6 @@
-define (["jquery", "underscore", "backbone", "dust", "tpl", "app", "viewModalDetail"], function ($, _, backbone, dust, tpl, App, viewModalDetail) {
+define (["jquery", "underscore", "backbone", "dust", "tpl"], function ($, _, backbone, dust, tpl) {
     'use strict';
-    App.viewUserDetail = Backbone.View.extend({
+    var viewUserDetail = Backbone.View.extend({
         // the constructor
         initialize: function (options) {
             // model is passed through

@@ -4,7 +4,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("adminLayout", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#permMenu\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-tower\"></span>Permissions</a><ul id=\"permMenu\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#groupMenu\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-folder-open\"></span>Groups</a><ul id=\"groupMenu\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#groups\">Groups List</a></li><li><a href=\"#groups/-1\">New group</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#users\"  aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"users\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li></ul></div><div id=\"errorCase\"></div><div id=\"main\" class=\"col-md-10\"></div>");
+      return chk.w("<div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#permMenu\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-tower\"></span>Permissions</a><ul id=\"permMenu\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#permissions\">Permission List</a></li><li><a href=\"#permissions/-1\">New permission</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#groupMenu\" aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-folder-open\"></span>Groups</a><ul id=\"groupMenu\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#groups\">Groups List</a></li><li><a href=\"#groups/-1\">New group</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#users\"  aria-expanded=\"false\" aria-controls=\"permMenu\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"users\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#users\">User List</a></li><li><a href=\"#users/-1\">New user</a></li></ul></li></ul></div><div id=\"errorCase\"></div><div id=\"main\" class=\"col-md-10\"></div>");
     }
     body_0.__dustBody = !0;
     return body_0;
@@ -133,16 +133,32 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("userList", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<ul>").s(ctx.get(["data"], false), ctx, {
+      return chk.w("<div class=\"widget\"><table class=\"table table-striped table-hover\">").s(ctx.get(["data"], false), ctx, {
         "block": body_1
-      }, {}).w("</ul>");
+      }, {}).w("</table></div>");
     }
     body_0.__dustBody = !0;
 
     function body_1(chk, ctx) {
-      return chk.w("<li><!-- a href=\"#users/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w("</a--><span class=\"detailView\" data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w(" </span><span> email: ").f(ctx.get(["email"], false), ctx, "h").w("</span></li>");
+      return chk.w("<tr><td><a href=\"#users/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w("</a></td><td><span>").f(ctx.get(["email"], false), ctx, "h").w("</span></td><td><span>").h("eq", ctx, {
+        "else": body_2,
+        "block": body_3
+      }, {
+        "key": ctx.get(["status"], false),
+        "value": 1
+      }).w("</span></td><td><a href=\"#\" class=\"removeGroup\" data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\"><span class=\"glyphicon glyphicon-trash\"></span></a></td></tr>");
     }
     body_1.__dustBody = !0;
+
+    function body_2(chk, ctx) {
+      return chk.w("Disabled");
+    }
+    body_2.__dustBody = !0;
+
+    function body_3(chk, ctx) {
+      return chk.w("Active");
+    }
+    body_3.__dustBody = !0;
     return body_0;
   })();
   // modules/chat/views/admin/userModalDetail.dust

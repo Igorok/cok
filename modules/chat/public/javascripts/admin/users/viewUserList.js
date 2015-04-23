@@ -1,48 +1,68 @@
-define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "vModalDetail", ], function ($, _, backbone, dust, tpl, Msg, vModalDetail) {
+define(["jquery", "underscore", "backbone", "dust", "tpl", "message", "api", "mUser"], function ($, _, Backbone, dust, tpl, Msg, Api, User) {
     'use strict';
-    var viewUserList = Backbone.View.extend({
+    var viewIndex = Backbone.View.extend({
         // the constructor
         initialize: function (options) {
-            console.log("options ", options.users);
-            // model is passed through
-            this.users = options.users;
-            this.users.bind('reset', this.addAll, this);
+            this.user = options.user;
+            this.mUser = new User();
         },
 
         events: {
-            "click .detailView": "userModal",
+            "click .removeGroup": "removeGroup"
         },
 
         // populate the html to the dom
         render: function () {
             this.$el.html($('#main').html());
-            this.addAll();
+            this.renderAll();
             return this;
         },
 
-        addAll: function () {
+        renderAll: function () {
             var self = this;
-            var usrData = _.pluck(this.users.models, "attributes");
-            dust.render("userList", {data: usrData}, function (err, result) {
-                if (err) {
-                    new Msg.showError(null, err);
-                }
-                self.$el.html(result);
+            self.mUser.getAll({token: self.user.token}, function () {
+                var data = _.pluck(self.mUser.models, "attributes");
+                dust.render("userList", {data: data}, function (err, result) {
+                    if (err) {
+                        new Msg.showError(null, err);
+                    }
+                    self.$el.html(result);
+                });
             });
         },
 
-        userModal: function (e) {
-            new Msg.showError("Error", "qweqwe");
-            /*var self = this;
+        removeGroup: function (e) {
+            var self = this;
+            e.preventDefault();
             var _id = $(e.currentTarget).attr("data-id");
-            var currentUser = this.users._byId[_id];
+            if (_id) {
+                self.mUser.removeOne({token: self.user.token, _id: _id}, function () {
+                    self.renderAll();
+                });
+            }
+        },
 
-            self.currentView = new vModalDetail({
-                user: currentUser
-            });
-            $('#main').html(self.currentView.render().el);*/
-        }
+
+//        removePermission: function (e) {
+//            var self = this;
+//            e.preventDefault();
+//            var _id = $(e.currentTarget).attr("data-id");
+//            if (_id) {
+//                Api.call("admin.removePermission", {token: self.user.token, _id: _id}, function (err, ret) {
+//                    if (err) {
+//                        new Msg.showError(null, err);
+//                    }
+//                    self.permissions.remove(_id);
+//                    self.renderAll();
+//                });
+//            }
+//        },
+
+
+
+
+
     });
 
-    return viewUserList;
+    return viewIndex;
 });

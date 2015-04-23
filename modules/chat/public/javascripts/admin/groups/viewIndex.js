@@ -43,8 +43,8 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "api", "m
                 });
             }
         },
-        
-        
+
+
 //        removePermission: function (e) {
 //            var self = this;
 //            e.preventDefault();
@@ -59,11 +59,11 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "api", "m
 //                });
 //            }
 //        },
-        
-        
-        
-        
-        
+
+
+
+
+
     });
 
     return viewIndex;

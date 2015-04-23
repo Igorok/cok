@@ -48,6 +48,6 @@
         "grunt-contrib-watch": ""
     },
     "engines": {
-        "node": "v0.10.x"
+        "node": "v0.12.x"
     }
 }

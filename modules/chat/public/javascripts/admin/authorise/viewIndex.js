@@ -34,19 +34,16 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "tpl"], f
                 login: $("#login").val(),
                 password: $("#password").val()
             });
-            
+
             if (! self.model.isValid()) {
                 Msg.inputError(self.model.validationError);
             } else {
-                Api.call("user.Authorise", self.model.attributes, function (err, ret) {
-                    if (!! err) {
-                        Msg.showError(null, err);
-                    }
+                Api.call("user.Authorise", self.model.attributes, function (ret) {
                     if (!! ret) {
                         Api.setUser(ret.result[0]);
                         window.location.hash = "permissions";
                     }
-                    
+
                 });
             }
         }

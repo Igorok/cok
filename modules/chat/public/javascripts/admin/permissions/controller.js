@@ -9,7 +9,7 @@ define (["jquery", "underscore", "backbone", "api", "message", "mPermission", "v
         if (opt == "-1") {
             mPermission.add({_id: "-1"});
             model = mPermission._byId[opt];
-            return cb(null, model);
+            return cb(model);
         }
 
         mPermission.getAll({token: _user.token}, function () {
