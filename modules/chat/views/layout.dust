@@ -14,6 +14,8 @@
         <script data-main="javascripts/main" src="/javascripts/require.js"></script>
     </head>
     <body>
-        {{{ body }}}
+        {+content}
+            This is the base content.
+        {/content}
     </body>
 </html>

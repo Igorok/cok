@@ -26,6 +26,7 @@
         "require-dust":"",
         "dustjs-linkedin":"",
         "dustjs-helpers":"",
+        "consolidate":"",
 
 
 

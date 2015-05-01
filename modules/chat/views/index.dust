@@ -1,3 +1,5 @@
+{>layout/}
+{<content}
 <script>
     require(["jquery", "cok_core", "cok_app", "bootstrap"], function ($, cok_core) {
         $(function () {
@@ -49,3 +51,4 @@
         <button id="btnSecond" class="btn btn-default btn-right"><span class="glyphicon glyphicon-cog"></span></button>
     </div>
 </div>
+{/content}

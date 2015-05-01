@@ -153,7 +153,7 @@ exports.getUserList = function (_data, cb) {
                     }));
                 },
                 function (cb) {
-                    users.find({_id: {$ne: mongo.ObjectID(_user._id)}, {status: 1}}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (_uArr) {
+                    users.find({_id: {$ne: mongo.ObjectID(_user._id)}, status: 1}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (_uArr) {
                         uArr = _uArr;
                         _.each(uArr, function (val) {
                             if (_.contains(friendIds, val._id.toHexString())) {

@@ -28,14 +28,12 @@ app.use(lessMiddleware(__dirname + '/modules/chat/less', {
     }
 }));
 
-var hbs = app.engine('hbs', exphbs({
-    defaultLayout: __dirname + '/modules/chat/views/layout.hbs',
-    partialsDir: __dirname + '/modules/chat/views/partials/',
-    //helpers: helpers,
-}));
-
-app.set('view engine', 'hbs');
+var dust = require('dustjs-linkedin');
+var cons = require('consolidate');
+app.engine('dust', cons.dust);
+app.set('view engine', 'dust');
 app.set('views', __dirname + '/modules/chat/views');
+
 app.use(express.static(__dirname + '/modules/chat/public'));
 app.use(errorhandler());
 
