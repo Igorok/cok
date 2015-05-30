@@ -5,15 +5,40 @@ var _ = require("lodash");
 var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
-var dbHelper = require('cok_db');
-var userApi = require(__dirname + '/user.js');
-var self = this;
-
-
+var cokcore = require('cokcore');
+var dbHelper = cokcore.db;
+var userApi = null;
+var Api = function () {
+    var self = this;
+};
+Api.prototype.init = function (cb) {
+    var self = this;
+    async.parallel([
+        function (cb) {
+            dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+                self.colChatgroups = chatgroups;
+                cb();
+            }));
+        },
+        function (cb) {
+            dbHelper.collection("users", safe.sure(cb, function (users) {
+                self.colUsers = users;
+                cb();
+            }));
+        },
+        function (cb) {
+            cokcore.mInit(__dirname + '/user.js', safe.sure(cb, function (_api) {
+                userApi = _api['user'];
+                cb();
+            }));
+        }
+    ], cb);
+};
 /**
 * all users
 */
-exports.getUserList = function (_data, cb) {
+Api.prototype.getUserList = function (_data, cb) {
+    var self = this;
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
             users.find({}, {login: 1, email: 1, group: 1, status: 1}).toArray(cb);
@@ -24,7 +49,8 @@ exports.getUserList = function (_data, cb) {
 /**
 * detail user
 */
-exports.deactivateUser = function (_data, cb) {
+Api.prototype.deactivateUser = function (_data, cb) {
+    var self = this;
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
             users.find({}, {login: 1, email: 1, status: 1}).toArray(cb);
@@ -36,7 +62,8 @@ exports.deactivateUser = function (_data, cb) {
 /**
 * all permissions
 */
-exports.getPermissionList = function (_data, cb) {
+Api.prototype.getPermissionList = function (_data, cb) {
+    var self = this;
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("permissions", safe.sure(cb, function (permissions) {
             permissions.find({}).toArray(cb);
@@ -47,7 +74,8 @@ exports.getPermissionList = function (_data, cb) {
 /**
 * edit permission
 */
-exports.editPermission = function (_data, cb) {
+Api.prototype.editPermission = function (_data, cb) {
+    var self = this;
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (! _params._id || ! _params.key || ! _params.title) {
             return cb(new Error("Wrong data!"));
@@ -81,7 +109,8 @@ exports.editPermission = function (_data, cb) {
 /**
 * remove permission
 */
-exports.removePermission = function (_data, cb) {
+Api.prototype.removePermission = function (_data, cb) {
+    var self = this;
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (! _params._id) {
             return cb(new Error("Wrong data!"));
@@ -97,7 +126,8 @@ exports.removePermission = function (_data, cb) {
 /**
 * all groups
 */
-exports.getGroupList = function (_data, cb) {
+Api.prototype.getGroupList = function (_data, cb) {
+    var self = this;
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("usergroups", safe.sure(cb, function (usergroups) {
             usergroups.find({}).toArray(cb);
@@ -108,7 +138,8 @@ exports.getGroupList = function (_data, cb) {
 /**
 * edit group
 */
-exports.editGroup = function (_data, cb) {
+Api.prototype.editGroup = function (_data, cb) {
+    var self = this;
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (! _params._id || ! _params.title || ! _params.description || ! _params.permission || ! _.isArray(_params.permission)) {
             return cb(new Error("Wrong data!"));
@@ -166,7 +197,8 @@ exports.editGroup = function (_data, cb) {
 /**
 * remove group
 */
-exports.removeGroup = function (_data, cb) {
+Api.prototype.removeGroup = function (_data, cb) {
+    var self = this;
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (! _params._id) {
             return cb(new Error("Wrong data!"));
@@ -176,5 +208,34 @@ exports.removeGroup = function (_data, cb) {
         dbHelper.collection("usergroups", safe.sure(cb, function (usergroups) {
             usergroups.remove({_id: mongo.ObjectID(id)}, cb)
         }));
+    }));
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * init function
+ */
+module.exports.init = function (cb) {
+    var api = new Api();
+    console.time('init admin api');
+    api.init(safe.sure(cb, function () {
+        console.timeEnd('init admin api');
+        cb(null, api);
     }));
 };

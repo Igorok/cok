@@ -3,7 +3,6 @@ var _ = require("lodash");
 var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
-var BSON = mongo.BSONPure;
 var dbHelper = require('cok_db');
 var userApi = require(__dirname + '/../api/user.js');
 
@@ -44,7 +43,7 @@ module.exports = function (app, io) {
                 },
                 function getGroup (cb) {
                     dbHelper.collection("chatgroups", safe.sure(cb, function  (chatgroups) {
-                        chatgroups.findOne({_id: BSON.ObjectID(chatId), "users._id" : cUser._id}, safe.sure(cb, function( _group) {
+                        chatgroups.findOne({_id: mongo.ObjectID(chatId), "users._id" : cUser._id}, safe.sure(cb, function( _group) {
                             if (! _group) {
                                 return cb(403);
                             }
@@ -64,11 +63,11 @@ module.exports = function (app, io) {
                 function getUsers (cb) {
                     var userIds = [];
                     _.each(cGroup.users, function (usr) {
-                        userIds.push(BSON.ObjectID(usr._id));
+                        userIds.push(mongo.ObjectID(usr._id));
                     });
                     _.each(cHistory, function (cH) {
-                        if (! _.contains(userIds, BSON.ObjectID(cH.userId))) {
-                            userIds.push(BSON.ObjectID(cH.userId));
+                        if (! _.contains(userIds, mongo.ObjectID(cH.userId))) {
+                            userIds.push(mongo.ObjectID(cH.userId));
                         }
                     });
 
@@ -133,7 +132,7 @@ module.exports = function (app, io) {
                         cUser = _user;
                         msg = _params;
                         dbHelper.collection("chatgroups", safe.sure(cb, function  (chatgroups) {
-                            chatgroups.findOne({_id: BSON.ObjectID(msg.chatId.toString()), "users._id" : _user._id}, safe.sure(cb, function( _group) {
+                            chatgroups.findOne({_id: mongo.ObjectID(msg.chatId.toString()), "users._id" : _user._id}, safe.sure(cb, function( _group) {
                                 if (! _group) {
                                     return cb(403);
                                 }

@@ -19,9 +19,13 @@
         "mongodb":"",
         "express":"",
         "errorhandler": "",
-        "express-handlebars":"",
-
-
+        "multer": "",
+        "socket.io": "",
+        "redis": "",
+        "compression": "",
+        "body-parser": "",
+        "safe": "",
+        "less-middleware": "",
 
         "require-dust":"",
         "dustjs-linkedin":"",
@@ -31,16 +35,11 @@
 
 
 
-        "multer": "",
-        "socket.io": "",
-        "redis": "",
-        "compression": "",
-        "body-parser": "",
-        "safe": "",
+
         "nodeunit": "",
         "nodeunit-async": "",
         "uglify": "",
-        "less-middleware": "",
+
         "grunt": "",
         "grunt-dust": "",
         "grunt-contrib-handlebars": "",

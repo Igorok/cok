@@ -1,4 +1,3 @@
-var path = require('path');
 // create server
 var express = require('express');
 var http = require('http');
@@ -12,8 +11,7 @@ var bodyParser = require('body-parser');
 var multer = require('multer');
 var exphbs = require('express-handlebars');
 var lessMiddleware = require('less-middleware');
-var dbHelper = require('cok_db');
-var cfg = require('cok_config');
+
 // Configuration
 app.use(compression());
 app.use(bodyParser.json());
@@ -38,24 +36,65 @@ app.use(express.static(__dirname + '/modules/chat/public'));
 app.use(errorhandler());
 
 
-dbHelper.redis(function (err, _redis) {
+
+
+
+
+var cokCore = require('cokcore');
+var cfg = cokCore.init(__dirname + '/config');
+dbHelper = cokCore.db;
+
+
+
+
+
+dbHelper.db(function (err, _mongo) {
     if (err) {
         console.trace(err);
     }
-    dbHelper.db(function (err, _mongo) {
+    cokCore.mInit(__dirname + '/modules/chat/api', function (err, _api) {
         if (err) {
             console.trace(err);
+            process.exit();
         }
-        // Routes
-        require('./modules/chat/routes/index.js')(app);
-        require('./modules/chat/routes/socket.js')(app, io);
-        // start server
-        var port = process.env.PORT || 3000;
-        var host = cfg.prod ? "igor-ok.herokuapp.com" : "localhost";
-        host = host + ":" + port;
-        process.env.apphost = host;
-        server.listen(port, function () {
-            console.log('Example app listening at ', host);
+        _api['user'].getUserList(null, function(err, arr) {
+            console.log('arr', arr);
+            process.exit();
         });
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+// dbHelper.redis(function (err, _redis) {
+//     if (err) {
+//         console.trace(err);
+//     }
+//     dbHelper.db(function (err, _mongo) {
+//         if (err) {
+//             console.trace(err);
+//         }
+//         // Routes
+//         require('./modules/chat/routes/index.js')(app);
+//         require('./modules/chat/routes/socket.js')(app, io);
+//         // start server
+//         var port = process.env.PORT || 3000;
+//         server.listen(port, function () {
+//             console.log('Example app listening at ', port);
+//         });
+//     });
+// });

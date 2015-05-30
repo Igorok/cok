@@ -2,13 +2,6 @@ var fs = require('fs');
 var _ = require('lodash');
 
 
-
-var api = {
-    "index": require(__dirname + '/../api/index.js'),
-    "user": require(__dirname + '/../api/user.js'),
-    "admin": require(__dirname + '/../api/admin.js'),
-};
-
 // routes
 module.exports = function (app) {
     app.get('/', index);
@@ -23,7 +16,6 @@ module.exports = function (app) {
 * main page
 */
 function index (req, res) {
-    var apphost = process.env.apphost;
     res.render('index');
 }
 

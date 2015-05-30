@@ -1,0 +1,29 @@
+<script>
+    require(["jquery", "cok_core", "cok_app", "bootstrap"], function ($, cok_core) {
+        $(function () {
+            var mObj = {};
+            var mChange = function (_id) {
+                var bodyCss = {};
+                var menuCss = {};
+                if (! mObj[_id]) {
+                    mObj[_id] = true;
+                    bodyCss['padding-' + _id] = '200px';
+                    menuCss[_id] = '0px';
+                } else {
+                    mObj[_id] = false;
+                    bodyCss['padding-' + _id] = '0px';
+                    menuCss[_id] = '-200px';
+                }
+                $('#body').animate(bodyCss, 200);
+                $('#' + _id + 'Menu').animate(menuCss, 200);
+            };
+            $('#btnMain, #btnSecond').click(function () {
+                mChange($(this).data('id'));
+            });
+
+            $("img").error(function () {
+                $(this).unbind("error").attr("src", "/images/no-avatar.jpg");
+            });
+        });
+    });
+</script>

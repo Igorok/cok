@@ -42,10 +42,11 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
 
     // check user login
     var menuRender = cok_controller.prototype.menuRender = function () {
+        console.log('menuRender', menu);
         var _user = cok_core.getUser();
         if (! _.isEmpty(_user)) {
             $("#navPanel").show();
-            cok_core.render ($("#mainMenu"), "mainMenu", {data: menu});
+            cok_core.render ($("#leftMenu"), "mainMenu", {data: menu});
         } else {
             return false;
         }
@@ -110,7 +111,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     cok_controller.prototype.userIndex = function () {
         cok_core.render ($("#body"), "userIndex", {});
     };
-    
+
     // picture index page
     cok_controller.prototype.imagesIndex = function (ownerId) {
         cok_core.render ($("#body"), "imagesIndex", {ownerId: ownerId});
@@ -121,22 +122,22 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
     cok_controller.prototype.userFriendsRender = function () {
         cok_core.render ($("#body"), "friendsIndex", {});
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // user detail page
     cok_controller.prototype.userDetail = function (_id) {
         var _user = checkedUser();
@@ -170,7 +171,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
             cok_core.render ($("#body"), "chatEdit", {data: result[0]});
         });
     };
-    
+
     menuRender();
     return new cok_controller();
 

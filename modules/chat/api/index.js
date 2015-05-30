@@ -4,14 +4,42 @@ var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
 var fs = require('fs');
-var dbHelper = require('cok_db');
-var userApi = require(__dirname + '/user.js');
+var cokcore = require('cokcore');
+var dbHelper = cokcore.db;
+var userApi = null;
+
+var Api = function () {
+    var self = this;
+};
+Api.prototype.init = function (cb) {
+    var self = this;
+    async.parallel([
+        function (cb) {
+            dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+                self.colChatgroups = chatgroups;
+                cb();
+            }));
+        },
+        function (cb) {
+            dbHelper.collection("users", safe.sure(cb, function (users) {
+                self.colUsers = users;
+                cb();
+            }));
+        },
+        function (cb) {
+            cokcore.mInit(__dirname + '/user.js', safe.sure(cb, function (_api) {
+                userApi = _api['user'];
+                cb();
+            }));
+        }
+    ], cb);
+};
 
 
 /**
 * all users
 */
-exports.getChatList = function (_data, cb) {
+Api.prototype.getChatList = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
             dbHelper.collection("users", safe.sure(cb, function (users) {
@@ -65,7 +93,7 @@ exports.getChatList = function (_data, cb) {
 /**
 * add new chat group
 */
-exports.addChat = function (_data, cb) {
+Api.prototype.addChat = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params.users) || ! _.isArray(_params.users)) {
             return cb('Wrong data');
@@ -89,7 +117,7 @@ exports.addChat = function (_data, cb) {
 /**
 * edit chat group
 */
-exports.editChat = function (_data, cb) {
+Api.prototype.editChat = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id) || _.isEmpty(_params.users) || ! _.isArray(_params.users)) {
             return cb('Wrong data');
@@ -130,7 +158,7 @@ exports.editChat = function (_data, cb) {
 /**
 * get edit chat
 */
-exports.getEditChat = function (_data, cb) {
+Api.prototype.getEditChat = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
             return cb('Wrong data');
@@ -194,7 +222,7 @@ exports.getEditChat = function (_data, cb) {
 /**
 * remove chat group
 */
-exports.removeChat = function (_data, cb) {
+Api.prototype.removeChat = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
             return cb('Wrong data');
@@ -226,7 +254,7 @@ exports.removeChat = function (_data, cb) {
 /**
 * remove chat group
 */
-exports.leaveChat = function (_data, cb) {
+Api.prototype.leaveChat = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
             return cb('Wrong data');
@@ -245,7 +273,7 @@ exports.leaveChat = function (_data, cb) {
 /**
 * upload pictire
 */
-exports.picUpload = function (_data, cb) {
+Api.prototype.picUpload = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params, _file) {
         var picExt = ["jpg", "jpeg", "png", "gif"];
         if (_.isEmpty(_params) || _.isEmpty(_file)) {
@@ -292,8 +320,9 @@ exports.picUpload = function (_data, cb) {
 /**
 * upload main picture for user
 */
-exports.mainPicUpload = function (_data, cb) {
-    exports.picUpload(_data, safe.sure(cb, function (newFileName, _user, _params) {
+Api.prototype.mainPicUpload = function (_data, cb) {
+    var self = this;
+    self.picUpload(_data, safe.sure(cb, function (newFileName, _user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
             users.update({_id: mongo.ObjectID(_user._id)}, {$set: { picture: newFileName}}, safe.sure(cb, function () {
                 cb(null, true);
@@ -306,7 +335,7 @@ exports.mainPicUpload = function (_data, cb) {
 /**
 * get user pictures
 */
-exports.getUserPic = function (_data, cb) {
+Api.prototype.getUserPic = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         var ownerId;
         if (_.isEmpty(_params.ownerId)) {
@@ -326,7 +355,7 @@ exports.getUserPic = function (_data, cb) {
 /**
 * remove pictures
 */
-exports.deletePic = function (_data, cb) {
+Api.prototype.deletePic = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
             return cb('Wrong data');
@@ -353,7 +382,7 @@ exports.deletePic = function (_data, cb) {
 /**
 * set main picture
 */
-exports.setMainPic = function (_data, cb) {
+Api.prototype.setMainPic = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
             return cb('Wrong data');
@@ -375,3 +404,28 @@ exports.setMainPic = function (_data, cb) {
         }));
     }));
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ /**
+  * init function
+  */
+ module.exports.init = function (cb) {
+     var api = new Api();
+     console.time('init index api');
+     api.init(safe.sure(cb, function () {
+         console.timeEnd('init index api');
+         cb(null, api);
+     }));
+ };

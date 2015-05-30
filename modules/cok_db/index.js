@@ -2,8 +2,9 @@ var safe = require('safe');
 var mongo = require('mongodb');
 var requireRedis = require("redis");
 var cfg = require('cok_config');
-var _db;
-var _redis;
+var _db = null;
+var _redis= null;
+var collections = [];
 
 /**
 * databases
@@ -32,11 +33,17 @@ function dbHelper () {
     };
 
     self.collection = function(name, cb) {
-        self.db(safe.sure(cb, function(db) {
-            db.collection(name, function (err, collection) {
-                cb(err, collection);
-            });
-        }));
+        if (! collections[name]) {
+            self.db(safe.sure(cb, function(db) {
+                db.collection(name, function (err, collection) {
+                    collections[name] = collection;
+                    cb(err, collection);
+                });
+            }));
+        } else {
+            cb(null, collections[name]);
+        }
+
     };
 
     self.redis = function (cb) {

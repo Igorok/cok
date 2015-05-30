@@ -1,54 +1,15 @@
 {>layout/}
 {<content}
-<script>
-    require(["jquery", "cok_core", "cok_app", "bootstrap"], function ($, cok_core) {
-        $(function () {
-            var mainMenu = false;
-            var secondMenu = false;
-            var showMainMenu = function () {
-                if (! mainMenu) {
-                    mainMenu = true;
-                    $('#body').animate({'padding-left': '200px'}, 200);
-                    $('#mainMenu').animate({'left': '0px'}, 200);
-                } else {
-                    mainMenu = false;
-                    $('#body').animate({'padding-left': '0px'}, 200);
-                    $('#mainMenu').animate({'left': '-200px'}, 200);
-                }
-            };
-            var showSecondMenu = function () {
-                if (! secondMenu) {
-                    secondMenu = true;
-                     $('#body').animate({'padding-right': '200px'}, 200);
-                    $('#secondMenu').animate({'right': '0px'}, 200);
-                } else {
-                    secondMenu = false;
-                     $('#body').animate({'padding-right': '0'}, 200);
-                    $('#secondMenu').animate({'right': '-200px'}, 200);
-                }
-            };
-
-            $('#btnMain').click(function () {
-                showMainMenu();
-            });
-            $('#btnSecond').click(function () {
-                showSecondMenu();
-            });
-            $("img").error(function () {
-                $(this).unbind("error").attr("src", "/images/no-avatar.jpg");
-            });
-        });
-    });
-</script>
 <div style="position:relative; height: 15px"></div>
 <div id="body"></div>
 <div style="position:relative; height: 60px"></div>
-<div id="mainMenu"></div>
-<div id="secondMenu"></div>
+
+<div id="leftMenu"></div>
+<div id="rightMenu"></div>
 <div id="navPanel">
     <div class="clearfix nav-case">
-        <button id="btnMain" class="btn btn-default btn-left"><span class="glyphicon glyphicon-th-list"></span></button>
-        <button id="btnSecond" class="btn btn-default btn-right"><span class="glyphicon glyphicon-cog"></span></button>
+        <button id="btnMain" data-id="left" class="btn btn-default btn-left"><span class="glyphicon glyphicon-th-list"></span></button>
+        <button id="btnSecond" data-id="right" class="btn btn-default btn-right"><span class="glyphicon glyphicon-cog"></span></button>
     </div>
 </div>
 {/content}

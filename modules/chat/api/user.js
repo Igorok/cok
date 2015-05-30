@@ -4,15 +4,100 @@ var _ = require("lodash");
 var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
-var dbHelper = require('cok_db');
-var self = this;
+var cokcore = require('cokcore');
+var dbHelper = cokcore.db;
+var collections = cokcore.collections;
+
+
+var Api = function () {
+    var self = this;
+};
+Api.prototype.init = function (cb) {
+    var self = this;
+    async.parallel([
+        function (cb) {
+            dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+                cb();
+            }));
+        },
+        function (cb) {
+            dbHelper.collection("users", safe.sure(cb, function (users) {
+                cb();
+            }));
+        }
+    ], cb);
+};
+
+
+
+
+
+
+
+/**
+* all users
+*/
+Api.prototype.getUserList = function (_data, cb) {
+    var self = this;
+    collections["users"].find({}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (arr) {
+        cb(null, arr);
+    }));
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 /**
 * login to system
 */
-exports.Registration = function (_data, cb) {
+Api.prototype.Registration = function (_data, cb) {
+    var self = this;
     var params = _data.params[0];
     if (_.isUndefined(params.login) || _.isUndefined(params.email) || _.isUndefined(params.password)) {
         return cb ("Wrong data");
@@ -46,7 +131,8 @@ exports.Registration = function (_data, cb) {
 /**
 * login to system
 */
-exports.Authorise = function (_data, cb) {
+Api.prototype.Authorise = function (_data, cb) {
+    var self = this;
     var params = _data.params[0];
     if (_.isUndefined(params.login) || _.isUndefined(params.password)) {
         return cb ("Wrong data");
@@ -97,7 +183,7 @@ exports.Authorise = function (_data, cb) {
 /**
 * check authenticate
 */
-exports.checkAuth = function (_data, cb) {
+Api.prototype.checkAuth = function (_data, cb) {
     var self = this;
     if (! _data || ! _data.params || ! cb || (typeof(cb) != 'function')) {
         return cb (403);
@@ -124,7 +210,8 @@ exports.checkAuth = function (_data, cb) {
 /**
 * logout to system
 */
-exports.logout = function (_data, cb) {
+Api.prototype.logout = function (_data, cb) {
+    var self = this;
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.redis(safe.sure(cb, function (_redis) {
             _redis.del(_params.token, {}, cb);
@@ -134,46 +221,48 @@ exports.logout = function (_data, cb) {
 /**
 * all users
 */
-exports.getUserList = function (_data, cb) {
-    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        var uArr = null;
-        var cUser = null;
-        var friendIds = [];
-        dbHelper.collection("users", safe.sure(cb, function (users) {
-            async.waterfall([
-                function (cb) {
-                    users.findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (_cUser) {
-                        cUser = _cUser;
-                        friendIds = _.pluck(cUser.friends, "_id");
-                        var selfFriendReqIds = _.pluck(cUser.selfFriendRequests, "_id");
-                        var friendReqIds = _.pluck(cUser.friendRequests, "_id");
-                        friendIds = friendIds.concat(selfFriendReqIds);
-                        friendIds = friendIds.concat(friendReqIds);
-                        cb();
-                    }));
-                },
-                function (cb) {
-                    users.find({_id: {$ne: mongo.ObjectID(_user._id)}, status: 1}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (_uArr) {
-                        uArr = _uArr;
-                        _.each(uArr, function (val) {
-                            if (_.contains(friendIds, val._id.toHexString())) {
-                                val.friend = true;
-                            }
-                        });
-                        cb();
-                    }));
-                },
-            ], safe.sure(cb, function () {
-                cb(null, uArr);
-            }));
-        }));
-    }));
-};
+// Api.prototype.getUserList = function (_data, cb) {
+//     var self = this;
+//     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+//         var uArr = null;
+//         var cUser = null;
+//         var friendIds = [];
+//         dbHelper.collection("users", safe.sure(cb, function (users) {
+//             async.waterfall([
+//                 function (cb) {
+//                     users.findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (_cUser) {
+//                         cUser = _cUser;
+//                         friendIds = _.pluck(cUser.friends, "_id");
+//                         var selfFriendReqIds = _.pluck(cUser.selfFriendRequests, "_id");
+//                         var friendReqIds = _.pluck(cUser.friendRequests, "_id");
+//                         friendIds = friendIds.concat(selfFriendReqIds);
+//                         friendIds = friendIds.concat(friendReqIds);
+//                         cb();
+//                     }));
+//                 },
+//                 function (cb) {
+//                     users.find({_id: {$ne: mongo.ObjectID(_user._id)}, status: 1}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (_uArr) {
+//                         uArr = _uArr;
+//                         _.each(uArr, function (val) {
+//                             if (_.contains(friendIds, val._id.toHexString())) {
+//                                 val.friend = true;
+//                             }
+//                         });
+//                         cb();
+//                     }));
+//                 },
+//             ], safe.sure(cb, function () {
+//                 cb(null, uArr);
+//             }));
+//         }));
+//     }));
+// };
 
 /**
 * detail user
 */
-exports.getUserDetail = function (_data, cb) {
+Api.prototype.getUserDetail = function (_data, cb) {
+    var self = this;
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         var _id;
         if (_.isEmpty(_params._id)) {
@@ -194,7 +283,8 @@ exports.getUserDetail = function (_data, cb) {
 /**
 * add friends for user
 */
-exports.addFriendRequest = function (_data, cb) {
+Api.prototype.addFriendRequest = function (_data, cb) {
+    var self = this;
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         var cUser = _user;
         if (_.isEmpty(_params._id)) {
@@ -252,7 +342,8 @@ exports.addFriendRequest = function (_data, cb) {
 /**
 * add friends for user
 */
-exports.addFriend = function (_data, cb) {
+Api.prototype.addFriend = function (_data, cb) {
+    var self = this;
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         var cUser = _user;
         if (_.isEmpty(_params._id)) {
@@ -312,7 +403,8 @@ exports.addFriend = function (_data, cb) {
 /**
  * delete friends for user
  */
-exports.deleteFriend = function (_data, cb) {
+Api.prototype.deleteFriend = function (_data, cb) {
+    var self = this;
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params._id)) {
             return cb ("Wrong form data");
@@ -347,7 +439,8 @@ exports.deleteFriend = function (_data, cb) {
 /**
 * friends list
 */
-exports.getFriendList = function (_data, cb) {
+Api.prototype.getFriendList = function (_data, cb) {
+    var self = this;
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
             users.findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (cUser) {
@@ -395,7 +488,8 @@ exports.getFriendList = function (_data, cb) {
 /**
 * detail user
 */
-exports.deleteUser = function (_data, cb) {
+Api.prototype.deleteUser = function (_data, cb) {
+    var self = this;
     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params._id)) {
             return cb ("Wrong form data");
@@ -406,5 +500,20 @@ exports.deleteUser = function (_data, cb) {
                 cb (null, _result);
             }));
         }));
+    }));
+};
+
+
+
+
+/**
+ * init function
+ */
+module.exports.init = function (cb) {
+    var api = new Api();
+    console.time('init user api');
+    api.init(safe.sure(cb, function () {
+        console.timeEnd('init user api');
+        cb(null, api);
     }));
 };
