@@ -16,7 +16,7 @@ define (["jquery", "lodash", "cok_core"], function ($, _, cok_core) {
         },
         {
             title: '<span class="glyphicon glyphicon-comment"></span>&nbsp;&nbsp;Chats',
-            hash: '#!/chat/index',
+            hash: '#!web/index',
         },
         {
             title: '<span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;Users',

@@ -3,11 +3,13 @@ var _ = require("lodash");
 var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
-var dbHelper = require('cok_db');
-var userApi = require(__dirname + '/../api/user.js');
+var cokCore = require('cokcore');
+var dbHelper = cokCore.db;
+var userApi = null;
 
 
-module.exports = function (app, io) {
+module.exports = function (app, io, _api) {
+    userApi = _api['user'];
     io.on('connection', function (socket) {
         var emitError = function (err) {
             console.trace(err);

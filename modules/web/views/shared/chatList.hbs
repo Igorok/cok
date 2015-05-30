@@ -2,11 +2,11 @@
 <tr>
     <td>{{fDate}}</td>
     <td>
-        <strong><a href="#!/chat/detail/{{_id}}">{{#users}}{{login}}&nbsp;{{/users}}</a></strong>
+        <strong><a href="#!web/detail/{{_id}}">{{#users}}{{login}}&nbsp;{{/users}}</a></strong>
     </td>
     <td class="action-column">
         {{#crPermission}}
-           <a href="#!/chat/edit/{{_id}}" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span></a>
+           <a href="#!web/edit/{{_id}}" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span></a>
            <button class="btn btn-danger cRemove" data-id="{{_id}}"><span class="glyphicon glyphicon-remove"></span></button>
         {{/crPermission}}
         {{^crPermission}}

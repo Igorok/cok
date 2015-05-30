@@ -1,5 +1,5 @@
 define(["dust", "dust-helpers"], function(dust, dust_helpers) {
-  // modules/chat/views/admin/adminLayout.dust
+  // modules/web/views/admin/adminLayout.dust
   (function() {
     dust.register("adminLayout", body_0);
 
@@ -9,7 +9,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_0.__dustBody = !0;
     return body_0;
   })();
-  // modules/chat/views/admin/groupDetail.dust
+  // modules/web/views/admin/groupDetail.dust
   (function() {
     dust.register("groupDetail", body_0);
 
@@ -40,7 +40,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_3.__dustBody = !0;
     return body_0;
   })();
-  // modules/chat/views/admin/groupList.dust
+  // modules/web/views/admin/groupList.dust
   (function() {
     dust.register("groupList", body_0);
 
@@ -64,7 +64,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_2.__dustBody = !0;
     return body_0;
   })();
-  // modules/chat/views/admin/login.dust
+  // modules/web/views/admin/login.dust
   (function() {
     dust.register("login", body_0);
 
@@ -74,7 +74,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_0.__dustBody = !0;
     return body_0;
   })();
-  // modules/chat/views/admin/message.dust
+  // modules/web/views/admin/message.dust
   (function() {
     dust.register("message", body_0);
 
@@ -91,7 +91,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_1.__dustBody = !0;
     return body_0;
   })();
-  // modules/chat/views/admin/permissionDetail.dust
+  // modules/web/views/admin/permissionDetail.dust
   (function() {
     dust.register("permissionDetail", body_0);
 
@@ -101,7 +101,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_0.__dustBody = !0;
     return body_0;
   })();
-  // modules/chat/views/admin/permissionList.dust
+  // modules/web/views/admin/permissionList.dust
   (function() {
     dust.register("permissionList", body_0);
 
@@ -118,7 +118,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_1.__dustBody = !0;
     return body_0;
   })();
-  // modules/chat/views/admin/userDetail.dust
+  // modules/web/views/admin/userDetail.dust
   (function() {
     dust.register("userDetail", body_0);
 
@@ -128,7 +128,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_0.__dustBody = !0;
     return body_0;
   })();
-  // modules/chat/views/admin/userList.dust
+  // modules/web/views/admin/userList.dust
   (function() {
     dust.register("userList", body_0);
 
@@ -161,7 +161,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_3.__dustBody = !0;
     return body_0;
   })();
-  // modules/chat/views/admin/userModalDetail.dust
+  // modules/web/views/admin/userModalDetail.dust
   (function() {
     dust.register("userModalDetail", body_0);
 

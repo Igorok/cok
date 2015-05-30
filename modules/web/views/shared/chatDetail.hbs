@@ -15,7 +15,7 @@ require(["jquery", "lodash", "io", "cok_core", "cok_controller"], function ($, _
     };
     // chatFixedItems
     if (_.isEmpty(chatId)) {
-        window.location("#!/chat/index");
+        window.location("#!web/index");
     }
     if (window.socket) {
         window.socket.destroy()
@@ -32,7 +32,7 @@ require(["jquery", "lodash", "io", "cok_core", "cok_controller"], function ($, _
     // add user
     window.socket.on('join', function (jObj) {
         if (! jObj) {
-            window.location("#!/chat/index");
+            window.location("#!web/index");
         }
         if (jObj.cHistory) {
             chatItems = chatItems.concat(jObj.cHistory);

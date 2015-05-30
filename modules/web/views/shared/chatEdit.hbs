@@ -2,6 +2,7 @@
     require(["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok_core, cok_controller) {
         var _user = cok_controller.checkedUser();
         var token = _user.token;
+        var _id = "{{data._id}}";
         $('#chatCreateForm').submit(function () {
             var formData = $(this).serializeArray();
             var users = [];
@@ -9,8 +10,8 @@
                 _.each(formData, function (val) {
                     users.push(val.name);
                 });
-                cok_core.call("index.addChat", {token: token, users: users}, function (result) {
-                    window.location = "#!/chat/index";
+                cok_core.call("index.editChat", {token: token, users: users, _id: _id}, function (result) {
+                    window.location = "#!web/index";
                 });
             } else {
                 cok_core.systemMessage($('#messageCase'), 'danger', 'Users is empty')
@@ -24,15 +25,15 @@
     <div id="messageCase"></div>
     <form role="form" id="chatCreateForm">
        <div class="row">
-        {{#data}}
+        {{#data.usrArr}}
         <div class="col-xs-4">
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="{{_id}}"> {{login}}
+                    <input type="checkbox" name="{{_id}}" {{#checked}}checked{{/checked}}> {{login}}
                 </label>
             </div>
         </div>
-        {{/data}}
+        {{/data.usrArr}}
         </div>
         <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
     </form>

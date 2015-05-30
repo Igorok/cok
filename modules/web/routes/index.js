@@ -1,9 +1,10 @@
 var fs = require('fs');
 var _ = require('lodash');
-
+var api = null;
 
 // routes
-module.exports = function (app) {
+module.exports = function (app, _api) {
+    api = _api;
     app.get('/', index);
     app.get('/admin', admin);
     app.post('/jsonrpc', jsonrpc);

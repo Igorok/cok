@@ -1,3 +1,4 @@
+"use strict";
 var crypto = require('crypto');
 var safe = require('safe');
 var _ = require("lodash");
@@ -10,94 +11,27 @@ var collections = cokcore.collections;
 
 
 var Api = function () {
-    var self = this;
+    this.init = function (cb) {
+        async.parallel([
+            function (cb) {
+                dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+                    cb();
+                }));
+            },
+            function (cb) {
+                dbHelper.collection("users", safe.sure(cb, function (users) {
+                    cb();
+                }));
+            }
+        ], cb);
+    }
 };
-Api.prototype.init = function (cb) {
-    var self = this;
-    async.parallel([
-        function (cb) {
-            dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-                cb();
-            }));
-        },
-        function (cb) {
-            dbHelper.collection("users", safe.sure(cb, function (users) {
-                cb();
-            }));
-        }
-    ], cb);
-};
-
-
-
-
-
-
-
-/**
-* all users
-*/
-Api.prototype.getUserList = function (_data, cb) {
-    var self = this;
-    collections["users"].find({}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (arr) {
-        cb(null, arr);
-    }));
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /**
 * login to system
 */
 Api.prototype.Registration = function (_data, cb) {
-    var self = this;
     var params = _data.params[0];
     if (_.isUndefined(params.login) || _.isUndefined(params.email) || _.isUndefined(params.password)) {
         return cb ("Wrong data");
@@ -105,25 +39,23 @@ Api.prototype.Registration = function (_data, cb) {
     var login = params.login.toString().trim();
     var email = params.email.toString().trim();
     var password = params.password.toString().trim();
-    dbHelper.collection("users", safe.sure(cb, function (users) {
-        users.find({$or : [{login: login}, {email: email}]}).toArray(safe.sure(cb, function (_result) {
-            if (! _.isEmpty(_result)) {
-                return cb (" Username or email already registered");
-            }
-            var hash = crypto.createHash('sha1');
-            hash = hash.update(password).digest('hex');
+    collections["users"].find({$or : [{login: login}, {email: email}]}).toArray(safe.sure(cb, function (_result) {
+        if (! _.isEmpty(_result)) {
+            return cb (" Username or email already registered");
+        }
+        var hash = crypto.createHash('sha1');
+        hash = hash.update(password).digest('hex');
 
-            var newUser = {
-                login: login,
-                email: email,
-                password: hash,
-                group: "SimpleUser",
-                created: new Date(),
-                status: 1
-            };
-            users.insert(newUser, safe.sure(cb, function (_result) {
-                cb(null, true);
-            }));
+        var newUser = {
+            login: login,
+            email: email,
+            password: hash,
+            group: "SimpleUser",
+            created: new Date(),
+            status: 1
+        };
+        collections["users"].insert(newUser, safe.sure(cb, function (_result) {
+            cb(null, true);
         }));
     }));
 };
@@ -132,50 +64,39 @@ Api.prototype.Registration = function (_data, cb) {
 * login to system
 */
 Api.prototype.Authorise = function (_data, cb) {
-    var self = this;
     var params = _data.params[0];
     if (_.isUndefined(params.login) || _.isUndefined(params.password)) {
         return cb ("Wrong data");
     }
     var login = params.login.toString().trim();
     var password = params.password.toString().trim();
-    var redis = null;
-    dbHelper.collection("users", safe.sure(cb, function (users) {
-        users.findOne({login: login, status: 1}, safe.sure(cb, function (user) {
-            var hash = crypto.createHash('sha1');
-            hash = hash.update(password).digest('hex');
-            if (! user || (hash != user.password)) {
-                return cb ("Wrong data");
-            }
-            delete user.password;
-            var userToken = null;
-            async.series([
-                function (cb) {
-                    crypto.randomBytes(48, safe.sure(cb, function(buf) {
-                        userToken = buf.toString('hex');
-                        cb();
-                    }));
-                },
-                function (cb) {
-                    var ruser = JSON.stringify(user);
-                    dbHelper.redis(safe.sure(cb, function (_redis) {
-                        redis = _redis;
-                        redis.set(userToken, ruser, safe.sure(cb, function () {
-                            cb();
-                        }));
-                    }));
-
-                },
-                function (cb) {
-                    redis.expire(userToken, 24*60*60, safe.sure(cb, function () {
-                        cb();
-                    }));
+    var user = null;
+    async.series([
+        function (cb) {
+            collections["users"].findOne({login: login, status: 1}, safe.sure(cb, function (_obj) {
+                var hash = crypto.createHash('sha1');
+                hash = hash.update(password).digest('hex');
+                if (! _obj || (hash != _obj.password)) {
+                    return cb ("Wrong data");
                 }
-            ], safe.sure(cb, function () {
-                user.token = userToken;
-                cb (null, user);
+                delete _obj.password;
+                user = _obj;
+                cb();
             }));
-        }));
+        },
+        function (cb) {
+            crypto.randomBytes(48, safe.sure(cb, function (buf) {
+                user.token = buf.toString('hex');
+                cb();
+            }));
+        },
+        function (cb) {
+            collections["users"].update({_id: user._id}, {$set: {token: user.token}}, safe.sure(cb, function () {
+                cb();
+            }));
+        }
+    ], safe.sure(cb, function () {
+        cb (null, user);
     }));
 };
 
@@ -188,22 +109,25 @@ Api.prototype.checkAuth = function (_data, cb) {
     if (! _data || ! _data.params || ! cb || (typeof(cb) != 'function')) {
         return cb (403);
     }
-    var token;
     if (! _data.params[0] || ! _data.params[0].token) {
         return cb (403);
     }
-    token = _data.params[0].token.toString();
-    dbHelper.redis(safe.sure(cb, function (_redis) {
-        _redis.get(token, safe.sure(cb, function (_user) {
-            if (! _user) {
-                return cb (403);
-            } else {
-                _user = JSON.parse(_user);
-                var startArr = [null, _user];
-                var params = startArr.concat(_data.params);
-                cb.apply(self, params);
-            }
-        }));
+    var token = _data.params[0].token.toString();
+    var rows = {
+        _id: 1,
+        login: 1,
+        email: 1,
+        group: 1,
+        created: 1,
+    };
+    collections["users"].findOne({token: token, status: 1}, rows, safe.sure(cb, function (_user) {
+        if (! _user) {
+            return cb (403);
+        } else {
+            var startArr = [null, _user];
+            var params = startArr.concat(_data.params);
+            cb.apply(self, params);
+        }
     }));
 };
 
@@ -211,69 +135,62 @@ Api.prototype.checkAuth = function (_data, cb) {
 * logout to system
 */
 Api.prototype.logout = function (_data, cb) {
-    var self = this;
-    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        dbHelper.redis(safe.sure(cb, function (_redis) {
-            _redis.del(_params.token, {}, cb);
+    Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
+        collections["users"].update({token: token}, {$unset: {token: ""}}, safe.sure(cb, function (_result) {
+            cb (null, _result);
         }));
     }));
 };
 /**
 * all users
 */
-// Api.prototype.getUserList = function (_data, cb) {
-//     var self = this;
-//     self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-//         var uArr = null;
-//         var cUser = null;
-//         var friendIds = [];
-//         dbHelper.collection("users", safe.sure(cb, function (users) {
-//             async.waterfall([
-//                 function (cb) {
-//                     users.findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (_cUser) {
-//                         cUser = _cUser;
-//                         friendIds = _.pluck(cUser.friends, "_id");
-//                         var selfFriendReqIds = _.pluck(cUser.selfFriendRequests, "_id");
-//                         var friendReqIds = _.pluck(cUser.friendRequests, "_id");
-//                         friendIds = friendIds.concat(selfFriendReqIds);
-//                         friendIds = friendIds.concat(friendReqIds);
-//                         cb();
-//                     }));
-//                 },
-//                 function (cb) {
-//                     users.find({_id: {$ne: mongo.ObjectID(_user._id)}, status: 1}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (_uArr) {
-//                         uArr = _uArr;
-//                         _.each(uArr, function (val) {
-//                             if (_.contains(friendIds, val._id.toHexString())) {
-//                                 val.friend = true;
-//                             }
-//                         });
-//                         cb();
-//                     }));
-//                 },
-//             ], safe.sure(cb, function () {
-//                 cb(null, uArr);
-//             }));
-//         }));
-//     }));
-// };
+Api.prototype.getUserList = function (_data, cb) {
+    Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
+        var uArr = null;
+        var cUser = null;
+        var friendIds = [];
+        async.series([
+            function (cb) {
+                collections["users"].findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (_cUser) {
+                    cUser = _cUser;
+                    friendIds = _.pluck(cUser.friends, "_id");
+                    var selfFriendReqIds = _.pluck(cUser.selfFriendRequests, "_id");
+                    var friendReqIds = _.pluck(cUser.friendRequests, "_id");
+                    friendIds = friendIds.concat(selfFriendReqIds);
+                    friendIds = friendIds.concat(friendReqIds);
+                    cb();
+                }));
+            },
+            function (cb) {
+                collections["users"].find({_id: {$ne: mongo.ObjectID(_user._id)}, status: 1}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (_uArr) {
+                    uArr = _uArr;
+                    _.each(uArr, function (val) {
+                        if (_.contains(friendIds, val._id.toHexString())) {
+                            val.friend = true;
+                        }
+                    });
+                    cb();
+                }));
+            },
+        ], safe.sure(cb, function () {
+            cb(null, uArr);
+        }));
+    }));
+};
 
 /**
 * detail user
 */
 Api.prototype.getUserDetail = function (_data, cb) {
-    var self = this;
-    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
         var _id;
         if (_.isEmpty(_params._id)) {
             _id = _user._id;
         } else {
-            _id = _params._id.toString();
+            _id = mongo.ObjectID(_params._id.toString());
         }
-        dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.findOne({_id: mongo.ObjectID(_id), status: 1}, {login:1, email: 1, picture: 1, friends: 1}, safe.sure(cb, function (_result) {
-                cb (null, _result);
-            }));
+        collections["users"].findOne({_id: _id, status: 1}, {login:1, email: 1, picture: 1, friends: 1}, safe.sure(cb, function (_result) {
+            cb (null, _result);
         }));
     }));
 };
@@ -284,8 +201,7 @@ Api.prototype.getUserDetail = function (_data, cb) {
 * add friends for user
 */
 Api.prototype.addFriendRequest = function (_data, cb) {
-    var self = this;
-    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
         var cUser = _user;
         if (_.isEmpty(_params._id)) {
             return cb ("Wrong form data");
@@ -343,8 +259,7 @@ Api.prototype.addFriendRequest = function (_data, cb) {
 * add friends for user
 */
 Api.prototype.addFriend = function (_data, cb) {
-    var self = this;
-    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
         var cUser = _user;
         if (_.isEmpty(_params._id)) {
             return cb ("Wrong data");
@@ -404,8 +319,7 @@ Api.prototype.addFriend = function (_data, cb) {
  * delete friends for user
  */
 Api.prototype.deleteFriend = function (_data, cb) {
-    var self = this;
-    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params._id)) {
             return cb ("Wrong form data");
         }
@@ -440,8 +354,7 @@ Api.prototype.deleteFriend = function (_data, cb) {
 * friends list
 */
 Api.prototype.getFriendList = function (_data, cb) {
-    var self = this;
-    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
             users.findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (cUser) {
                 if (_.isEmpty(cUser.friendRequests) && _.isEmpty(cUser.friends)) {
@@ -489,8 +402,7 @@ Api.prototype.getFriendList = function (_data, cb) {
 * detail user
 */
 Api.prototype.deleteUser = function (_data, cb) {
-    var self = this;
-    self.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params._id)) {
             return cb ("Wrong form data");
         }

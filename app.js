@@ -17,8 +17,8 @@ app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(multer({ dest: './tmp/'}));
-app.use(lessMiddleware(__dirname + '/modules/chat/less', {
-    dest: __dirname + '/modules/chat/public',
+app.use(lessMiddleware(__dirname + '/modules/web/less', {
+    dest: __dirname + '/modules/web/public',
     preprocess: {
         path: function(pathname, req) {
             return pathname.replace('/stylesheets/', '/');
@@ -30,9 +30,9 @@ var dust = require('dustjs-linkedin');
 var cons = require('consolidate');
 app.engine('dust', cons.dust);
 app.set('view engine', 'dust');
-app.set('views', __dirname + '/modules/chat/views');
+app.set('views', __dirname + '/modules/web/views');
 
-app.use(express.static(__dirname + '/modules/chat/public'));
+app.use(express.static(__dirname + '/modules/web/public'));
 app.use(errorhandler());
 
 
@@ -51,15 +51,21 @@ dbHelper = cokCore.db;
 dbHelper.db(function (err, _mongo) {
     if (err) {
         console.trace(err);
+        process.exit();
     }
-    cokCore.mInit(__dirname + '/modules/chat/api', function (err, _api) {
+    cokCore.mInit(__dirname + '/modules/web/api', function (err, _api) {
         if (err) {
             console.trace(err);
             process.exit();
         }
-        _api['user'].getUserList(null, function(err, arr) {
-            console.log('arr', arr);
-            process.exit();
+
+        // Routes
+        require('./modules/web/routes/index.js')(app, _api);
+        require('./modules/web/routes/socket.js')(app, io, _api);
+        // start server
+        var port = process.env.PORT || 3000;
+        server.listen(port, function () {
+            console.log('Example app listening at ', port);
         });
     });
 });
@@ -89,8 +95,8 @@ dbHelper.db(function (err, _mongo) {
 //             console.trace(err);
 //         }
 //         // Routes
-//         require('./modules/chat/routes/index.js')(app);
-//         require('./modules/chat/routes/socket.js')(app, io);
+//         require('./modules/web/routes/index.js')(app);
+//         require('./modules/web/routes/socket.js')(app, io);
 //         // start server
 //         var port = process.env.PORT || 3000;
 //         server.listen(port, function () {

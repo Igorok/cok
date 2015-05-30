@@ -17,6 +17,8 @@
                 $('#body').animate(bodyCss, 200);
                 $('#' + _id + 'Menu').animate(menuCss, 200);
             };
+
+            
             $('#btnMain, #btnSecond').click(function () {
                 mChange($(this).data('id'));
             });

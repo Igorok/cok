@@ -20,7 +20,7 @@ module.exports = function(grunt) {
                     }*/
                 },
                 files: {
-                  "modules/chat/public/javascripts/tpl.js": "modules/chat/views/shared/**.hbs"
+                  "modules/web/public/javascripts/tpl.js": "modules/web/views/shared/**.hbs"
                 }
             }
         },
@@ -38,7 +38,7 @@ module.exports = function(grunt) {
                     }
                 },
                 files: {
-                    "modules/chat/public/javascripts/admin/tpl.js": "modules/chat/views/admin/**.dust"
+                    "modules/web/public/javascripts/admin/tpl.js": "modules/web/views/admin/**.dust"
                 }
             }
         },
@@ -46,14 +46,14 @@ module.exports = function(grunt) {
             options: {
                 livereload: true,
             },
-            files: ['modules/chat/views/shared/**.hbs', 'modules/chat/views/admin/**.dust'],
+            files: ['modules/web/views/shared/**.hbs', 'modules/web/views/admin/**.dust'],
             tasks: ['handlebars', 'dust'],
         },
     });
-    
-    
 
-    
+
+
+
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-handlebars');
     grunt.loadNpmTasks('grunt-dust');
