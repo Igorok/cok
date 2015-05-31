@@ -1,0 +1,86 @@
+<script>
+require(["jquery", "lodash", "io", "cok_core", "cok_controller"], function ($, _, io, cok_core, cok_controller) {
+    var _user = cok_controller.checkedUser();
+    var token = _user.token;
+    var chatId = '{{chatId}}';
+    var chatItems = [];
+
+    var resizeHistory = function () {
+        var wHeight = $(window).height();
+        $('#chatFixedItems').height(wHeight - 110);
+    };
+    resizeHistory();
+    window.onresize = function() {
+        resizeHistory();
+    };
+    // chatFixedItems
+    if (_.isEmpty(chatId)) {
+        window.location("#!web/index");
+    }
+    if (window.socket) {
+        window.socket.destroy()
+    }
+    window.socket = new io(window.location.origin, { forceNew: true });
+
+    window.socket.connect();
+    window.socket.emit("join", {token: token, chatId: chatId});
+
+
+    window.socket.on("err", function (err) {
+        cok_core.error(err);
+    });
+    // add user
+    window.socket.on('join', function (jObj) {
+        if (! jObj) {
+            window.location("#!web/index");
+        }
+        if (jObj.cHistory) {
+            chatItems = chatItems.concat(jObj.cHistory);
+            chatTable = new cok_core.tableRender("chatItem", $("#chatItems tbody"), chatItems, {}, chatItems.length);
+            chatTable.render();
+            var cHeight = $('#chatItems').height();
+            $('#chatFixedItems').scrollTop(cHeight);
+        }
+    });
+
+    // message
+    window.socket.on('message', function (msg) {
+        chatItems.push(msg);
+        chatTable = new cok_core.tableRender("chatItem", $("#chatItems tbody"), chatItems, {}, chatItems.length);
+        chatTable.render();
+        var cHeight = $('#chatItems').height();
+        $('#chatFixedItems').scrollTop(cHeight);
+    });
+
+    $('#chatMessage').submit(function () {
+        var chatText = $('#chatText').val();
+        if (! _.isEmpty(chatText)) {
+            var formData = {
+                token: token,
+                chatId: chatId,
+                chatText: chatText,
+            };
+            window.socket.emit('message', formData);
+            var chatText = $('#chatText').val('');
+        }
+        return false;
+    });
+});
+</script>
+<div id="chatCase">
+    <div id="chatFixedItems">
+        <div id="chatItems">
+            <table class="table table-striped table-hover"><tbody></tbody></table>
+        </div>
+    </div>
+    <div id="chatFormCase">
+        <form id="chatMessage">
+            <div class="input-group">
+                <input id="chatText" type="text" class="form-control" required>
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-send"></span></button>
+                </span>
+            </div>
+        </form>
+    </div>
+</div>

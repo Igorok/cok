@@ -1,0 +1,47 @@
+<script>
+require(["jquery", "lodash", "cok_core", "cok_controller", "bootstrap"], function ($, _, cok_core, cok_controller) {
+    $(function () {
+        var _user = cok_controller.checkedUser();
+        var token = _user.token;
+        var ownerId = "{{ownerId}}";
+        if (_.isEmpty(ownerId)) {
+            ownerId = _user._id;
+        }
+        var renderUser = function () {
+            cok_core.call("index.getUserPic", {token: token, ownerId: ownerId}, function (result) {
+                cok_core.render ($("#imagesIndex"), "imagesList", {data: result[0]});
+            });
+        };
+        var selectedPic = {};
+        renderUser();
+        $("img").error(function () {
+            $(this).unbind("error").attr("src", "/images/no-avatar.jpg");
+        });
+        $("#imagesIndex").on("click", "img", function () {
+            selectedPic.src = $(this).attr("src");
+            selectedPic._id = $(this).attr("data-id");
+            
+            cok_core.render ($("#picUploadModal"), "imagesModal", {imgSrc: selectedPic.src, imgId: selectedPic._id, ownerId: ownerId, userId: _user._id});
+            $("#picUploadModal").modal("show");
+        });
+        $("#picUploadModal").on("click", "#btnRemove", function () {
+            if (selectedPic._id) {
+                cok_core.call("index.deletePic", {token: token, _id: selectedPic._id}, function (result) {
+                    $("#picUploadModal").modal("hide");
+                    renderUser();
+                });
+            }
+        });
+        $("#picUploadModal").on("click", "#btnSetMain", function () {
+            if (selectedPic._id) {
+                cok_core.call("index.setMainPic", {token: token, _id: selectedPic._id}, function (result) {
+                    $("#picUploadModal").modal("hide");
+                });
+            }
+        });
+    });
+});
+</script>
+
+<div id="picUploadModal" class="modal fade"></div>
+<div class="sub-container" id="imagesIndex"></div>

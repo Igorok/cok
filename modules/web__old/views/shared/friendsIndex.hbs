@@ -1,0 +1,93 @@
+<script>
+require (["jquery", "lodash", "cok_core", "cok_controller"], function ($, _, cok_core, cok_controller) {
+    $(function () {
+        var _user = cok_controller.checkedUser();
+        var token = _user.token;
+        
+        var friendListArr = [];
+        var friendReqArr = [];
+        var friendsCall = function (cb) {
+            cok_core.call("user.getFriendList", {token: token}, function (result) {
+                friendListArr = result[0];
+                friendReqArr = result[1];
+                cb();
+            });
+        }
+        
+        var renderFriendList = function () {
+            friendsCall(function () {
+                $('#getFrientList').addClass('btn-primary').siblings().removeClass('btn-primary');
+                if (! _.isEmpty(friendListArr)) {
+                    cok_core.render ($("#friendsCase tbody"), "userList", {data: friendListArr});
+                } else {
+                    $("#friendsCase tbody").empty();
+                }
+            });
+        };
+        
+        var renderFriendReq = function () {
+            friendsCall(function () {
+                $('#getFrientRequests').addClass('btn-primary').siblings().removeClass('btn-primary');
+                if (! _.isEmpty(friendReqArr)) {
+                    cok_core.render ($("#friendsCase tbody"), "userList", {data: friendReqArr});
+                } else {
+                    $("#friendsCase tbody").empty();
+                }
+            });
+        };
+        
+        
+        
+        
+        
+        
+        
+        
+        $('#friendsCase').on('click', '.delFriendBtn', function () {
+            var btn = $(this);
+            var _id = btn.attr('data-id');
+            cok_core.call("user.deleteFriend", {token: token, _id: _id}, function (result) {
+                renderFriendList();
+            });
+        });
+        
+        $('#friendsCase').on('click', '.addFriendBtn', function () {
+            var _id = $(this).attr('data-id');
+            cok_core.call("user.addFriend", {token: token, _id: _id}, function (result) {
+                renderFriendList();
+            });
+        });
+        
+        $('#getFrientList').click(function () {
+            renderFriendList();
+        });
+        
+        $('#getFrientRequests').click(function () {
+            renderFriendReq();
+        });
+        
+        
+        renderFriendList();
+    });
+});
+</script>
+<div id="friendsCase" class="sub-container">
+    <div class="row">
+        <div class="col-md-8">
+            <button id="getFrientList" class="btn btn-default">
+                <span class="glyphicon glyphicon-star"></span>
+                Friends
+            </button>
+            <button id="getFrientRequests" class="btn btn-default">
+               <span class="glyphicon glyphicon-star-empty"></span>
+                Requests
+            </button>
+        </div>
+        <div class="col-md-4">
+            <div class="cokSearch"></div>
+        </div>
+    </div>
+    <br />
+    <table class="table table-striped table-hover"><tbody></tbody></table>
+    <div class="cokPager"></div>
+</div>

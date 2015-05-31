@@ -2,28 +2,6 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        handlebars: {
-            compile: {
-                options: {
-                    amd: true,
-                    processName: function(filename) {
-                        return filename.replace(/.*\/(\w+)\.hbs/, "$1");
-                    },
-                    namespace: function(filename) {
-                        var name = filename.split("/");
-                        name = name[1];
-                        return name;
-                    },
-                    /*processContent: function(content, filepath) {
-                        content = "define(function () {" + content + "});";
-                        return content;
-                    }*/
-                },
-                files: {
-                  "modules/web/public/javascripts/tpl.js": "modules/web/views/shared/**.hbs"
-                }
-            }
-        },
         dust: {
             compile: {
                 options: {
@@ -31,6 +9,19 @@ module.exports = function(grunt) {
                     wrapper: "amd",
                     wrapperOptions: {
                         packageName: null,
+                        templatesNamesGenerator: function (_info, _path) {
+                            var name  = '';
+                            _path = _path.replace('.dust', '');
+                            _path = _path.split('/');
+                            _path = _path.slice(4, _path.length);
+                            for (var i = 0; i < _path.length; i++) {
+                                if (i > 0) {
+                                    name += "_";
+                                }
+                                name += _path[i];
+                            };
+                            return name;
+                        },
                         deps: {
                             dust: "dust",
                             "dust-helpers": "dust-helpers"
@@ -38,16 +29,18 @@ module.exports = function(grunt) {
                     }
                 },
                 files: {
+                    "modules/web/public/javascripts/web/tpl.js": "modules/web/views/web/**/*.dust",
+                    // "modules/web/public/javascripts/web/tpl.js": "modules/web/views/web/{,*/}*.dust",
                     "modules/web/public/javascripts/admin/tpl.js": "modules/web/views/admin/**.dust"
                 }
             }
         },
         watch: {
+            files: ['**/*.dust'],
             options: {
                 livereload: true,
             },
-            files: ['modules/web/views/shared/**.hbs', 'modules/web/views/admin/**.dust'],
-            tasks: ['handlebars', 'dust'],
+            tasks: ['dust'],
         },
     });
 
@@ -55,9 +48,8 @@ module.exports = function(grunt) {
 
 
     // Load the plugin that provides the "uglify" task.
-    grunt.loadNpmTasks('grunt-contrib-handlebars');
     grunt.loadNpmTasks('grunt-dust');
     grunt.loadNpmTasks('grunt-contrib-watch');
     // Default task(s).
-    grunt.registerTask('default', ['handlebars', 'dust', 'watch']);
+    grunt.registerTask('default', ['dust', 'watch']);
 };

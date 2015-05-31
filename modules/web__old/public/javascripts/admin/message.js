@@ -31,8 +31,8 @@ define (["jquery", "underscore", "backbone", "vMessage"], function ($, _, Backbo
         /*
         * show errors for inputs
         */
-        var inputError = function (_errObj) {
-            _.each(_errObj, function (_val, _key) {
+        var inputError = function (_errArr) {
+            _.each(_errArr, function (_val, _key) {
                 var elem = $("#" + _key).parent(".form-group");
                 var errCount = elem.find("span.control-label").length;
                 if (errCount == 0) {

@@ -33,10 +33,13 @@ define (["jquery", "underscore", "backbone", "vMessage"], function ($, _, Backbo
         */
         var inputError = function (_errObj) {
             _.each(_errObj, function (_val, _key) {
-                var elem = $("#" + _key).parent(".form-group");
+                var elem = $("#" + _key).parents(".form-group");
                 var errCount = elem.find("span.control-label").length;
-                if (errCount == 0) {
+
+                if (! errCount) {
                     var val ='<span class="control-label">' + _val + '</span>';
+
+                    console.log('_errObj ', $("#" + _key).parents(".form-group").length);
                     elem.append(val).addClass("has-error");
                 }
             });

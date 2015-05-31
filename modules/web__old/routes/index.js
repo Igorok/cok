@@ -17,7 +17,7 @@ module.exports = function (app, _api) {
 * main page
 */
 function index (req, res) {
-    res.render('index', {layout: false});
+    res.render('index');
 }
 
 /*
@@ -28,6 +28,9 @@ function admin (req, res) {
 }
 
 function jsonrpc (req, res) {
+    /*if (! req.xhr) {
+        return res.send(400);
+    }*/
     var jsonrpc = req.body;
     res.header("Cache-Control", "no-cache");
     var params = jsonrpc.params;

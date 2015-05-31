@@ -1,0 +1,39 @@
+<script>
+    require(["jquery", "cok_core"], function ($, cok_core) {
+        $(function () {
+            $("#loginForm").submit(function () {
+                var data = {
+                    login: $('#login').val(),
+                    email: $('#email').val(),
+                    password: $('#password').val(),
+                };
+                cok_core.call ("user.Registration", data, function (result) {
+                    window.location = "#!/login/index";
+                });
+                return false;
+            });
+        });
+    });
+</script>
+<div class="sub-container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <br><br><br><br>
+            <form role="form" id="loginForm">
+                <div class="form-group">
+                    <label for="login">Login</label>
+                    <input type="text" class="form-control" id="login" placeholder="Login" require>
+                </div>
+                <div class="form-group">
+                    <label for="login">Email</label>
+                    <input type="email" class="form-control" id="email" placeholder="Email" require>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Password" require>
+                </div>
+                <button type="submit" class="btn btn-default btn-block"><span class="glyphicon glyphicon-floppy-disk"></span>&nbsp;Registration</button>
+            </form>
+        </div>
+    </div>
+</div>

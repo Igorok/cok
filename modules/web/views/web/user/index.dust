@@ -1,0 +1,10 @@
+<div class="row widget">
+    <div class="col-md-3">
+        <img src="{#picture}/images/users/{/picture}{^picture}/images/no-avatar.jpg{/picture}" alt="" class="img-thumbnail">
+    </div>
+    <div class="col-md-9">
+        <br>
+        <p>{login}</p>
+        <p>{email}</p>
+    </div>
+</div>

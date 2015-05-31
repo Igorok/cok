@@ -1,0 +1,80 @@
+<meta charset="utf-8">
+<link href="/stylesheets/admin.css" rel="stylesheet">
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-61486738-1', 'auto');
+    ga('send', 'pageview');
+</script>
+<script>
+    var user = null;
+    var require = {
+        baseUrl: "/javascripts",
+        waitSeconds: 20,
+        paths: {
+            "jquery": "jquery",
+            "storageapi": "storageapi",
+            "bootstrap": "bootstrap",
+            "underscore": "underscore",
+            "backbone": "backbone",
+            "dust": "dust-full",
+            "dust-helpers": "dust-helpers",
+            "tpl": "/javascripts/admin/tpl",
+
+
+            "api": "/javascripts/admin/api",
+            "message": "/javascripts/admin/message",
+            "vMessage": "/javascripts/admin/message/viewMessage",
+
+            "route": "/javascripts/admin/route",
+
+            "mUser": "/javascripts/admin/users/model",
+            "vUserList": "/javascripts/admin/users/viewUserList",
+            "vUserDetail": "/javascripts/admin/users/viewUserDetail",
+
+            "mPermission": "/javascripts/admin/permissions/model",
+            "cPermission": "/javascripts/admin/permissions/controller",
+            "vPermissionList": "/javascripts/admin/permissions/viewIndex",
+            "vPermissionDetail": "/javascripts/admin/permissions/viewDetail",
+
+            "mAuth": "/javascripts/admin/authorise/model",
+            "cAuth": "/javascripts/admin/authorise/controller",
+            "vAuth": "/javascripts/admin/authorise/viewIndex",
+
+            "mGroup": "/javascripts/admin/groups/model",
+            "vGroupList": "/javascripts/admin/groups/viewIndex",
+            "vGroupDetail": "/javascripts/admin/groups/viewDetail",
+
+        },
+        shim: {
+            underscore: {
+                exports: '_'
+            },
+            backbone: {
+                exports: 'backbone',
+                deps: ['jquery', 'underscore']
+            },
+            bootstrap: {
+                deps:["jquery"]
+            },
+            storageapi: {
+                deps:["jquery"]
+            },
+            dust: {
+                exports: 'dust',
+            },
+            "dust-helpers": {
+                deps:["dust"],
+                exports: 'dust-helpers',
+            },
+            tpl: {
+                deps:["dust","dust-helpers"]
+            },
+        },
+        deps: ['jquery', 'underscore']
+    };
+</script>
+<script src="/javascripts/require.js"></script>

@@ -1,6 +1,8 @@
 // create server
 var express = require('express');
 var http = require('http');
+var async = require('async');
+var safe = require('safe');
 var app = express();
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
@@ -44,63 +46,28 @@ var cokCore = require('cokcore');
 var cfg = cokCore.init(__dirname + '/config');
 dbHelper = cokCore.db;
 
-
-
-
-
-dbHelper.db(function (err, _mongo) {
+var api = null;
+async.series([
+    function (cb) {
+        dbHelper.db(cb);
+    },
+    function (cb) {
+        cokCore.mInit(__dirname + '/modules/web/api', safe.sure(cb, function (_api) {
+            api = _api;
+            cb();
+        }));
+    },
+], function (err) {
     if (err) {
         console.trace(err);
         process.exit();
     }
-    cokCore.mInit(__dirname + '/modules/web/api', function (err, _api) {
-        if (err) {
-            console.trace(err);
-            process.exit();
-        }
-
-        // Routes
-        require('./modules/web/routes/index.js')(app, _api);
-        require('./modules/web/routes/socket.js')(app, io, _api);
-        // start server
-        var port = process.env.PORT || 3000;
-        server.listen(port, function () {
-            console.log('Example app listening at ', port);
-        });
+    // Routes
+    require('./modules/web/routes/index.js')(app, api);
+    require('./modules/web/routes/socket.js')(app, io, api);
+    // start server
+    var port = process.env.PORT || 3000;
+    server.listen(port, function () {
+        console.log('Web listening at ', port);
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
-// dbHelper.redis(function (err, _redis) {
-//     if (err) {
-//         console.trace(err);
-//     }
-//     dbHelper.db(function (err, _mongo) {
-//         if (err) {
-//             console.trace(err);
-//         }
-//         // Routes
-//         require('./modules/web/routes/index.js')(app);
-//         require('./modules/web/routes/socket.js')(app, io);
-//         // start server
-//         var port = process.env.PORT || 3000;
-//         server.listen(port, function () {
-//             console.log('Example app listening at ', port);
-//         });
-//     });
-// });
