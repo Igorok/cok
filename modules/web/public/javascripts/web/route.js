@@ -1,9 +1,10 @@
-define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex) {
+define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex", "vUserList"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex, vUserList) {
     'use strict';
     var Route = Backbone.Router.extend({
         routes: {
             "": "index",
-            "login": "auth"
+            "login": "auth",
+            "users": "users",
         },
 
         initialize: function (options) {
@@ -37,11 +38,18 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
         index: function () {
             var self = this;
             self.checkAuth(function () {
-                // "user.getUserDetail"
                 var view = new vIndex();
                 $('#main').html(view.render().el);
             });
         },
+        users: function () {
+            var self = this;
+            self.checkAuth(function () {
+                var view = new vUserList();
+                $('#main').html(view.render().el);
+            });
+        },
+
         // permissionList: function (options) {
         //     var self = this;
         //     self.checkAuth(function () {

@@ -60,6 +60,51 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_2.__dustBody = !0;
     return body_0;
   })();
+  // modules/web/views/web/user/list.dust
+  (function() {
+    dust.register("user_list", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div class=\"widget\"><div class=\"row\">").s(ctx.get(["data"], false), ctx, {
+        "block": body_1
+      }, {}).w("</div></div>");
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("<div class=\"col-xs-2\"><img src=\"").s(ctx.get(["picture"], false), ctx, {
+        "block": body_2
+      }, {}).nx(ctx.get(["picture"], false), ctx, {
+        "block": body_3
+      }, {}).w("\" alt=\"\" class=\"img-thumbnail\"></div><div class=\"col-xs-8\"><a href=\"#users/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w("</a></div><div class=\"col-xs-2\">").s(ctx.get(["friend"], false), ctx, {
+        "block": body_4
+      }, {}).nx(ctx.get(["friend"], false), ctx, {
+        "block": body_5
+      }, {}).w("</div>");
+    }
+    body_1.__dustBody = !0;
+
+    function body_2(chk, ctx) {
+      return chk.w("/images/users/");
+    }
+    body_2.__dustBody = !0;
+
+    function body_3(chk, ctx) {
+      return chk.w("/images/no-avatar.jpg");
+    }
+    body_3.__dustBody = !0;
+
+    function body_4(chk, ctx) {
+      return chk.w("<button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-danger delFriendBtn\"><span class=\"glyphicon glyphicon-remove\"></span>&nbsp; remove from friends</button>");
+    }
+    body_4.__dustBody = !0;
+
+    function body_5(chk, ctx) {
+      return chk.w("<button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-success addFriendBtn\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp; add to friends</button>");
+    }
+    body_5.__dustBody = !0;
+    return body_0;
+  })();
   define("layout", function() {
     return function(locals, callback) {
       var rendered;
@@ -144,5 +189,26 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["layout", "login_auth", "message", "user_index"];
+  define("user_list", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("user_list", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
+  return ["layout", "login_auth", "message", "user_index", "user_list"];
 });

@@ -8,22 +8,18 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser"],
             this.model = new mUser();
         },
         render: function () {
-            this.renderIndex();
+            this.renderUsers();
             return this;
         },
-        renderIndex: function (cb) {
+        renderUsers: function (cb) {
             var self = this;
-            self.model.getUserDetail(null, function (_model) {
-                var data = {
-                    login: _model.get('login'),
-                    email: _model.get('email'),
-                    picture: _model.get('picture'),
-                };
-                dust.render("user_index", data, function (err, text) {
+            self.model.getUserList(function () {
+                var data = self.model.toJSON();
+                console.log('data ', data);
+                dust.render("user_list", {data: data}, function (err, text) {
                     if (err) {
                         console.trace(err);
                     }
-                    console.log('data ', data);
                     self.$el.html(text);
                     return self;
                 });

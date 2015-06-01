@@ -35,7 +35,8 @@
 
             "mUser": "/javascripts/web/user/mUser",
             "vIndex": "/javascripts/web/user/vIndex",
-            "vUser": "/javascripts/web/user/vUser",
+            "vUserList": "/javascripts/web/user/vUserList",
+            "vUserDetail": "/javascripts/web/user/vUserDetail",
 
         },
         shim: {

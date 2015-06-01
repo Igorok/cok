@@ -2,6 +2,7 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
     'use strict';
     var model = Backbone.Model.extend({
         // you can set any defaults you would like here
+        idAttribute: "_id",
         defaults: {
             login: "",
             password: ""
@@ -24,13 +25,14 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
     var collection = Backbone.Collection.extend({
         // Reference to this collection's model.
         model: model,
-        getAll: function (_data, cb) {
+        getUserList: function (cb) {
             var self = this;
-            Api.call("user.getUserList", _data, function (ret) {
-                if (!! ret && !! ret.result) {
-                    self.set(ret.result[0]);
+            var user = Api.getUser();
+            Api.call("user.getUserList", {token: user.token}, function (ret) {
+                if (! ret && ! ret.result) {
+                    return cb();
                 }
-
+                self.set(ret.result[0]);
                 cb();
             });
         },
@@ -42,11 +44,12 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
                 _id: (_id || user._id),
             };
             Api.call("user.getUserDetail", data, function (ret) {
-                var result = null;
-                if (ret && ret.result) {
-                    result = ret.result[0];
+                if (! ret && ! ret.result) {
+                    return cb();
                 }
-                cb(result);
+                var model = new self.model();
+                model.set(ret.result[0]);
+                cb(model);
             });
         },
     });

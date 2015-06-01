@@ -146,33 +146,25 @@ Api.prototype.logout = function (_data, cb) {
 */
 Api.prototype.getUserList = function (_data, cb) {
     Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
-        var uArr = null;
-        var cUser = null;
-        var friendIds = [];
-        async.series([
-            function (cb) {
-                collections["users"].findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (_cUser) {
-                    cUser = _cUser;
-                    friendIds = _.pluck(cUser.friends, "_id");
-                    var selfFriendReqIds = _.pluck(cUser.selfFriendRequests, "_id");
-                    var friendReqIds = _.pluck(cUser.friendRequests, "_id");
-                    friendIds = friendIds.concat(selfFriendReqIds);
-                    friendIds = friendIds.concat(friendReqIds);
-                    cb();
-                }));
-            },
-            function (cb) {
-                collections["users"].find({_id: {$ne: mongo.ObjectID(_user._id)}, status: 1}, {login: 1, email: 1}, {limit: 100}).toArray(safe.sure(cb, function (_uArr) {
-                    uArr = _uArr;
-                    _.each(uArr, function (val) {
-                        if (_.contains(friendIds, val._id.toHexString())) {
-                            val.friend = true;
-                        }
-                    });
-                    cb();
-                }));
-            },
-        ], safe.sure(cb, function () {
+        var friendObj = {};
+
+        _.each(_user.friends, function (val) {
+            friendObj[val._id.toString()] = val;
+        });
+        _.each(_user.selfFriendRequests, function (val) {
+            friendObj[val._id.toString()] = val;
+        });
+        _.each(_user.friendRequests, function (val) {
+            friendObj[val._id.toString()] = val;
+        });
+
+        collections["users"].find({_id: {$ne: mongo.ObjectID(_user._id)}, status: 1}, {login: 1, email: 1}).toArray(safe.sure(cb, function (uArr) {
+            _.each(uArr, function (val) {
+                // hide friend button
+                if (friendObj[val._id.toString()]) {
+                    val.friend = true;
+                }
+            });
             cb(null, uArr);
         }));
     }));

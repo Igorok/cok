@@ -1,0 +1,24 @@
+<div class="widget">
+    <div class="row">
+        {#data}
+        <div class="col-xs-2">
+            <img src="{#picture}/images/users/{/picture}{^picture}/images/no-avatar.jpg{/picture}" alt="" class="img-thumbnail">
+        </div>
+        <div class="col-xs-8">
+            <a href="#users/{_id}">{login}</a>
+        </div>
+        <div class="col-xs-2">
+            {#friend}
+                <button data-id="{_id}" class="btn btn-sm btn-danger delFriendBtn">
+                    <span class="glyphicon glyphicon-remove"></span>&nbsp; remove from friends
+                </button>
+            {/friend}
+            {^friend}
+                <button data-id="{_id}" class="btn btn-sm btn-success addFriendBtn">
+                    <span class="glyphicon glyphicon-plus"></span>&nbsp; add to friends
+                </button>
+            {/friend}
+        </div>
+        {/data}
+    </div>
+</div>
