@@ -32,7 +32,18 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
                 if (! ret && ! ret.result) {
                     return cb();
                 }
-                self.set(ret.result[0]);
+                self.reset(ret.result[0]);
+                cb();
+            });
+        },
+        getFriendList: function (cb) {
+            var self = this;
+            var user = Api.getUser();
+            Api.call("user.getFriendList", {token: user.token}, function (ret) {
+                if (! ret && ! ret.result) {
+                    return cb();
+                }
+                self.reset(ret.result[0]);
                 cb();
             });
         },

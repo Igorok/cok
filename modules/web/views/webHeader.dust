@@ -35,6 +35,7 @@
 
             "mUser": "/javascripts/web/user/mUser",
             "vIndex": "/javascripts/web/user/vIndex",
+            "vFriendList": "/javascripts/web/user/vFriendList",
             "vUserList": "/javascripts/web/user/vUserList",
             "vUserDetail": "/javascripts/web/user/vUserDetail",
 

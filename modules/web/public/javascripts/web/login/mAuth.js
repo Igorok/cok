@@ -22,7 +22,6 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
             var self = this;
             Api.call("user.Authorise", self.attributes, function (ret) {
                 if (!! ret && !! ret.result) {
-                    console.log(ret.result[0]);
                     Api.setUser(ret.result[0]);
                 }
                 cb();

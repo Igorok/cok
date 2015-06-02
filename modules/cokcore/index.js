@@ -3,7 +3,6 @@ var fs = require("fs");
 var _ = require("lodash");
 var mongo = require('mongodb');
 var safe = require('safe');
-var async = require('async');
 var path = require('path');
 var _db = null;
 var collections = [];
@@ -94,7 +93,7 @@ var moduleInit = function (_path, cb) {
                 moduleSingleInit(_path, cb);
             } else {
                 fs.readdir(_path, safe.sure(cb, function (arr) {
-                    async.forEachSeries(arr, function (_file, cb) {
+                    safe.forEachSeries(arr, function (_file, cb) {
                         moduleSingleInit(_path + '/' + _file, cb);
                     }, safe.sure(cb, function () {
                         cb(null, apiArr);

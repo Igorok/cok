@@ -1,6 +1,6 @@
+"use strict";
 var safe = require('safe');
 var _ = require("lodash");
-var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
 var fs = require('fs');
@@ -13,7 +13,7 @@ var Api = function () {
 };
 Api.prototype.init = function (cb) {
     var self = this;
-    async.parallel([
+    safe.parallel([
         function (cb) {
             dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
                 self.colChatgroups = chatgroups;
@@ -46,7 +46,7 @@ Api.prototype.getChatList = function (_data, cb) {
                 var result = [];
                 var userIds = [];
                 var userObj = {};
-                async.series([
+                safe.series([
                     function (cb) {
                         chatgroups.find({"users._id": _user._id}, {sort: {date: -1}}).toArray(safe.sure(cb, function (groupsArr) {
                             _.each(groupsArr, function (curentGroup) {
@@ -132,7 +132,7 @@ Api.prototype.editChat = function (_data, cb) {
                 userArr.push({_id: val.toString()});
             });
             var cGroup = null;
-            async.waterfall([
+            safe.waterfall([
                 function (cb) {
                     chatgroups.findOne({_id: mongo.ObjectID(_id), creator: _user._id}, safe.sure(cb, function (_cGroup) {
                         if (_.isEmpty(_cGroup)) {
@@ -175,7 +175,7 @@ Api.prototype.getEditChat = function (_data, cb) {
         }
         dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            async.waterfall([
+            safe.waterfall([
                 function (cb) {
                     chatgroups.findOne({_id: mongo.ObjectID(_id), creator: cUser._id}, safe.sure(cb, function (_cGroup) {
                         if (_.isEmpty(_cGroup)) {
@@ -234,7 +234,7 @@ Api.prototype.removeChat = function (_data, cb) {
                     if (_group.creator != _user._id) {
                         return cb(403);
                     }
-                    async.parallel([
+                    safe.parallel([
                         function (cb) {
                             chatmessages.remove({chatId: _id}, cb);
                         },
@@ -288,7 +288,7 @@ Api.prototype.picUpload = function (_data, cb) {
                 cb('Wrong data');
             }));
         } else {
-            async.waterfall([
+            safe.waterfall([
                 function existFile (cb) {
                     fs.exists(oldPath, function (exists) {
                         if (! exists) {

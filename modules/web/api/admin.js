@@ -2,7 +2,6 @@
 var crypto = require('crypto');
 var safe = require('safe');
 var _ = require("lodash");
-var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
 var cokcore = require('cokcore');
@@ -13,7 +12,7 @@ var Api = function () {
 };
 Api.prototype.init = function (cb) {
     var self = this;
-    async.parallel([
+    safe.parallel([
         function (cb) {
             dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
                 self.colChatgroups = chatgroups;
@@ -154,7 +153,7 @@ Api.prototype.editGroup = function (_data, cb) {
 
         dbHelper.collection("permissions", safe.sure(cb, function (permissions) {
         dbHelper.collection("usergroups", safe.sure(cb, function (usergroups) {
-            async.series([
+            safe.series([
                 function (cb) {
                     permissions.find({}, {key: 1}).toArray(safe.sure(cb, function (_permArr) {
                         permission = _.intersection(_.pluck(_permArr, "key"), permission);

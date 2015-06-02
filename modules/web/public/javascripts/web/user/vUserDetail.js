@@ -1,39 +1,35 @@
-define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mAuth"], function ($, _, backbone, dust, tpl, Msg, mAuth) {
+define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser"], function ($, _, backbone, dust, tpl, Msg, mUser) {
     'use strict';
-    var viewAuth = Backbone.View.extend({
+    var view = Backbone.View.extend({
         events: {
             "submit #loginForm": "submitForm"
         },
-        initialize: function () {
-            this.model = new mAuth();
+        initialize: function (options) {
+            var self = this;
+            self._id = options._id;
+            self.model = new mUser();
         },
         render: function () {
-            this.renderForm();
+            this.renderUser();
             return this;
         },
-        renderForm: function (cb) {
+        renderUser: function (cb) {
             var self = this;
-            dust.render("login_auth", {}, function (err, result) {
-                if (err) {
-                    console.trace(err);
-                }
-                self.$el.html(result);
-                return self;
+            self.model.getUserDetail(self._id, function (_model) {
+                var data = {
+                    login: _model.get('login'),
+                    email: _model.get('email'),
+                    picture: _model.get('picture'),
+                };
+                dust.render("user_index", data, function (err, text) {
+                    if (err) {
+                        console.trace(err);
+                    }
+                    self.$el.html(text);
+                    return self;
+                });
             });
         },
-        submitForm: function (cb) {
-            var self = this;
-            self.model.set('login', self.$el.find('#login').val());
-            self.model.set('password', self.$el.find('#password').val());
-            if (! self.model.isValid()) {
-                Msg.inputError(self.model.validationError);
-            } else {
-                self.model.call(function () {
-                    window.location.hash = '#';
-                });
-            }
-            return false;
-        },
     });
-    return viewAuth;
+    return view;
 });

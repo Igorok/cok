@@ -1,6 +1,5 @@
 var safe = require('safe');
 var _ = require("lodash");
-var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
 var cokCore = require('cokcore');
@@ -32,7 +31,7 @@ module.exports = function (app, io, _api) {
             };
             data.params.push(_formGroup);
             var cHistory;
-            async.waterfall([
+            safe.waterfall([
                 function getAuth (cb) {
                     userApi.checkAuth (data, safe.sure(cb, function (_user, _params) {
                         if (! _user || ! _params || ! _params.chatId) {
@@ -125,7 +124,7 @@ module.exports = function (app, io, _api) {
                 params: []
             };
             data.params.push(_msg);
-            async.waterfall([
+            safe.waterfall([
                 function (cb) {
                     userApi.checkAuth (data, safe.sure(cb, function (_user, _params) {
                         if (! _user || ! _params) {

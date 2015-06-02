@@ -1,18 +1,20 @@
 // create server
 var express = require('express');
 var http = require('http');
-var async = require('async');
 var safe = require('safe');
-var app = express();
-var server = http.createServer(app);
-var io = require('socket.io').listen(server);
-
 var compression = require('compression');
 var errorhandler = require('errorhandler');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var exphbs = require('express-handlebars');
 var lessMiddleware = require('less-middleware');
+
+
+var app = express();
+var server = http.createServer(app);
+var io = require('socket.io').listen(server);
+
+
 
 // Configuration
 app.use(compression());
@@ -47,7 +49,7 @@ var cfg = cokCore.init(__dirname + '/config');
 dbHelper = cokCore.db;
 
 var api = null;
-async.series([
+safe.series([
     function (cb) {
         dbHelper.db(cb);
     },

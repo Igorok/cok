@@ -92,5 +92,11 @@ define (["jquery", "underscore", "backbone", "message", "storageapi"], function 
         }
     };
 
+    Api.prototype.removeUser = function () {
+        user = null;
+        Storage.remove('user');
+        return null;
+    };
+
     return new Api();
 });

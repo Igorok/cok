@@ -2,7 +2,6 @@
 var crypto = require('crypto');
 var safe = require('safe');
 var _ = require("lodash");
-var async = require('async');
 var moment = require('moment');
 var mongo = require('mongodb');
 var cokcore = require('cokcore');
@@ -12,7 +11,7 @@ var collections = cokcore.collections;
 
 var Api = function () {
     this.init = function (cb) {
-        async.parallel([
+        safe.parallel([
             function (cb) {
                 dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
                     cb();
@@ -71,7 +70,7 @@ Api.prototype.Authorise = function (_data, cb) {
     var login = params.login.toString().trim();
     var password = params.password.toString().trim();
     var user = null;
-    async.series([
+    safe.series([
         function (cb) {
             collections["users"].findOne({login: login, status: 1}, safe.sure(cb, function (_obj) {
                 var hash = crypto.createHash('sha1');
@@ -176,7 +175,7 @@ Api.prototype.getUserList = function (_data, cb) {
 Api.prototype.getUserDetail = function (_data, cb) {
     Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
         var _id;
-        if (_.isEmpty(_params._id)) {
+        if (! _params || ! _params._id) {
             _id = _user._id;
         } else {
             _id = mongo.ObjectID(_params._id.toString());
@@ -200,7 +199,7 @@ Api.prototype.addFriendRequest = function (_data, cb) {
         }
         var fid = _params._id.toString();
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            async.parallel([
+            safe.parallel([
                 function (cb) {
                     users.findOne({_id: mongo.ObjectID(cUser._id)}, safe.sure(cb, function (_cUser) {
                         if (_.isEmpty(_cUser)) {
@@ -258,7 +257,7 @@ Api.prototype.addFriend = function (_data, cb) {
         }
         var fid = _params._id.toString();
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            async.waterfall([
+            safe.waterfall([
                 function (cb) {
                     users.findOne({_id: mongo.ObjectID(cUser._id)}, safe.sure(cb, function (_cUser) {
                         if (_.isEmpty(_cUser)) {
@@ -318,7 +317,7 @@ Api.prototype.deleteFriend = function (_data, cb) {
         var _id = _params._id.toString();
         var usersIds = [_id, _user._id];
         dbHelper.collection("users", safe.sure(cb, function (users) {
-            async.each(usersIds, function (uId, cb) {
+            safe.each(usersIds, function (uId, cb) {
                 users.findOne({_id: mongo.ObjectID(uId)}, safe.sure(cb, function (_cUser) {
                     if (_.isEmpty(_cUser)) {
                         return cb(404);
@@ -363,7 +362,7 @@ Api.prototype.getFriendList = function (_data, cb) {
 
                 var friendList = [];
                 var friendReq = [];
-                async.parallel([
+                safe.parallel([
                     function (cb) {
                         users.find({_id: {$in: friendIds}}, {login: 1, email: 1}).toArray(safe.sure(cb, function (fArr) {
                             _.each(fArr, function (val) {

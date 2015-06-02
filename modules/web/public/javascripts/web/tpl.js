@@ -4,7 +4,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("layout", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a href=\"#\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Account</a></li><li><a data-toggle=\"collapse\" href=\"#users\"  aria-expanded=\"false\" aria-controls=\"users\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"users\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#users\">Users List</a></li><li><a href=\"#friends\">Friends List</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#chat\"  aria-expanded=\"false\" aria-controls=\"chat\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-envelope\"></span>Chats</a><ul id=\"chat\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#chat\">Chats List</a></li><li><a href=\"#chat/-1\">New chat</a></li></ul></li></ul></div><div id=\"main\" class=\"col-md-10\"></div>");
+      return chk.w("<div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a href=\"#\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Account</a></li><li><a data-toggle=\"collapse\" href=\"#user\"  aria-expanded=\"false\" aria-controls=\"users\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"user\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#user\">Users List</a></li><li><a href=\"#friend\">Friends List</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#chat\"  aria-expanded=\"false\" aria-controls=\"chat\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-envelope\"></span>Chats</a><ul id=\"chat\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#chat\">Chats List</a></li><li><a href=\"#chat/-1\">New chat</a></li></ul></li><li><a href=\"#logout\"><span class=\"glyphicon glyphicon-log-out\"></span>&nbsp;Logout</a></li></ul></div><div id=\"main\" class=\"col-md-10\"></div>");
     }
     body_0.__dustBody = !0;
     return body_0;
@@ -76,7 +76,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
         "block": body_2
       }, {}).nx(ctx.get(["picture"], false), ctx, {
         "block": body_3
-      }, {}).w("\" alt=\"\" class=\"img-thumbnail\"></div><div class=\"col-xs-8\"><a href=\"#users/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w("</a></div><div class=\"col-xs-2\">").s(ctx.get(["friend"], false), ctx, {
+      }, {}).w("\" alt=\"\" class=\"img-thumbnail\"></div><div class=\"col-xs-8\"><a href=\"#user/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w("</a></div><div class=\"col-xs-2\">").s(ctx.get(["friend"], false), ctx, {
         "block": body_4
       }, {}).nx(ctx.get(["friend"], false), ctx, {
         "block": body_5

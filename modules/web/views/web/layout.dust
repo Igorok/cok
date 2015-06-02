@@ -7,13 +7,13 @@
             </a>
         </li>
         <li>
-            <a data-toggle="collapse" href="#users"  aria-expanded="false" aria-controls="users" class="menuItem collapsed">
+            <a data-toggle="collapse" href="#user"  aria-expanded="false" aria-controls="users" class="menuItem collapsed">
                 <span class="glyphicon glyphicon-user"></span>
                 Users
             </a>
-            <ul id="users" class="nav nav-pills nav-stacked collapse nav-child">
-                <li><a href="#users">Users List</a></li>
-                <li><a href="#friends">Friends List</a></li>
+            <ul id="user" class="nav nav-pills nav-stacked collapse nav-child">
+                <li><a href="#user">Users List</a></li>
+                <li><a href="#friend">Friends List</a></li>
             </ul>
         </li>
         <li>
@@ -25,6 +25,12 @@
                 <li><a href="#chat">Chats List</a></li>
                 <li><a href="#chat/-1">New chat</a></li>
             </ul>
+        </li>
+        <li>
+            <a href="#logout">
+                <span class="glyphicon glyphicon-log-out"></span>&nbsp;
+                Logout
+            </a>
         </li>
     </ul>
 </div>

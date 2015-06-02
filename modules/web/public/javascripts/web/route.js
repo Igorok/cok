@@ -1,113 +1,71 @@
-define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex", "vUserList"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex, vUserList) {
-    'use strict';
+define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex", "vUserList", "vUserDetail", "vFriendList"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex, vUserList, vUserDetail, vFriendList) {
+    "use strict";
     var Route = Backbone.Router.extend({
-        routes: {
+        routes:  {
             "": "index",
             "login": "auth",
-            "users": "users",
+            "logout": "logout",
+            "user": "userList",
+            "friend": "friendList",
+            "user/:id": "userDetail",
+            '*notFound': 'notFound',
         },
-
         initialize: function (options) {
             var self = this;
         },
-
-        checkAuth: function (cb) {
+        execute: function(callback, args, name) {
             var self = this;
             self.user = Api.getUser();
+            if (! callback) {
+                callback = self.index;
+            }
             if (! self.user) {
-                return self.auth();
+                window.location.hash = "login";
             } else {
                 if ($("#main").length) {
-                    return cb();
+                    return callback.apply(this, args);
+                } else {
+                    dust.render("layout", {}, function (err, result) {
+                        if (err) {
+                            new Msg.showError(null, err);
+                        }
+                        $("#content").html(result);
+                        callback.apply(this, args);
+                    });
                 }
-                dust.render("layout", {}, function (err, result) {
-                    if (err) {
-                        new Msg.showError(null, err);
-                    }
-                    $("#content").html(result);
-                    cb();
-                });
             }
         },
+
 
         auth: function (options) {
             var view = new vAuth();
             $('#content').html(view.render().el);
         },
-
+        logout: function () {
+            self.user = Api.removeUser();
+            window.location.hash = "login";
+        },
         index: function () {
-            var self = this;
-            self.checkAuth(function () {
-                var view = new vIndex();
-                $('#main').html(view.render().el);
-            });
+            var view = new vIndex();
+            $('#main').html(view.render().el);
         },
-        users: function () {
-            var self = this;
-            self.checkAuth(function () {
-                var view = new vUserList();
-                $('#main').html(view.render().el);
-            });
+        friendList: function () {
+            var view = new vFriendList();
+            $('#main').html(view.render().el);
         },
-
-        // permissionList: function (options) {
-        //     var self = this;
-        //     self.checkAuth(function () {
-        //         cPermission.index(self.user, options);
-        //     });
-        // },
-        //
-        // permissionDetail: function (options) {
-        //     var self = this;
-        //     self.checkAuth(function () {
-        //         cPermission.detail(self.user, options);
-        //     });
-        // },
-        //
-        // groupList: function (options) {
-        //     var self = this;
-        //     self.checkAuth(function () {
-        //         var view = new vGroupList({
-        //             user: self.user,
-        //             params: options
-        //         });
-        //         $('#main').html(view.render().el);
-        //     });
-        // },
-        //
-        // groupDetail: function (options) {
-        //     var self = this;
-        //     self.checkAuth(function () {
-        //         var view = new vGroupDetail({
-        //             user: self.user,
-        //             params: options
-        //         });
-        //         $('#main').html(view.render().el);
-        //     });
-        // },
-        // // users routes
-        // userList: function (options) {
-        //     var self = this;
-        //     self.checkAuth(function () {
-        //         var view = new vUserList({
-        //             user: self.user,
-        //             params: options
-        //         });
-        //         $('#main').html(view.render().el);
-        //     });
-        // },
-        // userDetail: function (options) {
-        //     var self = this;
-        //     self.checkAuth(function () {
-        //         var view = new vUserDetail({
-        //             user: self.user,
-        //             params: options
-        //         });
-        //         $('#main').html(view.render().el);
-        //     });
-        // },
-
-
+        userList: function () {
+            var view = new vUserList();
+            $('#main').html(view.render().el);
+        },
+        userDetail: function (options) {
+            var view = new vUserDetail({
+                _id: options
+            });
+            $('#main').html(view.render().el);
+        },
+        notFound: function () {
+            window.location.hash = "#";
+        }
     });
 
 

@@ -23,7 +23,6 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser"],
                     if (err) {
                         console.trace(err);
                     }
-                    console.log('data ', data);
                     self.$el.html(text);
                     return self;
                 });
