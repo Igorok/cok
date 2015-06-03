@@ -1,27 +1,25 @@
-define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex", "vUserList", "vUserDetail", "vFriendList"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex, vUserList, vUserDetail, vFriendList) {
+define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex", "vUserList", "vUserDetail", "vFriendList", "vRegistration"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex, vUserList, vUserDetail, vFriendList, vRegistration) {
     "use strict";
     var Route = Backbone.Router.extend({
         routes:  {
             "": "index",
             "login": "auth",
+            "registration": "registration",
             "logout": "logout",
             "user": "userList",
             "friend": "friendList",
             "user/:id": "userDetail",
             '*notFound': 'notFound',
         },
-        initialize: function (options) {
-            var self = this;
-        },
+        // initialize: function (options) {
+        //     var self = this;
+        // },
         execute: function(callback, args, name) {
             var self = this;
-            self.user = Api.getUser();
-            if (! callback) {
-                callback = self.index;
-            }
-            if (! self.user) {
-                window.location.hash = "login";
+            if ((name === 'auth') || (name === 'registration')) {
+                callback.apply(this, args);
             } else {
+                self.user = Api.getUser();
                 if ($("#main").length) {
                     return callback.apply(this, args);
                 } else {
@@ -39,6 +37,10 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
 
         auth: function (options) {
             var view = new vAuth();
+            $('#content').html(view.render().el);
+        },
+        registration: function (options) {
+            var view = new vRegistration();
             $('#content').html(view.render().el);
         },
         logout: function () {

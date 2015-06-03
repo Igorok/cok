@@ -23,9 +23,10 @@ define (["jquery", "underscore", "backbone", "vMessage"], function ($, _, Backbo
         */
         var showError = function (_title, _text) {
             if (_text.toString() == "403") {
-                return window.location.hash = "login";
+                window.location.hash = "login";
+            } else {
+                show("danger", _title, _text);
             }
-            return show("danger", _title, _text);
         };
 
         /*
