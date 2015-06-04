@@ -32,7 +32,13 @@ var Api = function () {
 */
 Api.prototype.Registration = function (_data, cb) {
     var params = _data.params[0];
-    if (_.isUndefined(params.login) || _.isUndefined(params.email) || _.isUndefined(params.password)) {
+    var emailReg = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+    if (
+        _.isUndefined(params.login) ||
+        _.isUndefined(params.email) ||
+        _.isUndefined(params.password) ||
+        ! emailReg.test(params.email.toString())
+    ) {
         return cb ("Wrong data");
     }
     var login = params.login.toString().trim();
@@ -116,8 +122,6 @@ Api.prototype.checkAuth = function (_data, cb) {
         _id: 1,
         login: 1,
         email: 1,
-        group: 1,
-        created: 1,
     };
     collections["users"].findOne({token: token, status: 1}, rows, safe.sure(cb, function (_user) {
         if (! _user) {
@@ -145,25 +149,36 @@ Api.prototype.logout = function (_data, cb) {
 */
 Api.prototype.getUserList = function (_data, cb) {
     Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
+        var uArr = [];
         var friendObj = {};
-
-        _.each(_user.friends, function (val) {
-            friendObj[val._id.toString()] = val;
-        });
-        _.each(_user.selfFriendRequests, function (val) {
-            friendObj[val._id.toString()] = val;
-        });
-        _.each(_user.friendRequests, function (val) {
-            friendObj[val._id.toString()] = val;
-        });
-
-        collections["users"].find({_id: {$ne: mongo.ObjectID(_user._id)}, status: 1}, {login: 1, email: 1}).toArray(safe.sure(cb, function (uArr) {
-            _.each(uArr, function (val) {
-                // hide friend button
-                if (friendObj[val._id.toString()]) {
-                    val.friend = true;
-                }
-            });
+        safe.series([
+            function (cb) {
+                collections["users"].findOne({_id: _user._id}, safe.sure(cb, function (_obj) {
+                    _.each(_obj.friends, function (val) {
+                        friendObj[val._id.toString()] = val;
+                    });
+                    _.each(_obj.selfFriendRequests, function (val) {
+                        friendObj[val._id.toString()] = val;
+                    });
+                    _.each(_obj.friendRequests, function (val) {
+                        friendObj[val._id.toString()] = val;
+                    });
+                    cb();
+                }));
+            },
+            function (cb) {
+                collections["users"].find({_id: {$ne: mongo.ObjectID(_user._id)}, status: 1}, {login: 1, email: 1}).toArray(safe.sure(cb, function (_arr) {
+                    _.each(_arr, function (val) {
+                        // hide friend button
+                        if (friendObj[val._id.toString()]) {
+                            val.friend = true;
+                        }
+                    });
+                    uArr = _arr;
+                    cb();
+                }));
+            },
+        ], safe.sure(cb, function () {
             cb(null, uArr);
         }));
     }));
@@ -193,55 +208,33 @@ Api.prototype.getUserDetail = function (_data, cb) {
 */
 Api.prototype.addFriendRequest = function (_data, cb) {
     Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
-        var cUser = _user;
         if (_.isEmpty(_params._id)) {
-            return cb ("Wrong form data");
+            return cb ("Wrong _id");
         }
         var fid = _params._id.toString();
-        dbHelper.collection("users", safe.sure(cb, function (users) {
-            safe.parallel([
-                function (cb) {
-                    users.findOne({_id: mongo.ObjectID(cUser._id)}, safe.sure(cb, function (_cUser) {
-                        if (_.isEmpty(_cUser)) {
-                            return cb(404);
-                        } else {
-                            var userObj = _cUser;
-                            var fIds = _.pluck(userObj.friends, "_id");
-                            var frIds = _.pluck(userObj.selfFriendRequests, "_id");
+        fid = mongo.ObjectID(fid);
 
-                            if (_.contains(fIds, fid) || _.contains(frIds, fid)) {
-                                cb();
-                            } else {
-                                users.update({_id: userObj._id}, {$push: {selfFriendRequests: {_id: fid}}}, safe.sure(cb, function () {
-                                    cb();
-                                }));
-                            }
-                        }
-                    }));
-                },
-                function (cb) {
-                    users.findOne({_id: mongo.ObjectID(fid)}, safe.sure(cb, function (_fUser) {
-                        if (_.isEmpty(_fUser)) {
-                            return cb(404);
-                        } else {
-                            var fUser = _fUser;
-                            var fIds = _.pluck(fUser.friends, "_id");
-                            var frIds = _.pluck(fUser.friendRequests, "_id");
 
-                            if (_.contains(fIds, cUser._id) || _.contains(frIds, cUser._id)) {
-                                cb();
-                            } else {
-                                users.update({_id: fUser._id}, {$push: {friendRequests: {_id: cUser._id}}}, safe.sure(cb, function () {
-                                    cb();
-                                }));
-                            }
-                        }
-                    }));
-                },
+        safe.parallel([
+            function (cb) {
+                var setData = {
+                    $addToSet: {
+                        selfFriendRequests: {_id: fid},
+                    },
+                };
+                collections["users"].update({_id: _user._id}, setData, cb);
+            },
+            function (cb) {
+                var setData = {
+                    $addToSet: {
+                        friendRequests: {_id: _user._id},
+                    },
+                };
+                collections["users"].update({_id: fid}, setData, cb);
+            },
 
-            ], safe.sure(cb, function () {
-                cb(null, true);
-            }));
+        ], safe.sure(cb, function () {
+            cb(null, true);
         }));
     }));
 };

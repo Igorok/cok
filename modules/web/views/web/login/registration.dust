@@ -13,6 +13,15 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="email" class="control-label">Email</label>
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-envelope"></span>
+                    </div>
+                    <input type="email" class="form-control" id="email" placeholder="Email" value="" />
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="password" class="control-label">Password</label>
                 <div class="input-group">
                     <div class="input-group-addon">
@@ -22,12 +31,12 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="password" class="control-label">Confirm password</label>
+                <label for="passwordConf" class="control-label">Confirm password</label>
                 <div class="input-group">
                     <div class="input-group-addon">
-                        <span class="glyphicon glyphicon glyphicon-lock"></span>
+                        <span class="glyphicon glyphicon-ok"></span>
                     </div>
-                    <input type="password" class="form-control" id="password" placeholder="Password" value="" />
+                    <input type="password" class="form-control" id="passwordConf" placeholder="Confirm password" value="" />
                 </div>
             </div>
             <button type="submit" class="btn btn-danger btn-block">

@@ -24,7 +24,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("login_registration", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"col-md-offset-4 col-md-4\"><div class=\"widget\"><form id=\"loginForm\"><br /><p class=\"center\">Registration a new account</p><div class=\"form-group\"><label for=\"login\" class=\"control-label\">Login</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon-user\"></span></div><input type=\"text\" class=\"form-control\" id=\"login\" placeholder=\"Login\" value=\"\" /></div></div><div class=\"form-group\"><label for=\"password\" class=\"control-label\">Password</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon glyphicon-lock\"></span></div><input type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\" value=\"\" /></div></div><div class=\"form-group\"><label for=\"password\" class=\"control-label\">Confirm password</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon glyphicon-lock\"></span></div><input type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\" value=\"\" /></div></div><button type=\"submit\" class=\"btn btn-danger btn-block\">&nbsp;&nbsp;Registration</button></form></div></div>");
+      return chk.w("<div class=\"col-md-offset-4 col-md-4\"><div class=\"widget\"><form id=\"loginForm\"><br /><p class=\"center\">Registration a new account</p><div class=\"form-group\"><label for=\"login\" class=\"control-label\">Login</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon-user\"></span></div><input type=\"text\" class=\"form-control\" id=\"login\" placeholder=\"Login\" value=\"\" /></div></div><div class=\"form-group\"><label for=\"email\" class=\"control-label\">Email</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon-envelope\"></span></div><input type=\"email\" class=\"form-control\" id=\"email\" placeholder=\"Email\" value=\"\" /></div></div><div class=\"form-group\"><label for=\"password\" class=\"control-label\">Password</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon glyphicon-lock\"></span></div><input type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\" value=\"\" /></div></div><div class=\"form-group\"><label for=\"passwordConf\" class=\"control-label\">Confirm password</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon-ok\"></span></div><input type=\"password\" class=\"form-control\" id=\"passwordConf\" placeholder=\"Confirm password\" value=\"\" /></div></div><button type=\"submit\" class=\"btn btn-danger btn-block\">&nbsp;&nbsp;Registration</button></form></div></div>");
     }
     body_0.__dustBody = !0;
     return body_0;
@@ -75,14 +75,14 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("user_list", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"widget\"><div class=\"row\">").s(ctx.get(["data"], false), ctx, {
+      return chk.w("<div class=\"widget\">").s(ctx.get(["data"], false), ctx, {
         "block": body_1
-      }, {}).w("</div></div>");
+      }, {}).w("</div>");
     }
     body_0.__dustBody = !0;
 
     function body_1(chk, ctx) {
-      return chk.w("<div class=\"col-xs-2\"><img src=\"").s(ctx.get(["picture"], false), ctx, {
+      return chk.w("<div class=\"row\"><div class=\"col-xs-2\"><img src=\"").s(ctx.get(["picture"], false), ctx, {
         "block": body_2
       }, {}).nx(ctx.get(["picture"], false), ctx, {
         "block": body_3
@@ -90,7 +90,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
         "block": body_4
       }, {}).nx(ctx.get(["friend"], false), ctx, {
         "block": body_5
-      }, {}).w("</div>");
+      }, {}).w("</div></div><br />");
     }
     body_1.__dustBody = !0;
 
@@ -105,12 +105,12 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_3.__dustBody = !0;
 
     function body_4(chk, ctx) {
-      return chk.w("<button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-danger delFriendBtn\"><span class=\"glyphicon glyphicon-remove\"></span>&nbsp; remove from friends</button>");
+      return chk.w("<button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-danger delFriendBtn\"><span class=\"glyphicon glyphicon-remove\"></span></button>");
     }
     body_4.__dustBody = !0;
 
     function body_5(chk, ctx) {
-      return chk.w("<button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-success addFriendBtn\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp; add to friends</button>");
+      return chk.w("<button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-success addFriendBtn\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
     }
     body_5.__dustBody = !0;
     return body_0;

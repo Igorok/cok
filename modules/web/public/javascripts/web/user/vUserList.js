@@ -2,7 +2,8 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser"],
     'use strict';
     var view = Backbone.View.extend({
         events: {
-            "submit #loginForm": "submitForm"
+            "submit #loginForm": "submitForm",
+            "click button.addFriendBtn": "addFriendRequest",
         },
         initialize: function () {
             this.model = new mUser();
@@ -11,7 +12,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser"],
             this.renderUsers();
             return this;
         },
-        renderUsers: function (cb) {
+        renderUsers: function () {
             var self = this;
             self.model.getUserList(function () {
                 var data = self.model.toJSON();
@@ -22,6 +23,17 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser"],
                     self.$el.html(text);
                     return self;
                 });
+            });
+        },
+        addFriendRequest: function (e) {
+            e.preventDefault();
+            var self = this;
+            var _id = $(e.currentTarget).data('id');
+            if (! _id) {
+                return false;
+            }
+            self.model.addFriendRequest(_id, function () {
+                self.renderUsers();
             });
         },
     });

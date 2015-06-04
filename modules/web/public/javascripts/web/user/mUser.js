@@ -63,6 +63,17 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
                 cb(model);
             });
         },
+        addFriendRequest: function (_id, cb) {
+            var self = this;
+            var user = Api.getUser();
+            var data = {
+                token: user.token,
+                _id: _id,
+            };
+            Api.call("user.addFriendRequest", data, function (ret) {
+                cb();
+            });
+        },
     });
     return collection;
 });

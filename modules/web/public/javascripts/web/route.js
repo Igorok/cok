@@ -1,4 +1,4 @@
-define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex", "vUserList", "vUserDetail", "vFriendList", "vRegistration"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex, vUserList, vUserDetail, vFriendList, vRegistration) {
+define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex", "vUserList", "vUserDetail", "vFriendList", "vReg"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex, vUserList, vUserDetail, vFriendList, vReg) {
     "use strict";
     var Route = Backbone.Router.extend({
         routes:  {
@@ -40,7 +40,7 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
             $('#content').html(view.render().el);
         },
         registration: function (options) {
-            var view = new vRegistration();
+            var view = new vReg();
             $('#content').html(view.render().el);
         },
         logout: function () {

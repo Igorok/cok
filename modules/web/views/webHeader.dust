@@ -32,7 +32,8 @@
 
             "mAuth": "/javascripts/web/login/mAuth",
             "vAuth": "/javascripts/web/login/vAuth",
-            "vRegistration": "/javascripts/web/login/vRegistration",
+            "vReg": "/javascripts/web/login/vReg",
+            "mReg": "/javascripts/web/login/mReg",
 
             "mUser": "/javascripts/web/user/mUser",
             "vIndex": "/javascripts/web/user/vIndex",
