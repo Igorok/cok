@@ -1,16 +1,19 @@
 define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mFriend"], function ($, _, backbone, dust, tpl, Msg, mFriend) {
     'use strict';
     var view = Backbone.View.extend({
+        events: {
+            "click button.addFriendBtn": "friendAprove",
+        },
         initialize: function () {
             this.model = new mFriend();
         },
         render: function () {
-            this.friendList();
+            this.friendReq();
             return this;
         },
-        friendList: function (cb) {
+        friendReq: function () {
             var self = this;
-            self.model.getFriendList(function () {
+            self.model.getFriendRequests(function () {
                 var data = self.model.toJSON();
                 dust.render("user_friendList", {data: data}, function (err, text) {
                     if (err) {
@@ -19,6 +22,18 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mFriend"
                     self.$el.html(text);
                     return self;
                 });
+            });
+        },
+        friendAprove: function (e) {
+            var self = this;
+            e.preventDefault();
+            var self = this;
+            var _id = $(e.currentTarget).data('id');
+            if (! _id) {
+                return false;
+            }
+            self.model.addFriend(_id, function () {
+                window.location.hash = "friends";
             });
         },
     });

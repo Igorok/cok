@@ -11,18 +11,9 @@ var collections = cokcore.collections;
 
 var Api = function () {
     this.init = function (cb) {
-        safe.parallel([
-            function (cb) {
-                dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-                    cb();
-                }));
-            },
-            function (cb) {
-                dbHelper.collection("users", safe.sure(cb, function (users) {
-                    cb();
-                }));
-            }
-        ], cb);
+        dbHelper.collection("users", safe.sure(cb, function (users) {
+            cb();
+        }));
     }
 };
 
@@ -122,6 +113,9 @@ Api.prototype.checkAuth = function (_data, cb) {
         _id: 1,
         login: 1,
         email: 1,
+        friendRequests: 1,
+        selfFriendRequests: 1,
+        friends: 1,
     };
     collections["users"].findOne({token: token, status: 1}, rows, safe.sure(cb, function (_user) {
         if (! _user) {
@@ -151,35 +145,23 @@ Api.prototype.getUserList = function (_data, cb) {
     Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
         var uArr = [];
         var friendObj = {};
-        safe.series([
-            function (cb) {
-                collections["users"].findOne({_id: _user._id}, safe.sure(cb, function (_obj) {
-                    _.each(_obj.friends, function (val) {
-                        friendObj[val._id.toString()] = val;
-                    });
-                    _.each(_obj.selfFriendRequests, function (val) {
-                        friendObj[val._id.toString()] = val;
-                    });
-                    _.each(_obj.friendRequests, function (val) {
-                        friendObj[val._id.toString()] = val;
-                    });
-                    cb();
-                }));
-            },
-            function (cb) {
-                collections["users"].find({_id: {$ne: mongo.ObjectID(_user._id)}, status: 1}, {login: 1, email: 1}).toArray(safe.sure(cb, function (_arr) {
-                    _.each(_arr, function (val) {
-                        // hide friend button
-                        if (friendObj[val._id.toString()]) {
-                            val.friend = true;
-                        }
-                    });
-                    uArr = _arr;
-                    cb();
-                }));
-            },
-        ], safe.sure(cb, function () {
-            cb(null, uArr);
+        _.each(_user.friends, function (val) {
+            friendObj[val._id.toString()] = val;
+        });
+        _.each(_user.selfFriendRequests, function (val) {
+            friendObj[val._id.toString()] = val;
+        });
+        _.each(_user.friendRequests, function (val) {
+            friendObj[val._id.toString()] = val;
+        });
+        collections["users"].find({_id: {$ne: mongo.ObjectID(_user._id)}, status: 1}, {login: 1, email: 1}).toArray(safe.sure(cb, function (_arr) {
+            _.each(_arr, function (val) {
+                // hide friend button
+                if (friendObj[val._id.toString()]) {
+                    val.friend = true;
+                }
+            });
+            cb(null, _arr);
         }));
     }));
 };
@@ -191,11 +173,19 @@ Api.prototype.getUserDetail = function (_data, cb) {
     Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
         var _id;
         if (! _params || ! _params._id) {
-            _id = _user._id;
+            return cb (null, _user);
         } else {
             _id = mongo.ObjectID(_params._id.toString());
         }
-        collections["users"].findOne({_id: _id, status: 1}, {login:1, email: 1, picture: 1, friends: 1}, safe.sure(cb, function (_result) {
+        var rows = {
+            _id: 1,
+            login: 1,
+            email: 1,
+            friendRequests: 1,
+            selfFriendRequests: 1,
+            friends: 1,
+        };
+        collections["users"].findOne({_id: _id, status: 1}, rows, safe.sure(cb, function (_result) {
             cb (null, _result);
         }));
     }));
@@ -239,97 +229,51 @@ Api.prototype.addFriendRequest = function (_data, cb) {
     }));
 };
 
+
 /**
 * add friends for user
 */
 Api.prototype.addFriend = function (_data, cb) {
     Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
-        var cUser = _user;
         if (_.isEmpty(_params._id)) {
-            return cb ("Wrong data");
+            return cb ("_id is required");
         }
-        var fid = _params._id.toString();
-        dbHelper.collection("users", safe.sure(cb, function (users) {
-            safe.waterfall([
-                function (cb) {
-                    users.findOne({_id: mongo.ObjectID(cUser._id)}, safe.sure(cb, function (_cUser) {
-                        if (_.isEmpty(_cUser)) {
-                            return cb("Wrong data");
-                        } else {
-                            var userObj = _cUser;
-                            var fIds = _.pluck(userObj.friends, "_id");
-                            var frIds = _.pluck(userObj.friendRequests, "_id");
-
-                            if (_.contains(fIds, fid)) {
-                                cb();
-                            } else if (! _.contains(frIds, fid)) {
-                                cb("Wrong data");
-                            } else {
-                                users.update({_id: userObj._id}, {$push: {friends: {_id: fid}}, $pull: {friendRequests: {_id: fid}}}, safe.sure(cb, function () {
-                                    cb();
-                                }));
-                            }
-                        }
-                    }));
-                },
-                function (cb) {
-                    users.findOne({_id: mongo.ObjectID(fid)}, safe.sure(cb, function (_fUser) {
-                        if (_.isEmpty(_fUser)) {
-                            return cb("Wrong data");
-                        } else {
-                            var fUser = _fUser;
-                            var fIds = _.pluck(fUser.friends, "_id");
-
-                            if (_.contains(fIds, cUser._id)) {
-                                cb();
-                            } else {
-                                users.update({_id: fUser._id}, {$pull: {selfFriendRequests: {_id: cUser._id}}, $push: {friends: {_id: cUser._id}}}, safe.sure(cb, function () {
-                                    cb();
-                                }));
-                            }
-                        }
-                    }));
-                },
-
-            ], safe.sure(cb, function () {
-                cb(null, true);
-            }));
-        }));
-    }));
-};
-
-
-/**
- * delete friends for user
- */
-Api.prototype.deleteFriend = function (_data, cb) {
-    Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
-        if (_.isEmpty(_params._id)) {
-            return cb ("Wrong form data");
-        }
-        var _id = _params._id.toString();
-        var usersIds = [_id, _user._id];
-        dbHelper.collection("users", safe.sure(cb, function (users) {
-            safe.each(usersIds, function (uId, cb) {
-                users.findOne({_id: mongo.ObjectID(uId)}, safe.sure(cb, function (_cUser) {
-                    if (_.isEmpty(_cUser)) {
-                        return cb(404);
-                    } else {
-                        var cUser = _cUser;
-                        var removedId = _.difference(usersIds, [uId]);
-                        removedId = removedId[0];
-                        users.update({_id: cUser._id}, { $pull: {
-                            friends: {_id: removedId},
-                            selfFriendRequests: {_id: removedId},
-                            friendRequests: {_id: removedId}
-                        }}, safe.sure(cb, function (_delRes, info) {
-                            cb();
-                        }));
+        var frId = _params._id.toString();
+        safe.parallel([
+            function (cb) {
+                collections["users"].findOne({_id: _user._id, "friendRequests._id": mongo.ObjectID(frId)}, safe.sure(cb, function (cUser) {
+                    if (! cUser) {
+                        return cb ("Request from friend is not defined");
                     }
+                    var updateObj = {
+                        $addToSet: {
+                            friends: {_id: mongo.ObjectID(frId)}
+                        },
+                        $pull: {
+                            friendRequests: {_id: mongo.ObjectID(frId)}
+                        }
+                    };
+                    collections["users"].update({_id: cUser._id}, updateObj, cb);
                 }));
-            }, safe.sure(cb, function () {
-                cb(null, true);
-            }));
+            },
+            function (cb) {
+                collections["users"].findOne({_id: mongo.ObjectID(frId), "selfFriendRequests._id": _user._id}, safe.sure(cb, function (reqUser) {
+                    if (! reqUser) {
+                        return cb ("Request to friend is not defined");
+                    }
+                    var updateObj = {
+                        $addToSet: {
+                            friends: {_id: _user._id}
+                        },
+                        $pull: {
+                            selfFriendRequests: {_id: _user._id}
+                        }
+                    };
+                    collections["users"].update({_id: reqUser._id}, updateObj, cb);
+                }));
+            },
+        ], safe.sure(cb, function () {
+            cb(null, true);
         }));
     }));
 };
@@ -339,65 +283,55 @@ Api.prototype.deleteFriend = function (_data, cb) {
 */
 Api.prototype.getFriendList = function (_data, cb) {
     Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
-        dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (cUser) {
-                if (_.isEmpty(cUser.friendRequests) && _.isEmpty(cUser.friends)) {
-                    return cb();
-                }
-                var friendIds = [];
-                var friendReqIds = [];
-                _.each(cUser.friends, function (val) {
-                    friendIds.push(mongo.ObjectID(val._id));
-                });
-                _.each(cUser.friendRequests, function (val) {
-                    friendReqIds.push(mongo.ObjectID(val._id));
-                });
+        if (! _user.friends || ! _user.friends.length) {
+            return cb(null, []);
+        }
+        var frIds = _.pluck(_user.friends, '_id');
 
-                var friendList = [];
-                var friendReq = [];
-                safe.parallel([
-                    function (cb) {
-                        users.find({_id: {$in: friendIds}}, {login: 1, email: 1}).toArray(safe.sure(cb, function (fArr) {
-                            _.each(fArr, function (val) {
-                                val.friend = true;
-                                friendList.push(val);
-                            });
-                            cb();
-                        }));
-                    },
-                    function (cb) {
-                        users.find({_id: {$in: friendReqIds}}, {login: 1, email: 1}).toArray(safe.sure(cb, function (frArr) {
-                            _.each(frArr, function (val) {
-                                val.friend = false;
-                                friendReq.push(val);
-                            });
-                            cb();
-                        }));
-                    },
-                ], safe.sure(cb, function () {
-                    cb(null, friendList, friendReq);
-                }));
-            }));
-        }));
+        collections["users"].find({_id: {$in: frIds}}, {login: 1, email: 1, picture: 1}).toArray(cb);
+
+    }));
+};
+/**
+* friends list
+*/
+Api.prototype.getFriendRequests = function (_data, cb) {
+    Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
+        if (! _user.friendRequests || ! _user.friendRequests.length) {
+            return cb(null, []);
+        }
+
+        var frIds = _.pluck(_user.friendRequests, '_id');
+
+        collections["users"].find({_id: {$in: frIds}}, {login: 1, email: 1, picture: 1}).toArray(cb);
+
     }));
 };
 
 /**
-* detail user
-*/
-Api.prototype.deleteUser = function (_data, cb) {
+ * delete friends for user
+ */
+Api.prototype.deleteFriend = function (_data, cb) {
     Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params._id)) {
-            return cb ("Wrong form data");
+            return cb ("_id is required");
         }
-        var _id = _params._id.toString();
-        dbHelper.collection("users", safe.sure(cb, function (users) {
-            users.remove({_id: mongo.ObjectID(_id)}, safe.sure(cb, function (_result) {
-                cb (null, _result);
-            }));
+        var frId = _params._id.toString();
+
+        safe.parallel([
+            function (cb) {
+                collections["users"].update({_id: _user._id}, {$pull: {friends: mongo.ObjectID(frId)}}, cb)
+            },
+            function (cb) {
+                collections["users"].update({_id: mongo.ObjectID(frId)}, {$pull: {friends: _user._id}}, cb)
+            },
+        ], safe.sure(cb, function () {
+            cb(null, true);
         }));
     }));
 };
+
+
 
 
 

@@ -5,19 +5,8 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
         idAttribute: "_id",
         defaults: {
             login: "",
-            password: ""
-        },
-        validate: function (attrs) {
-            var errors = {};
-            if (! attrs.login || ! attrs.login.length) {
-                errors.login = "login is required!"
-            }
-            if (! attrs.password || ! attrs.password.length) {
-                errors.password = "password is required!"
-            }
-            if (! _.isEmpty(errors)) {
-                return errors;
-            }
+            email: "",
+            picture: "",
         },
     });
 
@@ -29,17 +18,6 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
             var self = this;
             var user = Api.getUser();
             Api.call("user.getUserList", {token: user.token}, function (ret) {
-                if (! ret && ! ret.result) {
-                    return cb();
-                }
-                self.reset(ret.result[0]);
-                cb();
-            });
-        },
-        getFriendList: function (cb) {
-            var self = this;
-            var user = Api.getUser();
-            Api.call("user.getFriendList", {token: user.token}, function (ret) {
                 if (! ret && ! ret.result) {
                     return cb();
                 }
@@ -61,17 +39,6 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
                 var model = new self.model();
                 model.set(ret.result[0]);
                 cb(model);
-            });
-        },
-        addFriendRequest: function (_id, cb) {
-            var self = this;
-            var user = Api.getUser();
-            var data = {
-                token: user.token,
-                _id: _id,
-            };
-            Api.call("user.addFriendRequest", data, function (ret) {
-                cb();
             });
         },
     });

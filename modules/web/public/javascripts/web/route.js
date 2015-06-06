@@ -1,4 +1,4 @@
-define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex", "vUserList", "vUserDetail", "vFriendList", "vReg"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex, vUserList, vUserDetail, vFriendList, vReg) {
+define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex", "vUserList", "vUserDetail", "vFriendList", "vReg", "vFriendReq"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex, vUserList, vUserDetail, vFriendList, vReg, vFriendReq) {
     "use strict";
     var Route = Backbone.Router.extend({
         routes:  {
@@ -8,6 +8,7 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
             "logout": "logout",
             "user": "userList",
             "friend": "friendList",
+            "friend-requests": "friendReq",
             "user/:id": "userDetail",
             '*notFound': 'notFound',
         },
@@ -53,6 +54,10 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
         },
         friendList: function () {
             var view = new vFriendList();
+            $('#main').html(view.render().el);
+        },
+        friendReq: function () {
+            var view = new vFriendReq();
             $('#main').html(view.render().el);
         },
         userList: function () {

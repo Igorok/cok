@@ -1,9 +1,6 @@
 define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser"], function ($, _, backbone, dust, tpl, Msg, mUser) {
     'use strict';
     var view = Backbone.View.extend({
-        events: {
-            "submit #loginForm": "submitForm"
-        },
         initialize: function () {
             this.model = new mUser();
         },

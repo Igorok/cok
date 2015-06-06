@@ -1,12 +1,12 @@
-define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser"], function ($, _, backbone, dust, tpl, Msg, mUser) {
+define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser", "mFriend"], function ($, _, backbone, dust, tpl, Msg, mUser, mFriend) {
     'use strict';
     var view = Backbone.View.extend({
         events: {
-            "submit #loginForm": "submitForm",
             "click button.addFriendBtn": "addFriendRequest",
         },
         initialize: function () {
-            this.model = new mUser();
+            this.uModel = new mUser();
+            this.fModel = new mFriend();
         },
         render: function () {
             this.renderUsers();
@@ -14,8 +14,8 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser"],
         },
         renderUsers: function () {
             var self = this;
-            self.model.getUserList(function () {
-                var data = self.model.toJSON();
+            self.uModel.getUserList(function () {
+                var data = self.uModel.toJSON();
                 dust.render("user_list", {data: data}, function (err, text) {
                     if (err) {
                         console.trace(err);
@@ -32,7 +32,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser"],
             if (! _id) {
                 return false;
             }
-            self.model.addFriendRequest(_id, function () {
+            self.fModel.addFriendRequest(_id, function () {
                 self.renderUsers();
             });
         },

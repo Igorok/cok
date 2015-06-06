@@ -14,6 +14,7 @@
             <ul id="user" class="nav nav-pills nav-stacked collapse nav-child">
                 <li><a href="#user">Users List</a></li>
                 <li><a href="#friend">Friends List</a></li>
+                <li><a href="#friend-requests">Friends Requests</a></li>
             </ul>
         </li>
         <li>

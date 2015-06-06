@@ -36,8 +36,10 @@
             "mReg": "/javascripts/web/login/mReg",
 
             "mUser": "/javascripts/web/user/mUser",
+            "mFriend": "/javascripts/web/user/mFriend",
             "vIndex": "/javascripts/web/user/vIndex",
             "vFriendList": "/javascripts/web/user/vFriendList",
+            "vFriendReq": "/javascripts/web/user/vFriendReq",
             "vUserList": "/javascripts/web/user/vUserList",
             "vUserDetail": "/javascripts/web/user/vUserDetail",
 
