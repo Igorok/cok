@@ -320,10 +320,10 @@ Api.prototype.deleteFriend = function (_data, cb) {
 
         safe.parallel([
             function (cb) {
-                collections["users"].update({_id: _user._id}, {$pull: {friends: mongo.ObjectID(frId)}}, cb)
+                collections["users"].update({_id: _user._id}, {$pull: {friends: {_id: mongo.ObjectID(frId)}}}, cb)
             },
             function (cb) {
-                collections["users"].update({_id: mongo.ObjectID(frId)}, {$pull: {friends: _user._id}}, cb)
+                collections["users"].update({_id: mongo.ObjectID(frId)}, {$pull: {friends: {_id: _user._id}}}, cb)
             },
         ], safe.sure(cb, function () {
             cb(null, true);

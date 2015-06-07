@@ -3,6 +3,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser", 
     var view = Backbone.View.extend({
         events: {
             "click button.addFriendBtn": "addFriendRequest",
+            "click button.delFriendBtn": "deleteFriend",
         },
         initialize: function () {
             this.uModel = new mUser();
@@ -33,6 +34,17 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser", 
                 return false;
             }
             self.fModel.addFriendRequest(_id, function () {
+                self.renderUsers();
+            });
+        },
+        deleteFriend: function (e) {
+            e.preventDefault();
+            var self = this;
+            var _id = $(e.currentTarget).data('id');
+            if (! _id) {
+                return false;
+            }
+            self.fModel.deleteFriend(_id, function () {
                 self.renderUsers();
             });
         },

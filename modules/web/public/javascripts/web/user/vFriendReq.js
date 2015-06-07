@@ -15,7 +15,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mFriend"
             var self = this;
             self.model.getFriendRequests(function () {
                 var data = self.model.toJSON();
-                dust.render("user_friendList", {data: data}, function (err, text) {
+                dust.render("user_list", {data: data}, function (err, text) {
                     if (err) {
                         console.trace(err);
                     }
@@ -27,13 +27,12 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mFriend"
         friendAprove: function (e) {
             var self = this;
             e.preventDefault();
-            var self = this;
             var _id = $(e.currentTarget).data('id');
             if (! _id) {
                 return false;
             }
             self.model.addFriend(_id, function () {
-                window.location.hash = "friends";
+                self.friendReq();
             });
         },
     });

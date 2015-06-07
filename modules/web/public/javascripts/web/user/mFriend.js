@@ -36,6 +36,19 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
                 cb();
             });
         },
+        deleteFriend: function (_id, cb) {
+            var self = this;
+            var user = Api.getUser();
+            var data = {
+                token: user.token,
+                _id: _id,
+            };
+
+            console.log();
+            Api.call("user.deleteFriend", data, function (ret) {
+                cb();
+            });
+        },
         getFriendList: function (cb) {
             var self = this;
             var user = Api.getUser();
@@ -58,6 +71,7 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
                 cb();
             });
         },
+
     });
     return collection;
 });

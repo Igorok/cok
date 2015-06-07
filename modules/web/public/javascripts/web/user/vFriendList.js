@@ -1,6 +1,9 @@
 define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mFriend"], function ($, _, backbone, dust, tpl, Msg, mFriend) {
     'use strict';
     var view = Backbone.View.extend({
+        events: {
+            "click button.delFriendBtn": "deleteFriend",
+        },
         initialize: function () {
             this.model = new mFriend();
         },
@@ -19,6 +22,17 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mFriend"
                     self.$el.html(text);
                     return self;
                 });
+            });
+        },
+        deleteFriend: function (e) {
+            e.preventDefault();
+            var self = this;
+            var _id = $(e.currentTarget).data('id');
+            if (! _id) {
+                return false;
+            }
+            self.model.deleteFriend(_id, function () {
+                self.friendList();
             });
         },
     });
