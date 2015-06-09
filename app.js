@@ -169,7 +169,7 @@ var moduleInit = function (_path, cb) {
         });
     };
 
-    var myCycle = function (_arr, _pr, cb) {
+    var myLoop = function (_arr, _pr, cb) {
         Promise.resolve(0).then(function loop (i) {
             if (i < _arr.length) {
                 return _pr(_arr[i]).then(function () {
@@ -196,7 +196,7 @@ var moduleInit = function (_path, cb) {
         }
     }).then(function (_file) {
         console.log('_file ', _file);
-        myCycle(_file, readFile, function () {
+        myLoop(_file, readFile, function () {
             console.log(fileObj);
         });
     });
