@@ -10,6 +10,8 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
             "friend": "friendList",
             "friend-requests": "friendReq",
             "user/:id": "userDetail",
+            "chat": "chatList",
+            "chat/:id": "userDetail",
             '*notFound': 'notFound',
         },
         // initialize: function (options) {
@@ -68,6 +70,10 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
             var view = new vUserDetail({
                 _id: options
             });
+            $('#main').html(view.render().el);
+        },
+        chatList: function () {
+            var view = new vChatList();
             $('#main').html(view.render().el);
         },
         notFound: function () {
