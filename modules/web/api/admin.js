@@ -11,6 +11,7 @@ var Api = function () {
     var self = this;
 };
 Api.prototype.init = function (cb) {
+    return cb();
     var self = this;
     safe.parallel([
         function (cb) {

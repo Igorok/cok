@@ -11,6 +11,7 @@ var collections = cokcore.collections;
 
 var Api = function () {
     this.init = function (cb) {
+    return cb();
         dbHelper.collection("users", safe.sure(cb, function (users) {
             cb();
         }));
