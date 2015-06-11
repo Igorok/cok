@@ -5,7 +5,6 @@ var moment = require('moment');
 var mongo = require('mongodb');
 var fs = require('fs');
 var cokcore = require('cokcore');
-var dbHelper = cokcore.db;
 var collections = cokcore.collections;
 
 var Api = function () {
@@ -17,19 +16,19 @@ Api.prototype.init = function (cb) {
     var self = this;
     safe.parallel([
         function (cb) {
-            dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+            cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
                 self.colChatgroups = chatgroups;
                 cb();
             }));
         },
         function (cb) {
-            dbHelper.collection("users", safe.sure(cb, function (users) {
+            cokcore.collection("users", safe.sure(cb, function (users) {
                 self.colUsers = users;
                 cb();
             }));
         },
         function (cb) {
-            cokcore.mInit(__dirname + '/user.js', safe.sure(cb, function (_api) {
+            cokcore.apiLoad(__dirname + '/user.js', safe.sure(cb, function (_api) {
                 self.api.user = _api['user'];
                 cb();
             }));
@@ -48,7 +47,7 @@ Api.prototype.init = function (cb) {
  */
 
 Api.prototype.addPrivateChat = function (_data, cb) {
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
 
     }));
 };
@@ -57,9 +56,9 @@ Api.prototype.addPrivateChat = function (_data, cb) {
 */
 
 Api.prototype.getChatList = function (_data, cb) {
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-            dbHelper.collection("users", safe.sure(cb, function (users) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+            cokcore.collection("users", safe.sure(cb, function (users) {
                 var result = [];
                 var userIds = [];
                 var userObj = {};
@@ -111,11 +110,11 @@ Api.prototype.getChatList = function (_data, cb) {
 * add new chat group
 */
 Api.prototype.addChat = function (_data, cb) {
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params.users) || ! _.isArray(_params.users)) {
             return cb('Wrong data');
         }
-        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
             var userArr = [];
             if (! _.contains(_params.users, _user._id)) {
                 userArr.push({_id: _user._id});
@@ -135,11 +134,11 @@ Api.prototype.addChat = function (_data, cb) {
 * edit chat group
 */
 Api.prototype.editChat = function (_data, cb) {
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id) || _.isEmpty(_params.users) || ! _.isArray(_params.users)) {
             return cb('Wrong data');
         }
-        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
             var _id = _params._id.toString();
             var userArr = [];
             if (! _.contains(_params.users, _user._id)) {
@@ -176,7 +175,7 @@ Api.prototype.editChat = function (_data, cb) {
 * get edit chat
 */
 Api.prototype.getEditChat = function (_data, cb) {
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
             return cb('Wrong data');
         }
@@ -190,8 +189,8 @@ Api.prototype.getEditChat = function (_data, cb) {
         if (cUser.friends && (cUser.friends.length > 0)) {
             friendIds = _.pluck(cUser.friends, "_id");
         }
-        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-        dbHelper.collection("users", safe.sure(cb, function (users) {
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+        cokcore.collection("users", safe.sure(cb, function (users) {
             safe.waterfall([
                 function (cb) {
                     chatgroups.findOne({_id: mongo.ObjectID(_id), creator: cUser._id}, safe.sure(cb, function (_cGroup) {
@@ -240,13 +239,13 @@ Api.prototype.getEditChat = function (_data, cb) {
 * remove chat group
 */
 Api.prototype.removeChat = function (_data, cb) {
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
             return cb('Wrong data');
         }
         var _id = _params._id.toString();
-        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-            dbHelper.collection("chatmessages", safe.sure(cb, function (chatmessages) {
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+            cokcore.collection("chatmessages", safe.sure(cb, function (chatmessages) {
                 chatgroups.findOne({_id: mongo.ObjectID(_id)}, safe.sure(cb, function (_group) {
                     if (_group.creator != _user._id) {
                         return cb(403);
@@ -272,12 +271,12 @@ Api.prototype.removeChat = function (_data, cb) {
 * remove chat group
 */
 Api.prototype.leaveChat = function (_data, cb) {
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
             return cb('Wrong data');
         }
         var _id = _params._id.toString();
-        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
             chatgroups.update({_id: mongo.ObjectID(_id), "users._id": _user._id}, {$pull: { users: {_id: _user._id}}}, {multi: true}, safe.sure(cb, function (_result) {
                 cb(null, true);
             }));

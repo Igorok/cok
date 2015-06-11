@@ -2,19 +2,15 @@
 // create server
 var express = require('express');
 var http = require('http');
-var safe = require('safe');
 var compression = require('compression');
 var errorhandler = require('errorhandler');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var lessMiddleware = require('less-middleware');
 
-
 var app = express();
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
-
-
 
 // Configuration
 app.use(compression());
@@ -39,48 +35,43 @@ app.set('views', __dirname + '/modules/web/views');
 app.use(express.static(__dirname + '/modules/web/public'));
 app.use(errorhandler());
 
+var cokcore = require('cokcore');
 
-
-
-
-
-
-var CokCore = require('cokcore');
-CokCore.init(__dirname + '/config', function (err, cfg) {
-    console.log(cfg);
-    CokCore.apiLoad(__dirname + '/modules/web/api', function (err, val) {
-        console.log(err, val);
+new Promise(function (resolve, reject) {
+    cokcore.init(__dirname + '/config', function (err, cfg) {
+        if (err) {
+            return reject(err);
+        }
+        resolve();
     });
+}).then(function () {
+    return new Promise(function (resolve, reject) {
+        cokcore.db(function (err, val) {
+            if (err) {
+                return reject(err);
+            }
+            resolve();
+        });
+    });
+}).then(function () {
+    return new Promise(function (resolve, reject) {
+        cokcore.apiLoad(__dirname + '/modules/web/api', function (err, val) {
+            if (err) {
+                return reject(err);
+            }
+            resolve();
+        });
+    });
+}).then(function () {
+    // Routes
+    require('./modules/web/routes/index.js')(app);
+    require('./modules/web/routes/socket.js')(app, io);
+    // start server
+    var port = process.env.PORT || 3000;
+    server.listen(port, function () {
+        console.log('Web listening at ', port);
+    });
+}).catch(function (e) {
+    console.trace(e);
+    process.exit();
 });
-
-//
-//
-// var cokCore = require('cokcore');
-// var cfg = cokCore.init(__dirname + '/config');
-// dbHelper = cokCore.db;
-//
-// var api = null;
-// safe.series([
-//     function (cb) {
-//         dbHelper.db(cb);
-//     },
-//     function (cb) {
-//         cokCore.mInit(__dirname + '/modules/web/api', safe.sure(cb, function (_api) {
-//             api = _api;
-//             cb();
-//         }));
-//     },
-// ], function (err) {
-//     if (err) {
-//         console.trace(err);
-//         process.exit();
-//     }
-//     // Routes
-//     require('./modules/web/routes/index.js')(app, api);
-//     require('./modules/web/routes/socket.js')(app, io, api);
-//     // start server
-//     var port = process.env.PORT || 3000;
-//     server.listen(port, function () {
-//         console.log('Web listening at ', port);
-//     });
-// });

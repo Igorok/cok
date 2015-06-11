@@ -1,10 +1,9 @@
 var fs = require('fs');
 var _ = require('lodash');
-var api = null;
+var cokcore = require('cokcore');
 
 // routes
-module.exports = function (app, _api) {
-    api = _api;
+module.exports = function (app) {
     app.get('/', index);
     app.get('/admin', admin);
     app.post('/jsonrpc', jsonrpc);
@@ -43,7 +42,7 @@ function jsonrpc (req, res) {
     var func = jsonrpc.method.match(/^(.*)\.(.*)$/);
     var module = func[1];
     func = func[2];
-    if (! api[module] || ! api[module][func]) {
+    if (! cokcore.ctx.api[module] || ! cokcore.ctx.api[module][func]) {
         console.log("not found", module, func)
         var jsonres = {jsonrpc: "2.0", id: jsonrpc.id};
         console.trace(404, module, func);
@@ -52,7 +51,7 @@ function jsonrpc (req, res) {
 //        return res.json(jsonres);
         return res.sendStatus(404);
     }
-    var fn = api[module][func];
+    var fn = cokcore.ctx.api[module][func];
     var rf = function () {
         var jsonres = {jsonrpc: "2.0", id: jsonrpc.id};
         if (arguments[0]) {
@@ -67,7 +66,7 @@ function jsonrpc (req, res) {
     };
 
     params.push(rf);
-    fn.apply(api, params);
+    fn.apply(cokcore.ctx.api, params);
 }
 
 function upload(req, res) {
@@ -99,14 +98,14 @@ function upload(req, res) {
             ]
         };
         actionArr = actionArr.split(".");
-        if ((actionArr.length < 2) || ! api[actionArr[0]] || ! api[actionArr[0]][actionArr[1]]) {
+        if ((actionArr.length < 2) || ! cokcore.ctx.api[actionArr[0]] || ! cokcore.ctx.api[actionArr[0]][actionArr[1]]) {
             console.trace(404, actionArr);
             _result.error = {err: 404, code:-1};
             _result.result = null;
 //            return res.json(_result);
             return res.sendStatus(404);
         } else {
-            api[actionArr[0]][actionArr[1]].apply(api, [data, function (err, _data) {
+            cokcore.ctx.api[actionArr[0]][actionArr[1]].apply(cokcore.ctx.api, [data, function (err, _data) {
                 if (err) {
                     console.trace(err);
                     _result.error = {err: err, code: -1};

@@ -2,13 +2,10 @@ var safe = require('safe');
 var _ = require("lodash");
 var moment = require('moment');
 var mongo = require('mongodb');
-var cokCore = require('cokcore');
-var dbHelper = cokCore.db;
-var userApi = null;
+var cokcore = require('cokcore');
 
 
-module.exports = function (app, io, _api) {
-    userApi = _api['user'];
+module.exports = function (app, io) {
     io.on('connection', function (socket) {
         var emitError = function (err) {
             console.trace(err);
@@ -33,7 +30,7 @@ module.exports = function (app, io, _api) {
             var cHistory;
             safe.waterfall([
                 function getAuth (cb) {
-                    userApi.checkAuth (data, safe.sure(cb, function (_user, _params) {
+                    cokcore.ctx.api["user"].checkAuth (data, safe.sure(cb, function (_user, _params) {
                         if (! _user || ! _params || ! _params.chatId) {
                             return cb(403);
                         }
@@ -43,7 +40,7 @@ module.exports = function (app, io, _api) {
                     }));
                 },
                 function getGroup (cb) {
-                    dbHelper.collection("chatgroups", safe.sure(cb, function  (chatgroups) {
+                    cokcore.collection("chatgroups", safe.sure(cb, function  (chatgroups) {
                         chatgroups.findOne({_id: mongo.ObjectID(chatId), "users._id" : cUser._id}, safe.sure(cb, function( _group) {
                             if (! _group) {
                                 return cb(403);
@@ -54,7 +51,7 @@ module.exports = function (app, io, _api) {
                     }));
                 },
                 function getHistory (cb) {
-                    dbHelper.collection("chatmessages", safe.sure(cb, function  (chatmessages) {
+                    cokcore.collection("chatmessages", safe.sure(cb, function  (chatmessages) {
                         chatmessages.find({chatId: chatId}, {userId: 1, chatText: 1, date: 1}, {sort: {date: 1}, limit: 100}).toArray(safe.sure(cb, function(_history) {
                             cHistory = _history;
                             cb();
@@ -72,7 +69,7 @@ module.exports = function (app, io, _api) {
                         }
                     });
 
-                    dbHelper.collection("users", safe.sure(cb, function  (users) {
+                    cokcore.collection("users", safe.sure(cb, function  (users) {
                         users.find({_id: {$in : userIds}}, {login:1, email:1}).toArray(safe.sure(cb, function( _uArr) {
                             if (! _.isEmpty(_uArr)) {
                                 var uObj = {};
@@ -126,13 +123,13 @@ module.exports = function (app, io, _api) {
             data.params.push(_msg);
             safe.waterfall([
                 function (cb) {
-                    userApi.checkAuth (data, safe.sure(cb, function (_user, _params) {
+                    cokcore.ctx.api["user"].checkAuth (data, safe.sure(cb, function (_user, _params) {
                         if (! _user || ! _params) {
                             return cb(403);
                         }
                         cUser = _user;
                         msg = _params;
-                        dbHelper.collection("chatgroups", safe.sure(cb, function  (chatgroups) {
+                        cokcore.collection("chatgroups", safe.sure(cb, function  (chatgroups) {
                             chatgroups.findOne({_id: mongo.ObjectID(msg.chatId.toString()), "users._id" : _user._id}, safe.sure(cb, function( _group) {
                                 if (! _group) {
                                     return cb(403);
@@ -145,7 +142,7 @@ module.exports = function (app, io, _api) {
                     }));
                 },
                 function (cb) {
-                    dbHelper.collection("chatmessages", safe.sure(cb, function  (chatmessages) {
+                    cokcore.collection("chatmessages", safe.sure(cb, function  (chatmessages) {
                         chatmessages.insert({
                             userId: cUser._id,
                             chatId: chatId,

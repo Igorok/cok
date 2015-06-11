@@ -5,8 +5,6 @@ var _ = require("lodash");
 var moment = require('moment');
 var mongo = require('mongodb');
 var cokcore = require('cokcore');
-var dbHelper = cokcore.db;
-var userApi = null;
 var Api = function () {
     var self = this;
 };
@@ -15,20 +13,12 @@ Api.prototype.init = function (cb) {
     var self = this;
     safe.parallel([
         function (cb) {
-            dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-                self.colChatgroups = chatgroups;
+            cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
                 cb();
             }));
         },
         function (cb) {
-            dbHelper.collection("users", safe.sure(cb, function (users) {
-                self.colUsers = users;
-                cb();
-            }));
-        },
-        function (cb) {
-            cokcore.mInit(__dirname + '/user.js', safe.sure(cb, function (_api) {
-                userApi = _api['user'];
+            cokcore.collection("users", safe.sure(cb, function (users) {
                 cb();
             }));
         }
@@ -39,8 +29,8 @@ Api.prototype.init = function (cb) {
 */
 Api.prototype.getUserList = function (_data, cb) {
     var self = this;
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        dbHelper.collection("users", safe.sure(cb, function (users) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        cokcore.collection("users", safe.sure(cb, function (users) {
             users.find({}, {login: 1, email: 1, group: 1, status: 1}).toArray(cb);
         }));
     }));
@@ -51,8 +41,8 @@ Api.prototype.getUserList = function (_data, cb) {
 */
 Api.prototype.deactivateUser = function (_data, cb) {
     var self = this;
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        dbHelper.collection("users", safe.sure(cb, function (users) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        cokcore.collection("users", safe.sure(cb, function (users) {
             users.find({}, {login: 1, email: 1, status: 1}).toArray(cb);
         }));
     }));
@@ -64,8 +54,8 @@ Api.prototype.deactivateUser = function (_data, cb) {
 */
 Api.prototype.getPermissionList = function (_data, cb) {
     var self = this;
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        dbHelper.collection("permissions", safe.sure(cb, function (permissions) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        cokcore.collection("permissions", safe.sure(cb, function (permissions) {
             permissions.find({}).toArray(cb);
         }));
     }));
@@ -76,7 +66,7 @@ Api.prototype.getPermissionList = function (_data, cb) {
 */
 Api.prototype.editPermission = function (_data, cb) {
     var self = this;
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (! _params._id || ! _params.key || ! _params.title) {
             return cb(new Error("Wrong data!"));
         }
@@ -84,7 +74,7 @@ Api.prototype.editPermission = function (_data, cb) {
         var key = _params.key.toString();
         var title = _params.title.toString();
 
-        dbHelper.collection("permissions", safe.sure(cb, function (permissions) {
+        cokcore.collection("permissions", safe.sure(cb, function (permissions) {
             if (id == '-1') {
                 permissions.find({key: key}, {key: 1}).toArray(safe.sure(cb, function (_result) {
                     if (!! _result && _result.length > 0) {
@@ -111,13 +101,13 @@ Api.prototype.editPermission = function (_data, cb) {
 */
 Api.prototype.removePermission = function (_data, cb) {
     var self = this;
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (! _params._id) {
             return cb(new Error("Wrong data!"));
         }
         var id = _params._id.toString();
 
-        dbHelper.collection("permissions", safe.sure(cb, function (permissions) {
+        cokcore.collection("permissions", safe.sure(cb, function (permissions) {
             permissions.remove({_id: mongo.ObjectID(id)}, cb)
         }));
     }));
@@ -128,8 +118,8 @@ Api.prototype.removePermission = function (_data, cb) {
 */
 Api.prototype.getGroupList = function (_data, cb) {
     var self = this;
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        dbHelper.collection("usergroups", safe.sure(cb, function (usergroups) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        cokcore.collection("usergroups", safe.sure(cb, function (usergroups) {
             usergroups.find({}).toArray(cb);
         }));
     }));
@@ -140,7 +130,7 @@ Api.prototype.getGroupList = function (_data, cb) {
 */
 Api.prototype.editGroup = function (_data, cb) {
     var self = this;
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (! _params._id || ! _params.title || ! _params.description || ! _params.permission || ! _.isArray(_params.permission)) {
             return cb(new Error("Wrong data!"));
         }
@@ -152,8 +142,8 @@ Api.prototype.editGroup = function (_data, cb) {
             permission.push(val.toString());
         });
 
-        dbHelper.collection("permissions", safe.sure(cb, function (permissions) {
-        dbHelper.collection("usergroups", safe.sure(cb, function (usergroups) {
+        cokcore.collection("permissions", safe.sure(cb, function (permissions) {
+        cokcore.collection("usergroups", safe.sure(cb, function (usergroups) {
             safe.series([
                 function (cb) {
                     permissions.find({}, {key: 1}).toArray(safe.sure(cb, function (_permArr) {
@@ -199,13 +189,13 @@ Api.prototype.editGroup = function (_data, cb) {
 */
 Api.prototype.removeGroup = function (_data, cb) {
     var self = this;
-    userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (! _params._id) {
             return cb(new Error("Wrong data!"));
         }
         var id = _params._id.toString();
 
-        dbHelper.collection("usergroups", safe.sure(cb, function (usergroups) {
+        cokcore.collection("usergroups", safe.sure(cb, function (usergroups) {
             usergroups.remove({_id: mongo.ObjectID(id)}, cb)
         }));
     }));

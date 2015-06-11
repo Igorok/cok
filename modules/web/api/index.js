@@ -5,7 +5,6 @@ var moment = require('moment');
 var mongo = require('mongodb');
 var fs = require('fs');
 var cokcore = require('cokcore');
-var dbHelper = cokcore.db;
 var userApi = null;
 
 var Api = function () {
@@ -16,19 +15,19 @@ Api.prototype.init = function (cb) {
     var self = this;
     safe.parallel([
         function (cb) {
-            dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+            cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
                 self.colChatgroups = chatgroups;
                 cb();
             }));
         },
         function (cb) {
-            dbHelper.collection("users", safe.sure(cb, function (users) {
+            cokcore.collection("users", safe.sure(cb, function (users) {
                 self.colUsers = users;
                 cb();
             }));
         },
         function (cb) {
-            cokcore.mInit(__dirname + '/user.js', safe.sure(cb, function (_api) {
+            cokcore.apiLoad(__dirname + '/user.js', safe.sure(cb, function (_api) {
                 userApi = _api['user'];
                 cb();
             }));
@@ -42,8 +41,8 @@ Api.prototype.init = function (cb) {
 */
 Api.prototype.getChatList = function (_data, cb) {
     userApi.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-            dbHelper.collection("users", safe.sure(cb, function (users) {
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+            cokcore.collection("users", safe.sure(cb, function (users) {
                 var result = [];
                 var userIds = [];
                 var userObj = {};
@@ -99,7 +98,7 @@ Api.prototype.addChat = function (_data, cb) {
         if (_.isEmpty(_params) || _.isEmpty(_params.users) || ! _.isArray(_params.users)) {
             return cb('Wrong data');
         }
-        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
             var userArr = [];
             if (! _.contains(_params.users, _user._id)) {
                 userArr.push({_id: _user._id});
@@ -123,7 +122,7 @@ Api.prototype.editChat = function (_data, cb) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id) || _.isEmpty(_params.users) || ! _.isArray(_params.users)) {
             return cb('Wrong data');
         }
-        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
             var _id = _params._id.toString();
             var userArr = [];
             if (! _.contains(_params.users, _user._id)) {
@@ -174,8 +173,8 @@ Api.prototype.getEditChat = function (_data, cb) {
         if (cUser.friends && (cUser.friends.length > 0)) {
             friendIds = _.pluck(cUser.friends, "_id");
         }
-        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-        dbHelper.collection("users", safe.sure(cb, function (users) {
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+        cokcore.collection("users", safe.sure(cb, function (users) {
             safe.waterfall([
                 function (cb) {
                     chatgroups.findOne({_id: mongo.ObjectID(_id), creator: cUser._id}, safe.sure(cb, function (_cGroup) {
@@ -229,8 +228,8 @@ Api.prototype.removeChat = function (_data, cb) {
             return cb('Wrong data');
         }
         var _id = _params._id.toString();
-        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-            dbHelper.collection("chatmessages", safe.sure(cb, function (chatmessages) {
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+            cokcore.collection("chatmessages", safe.sure(cb, function (chatmessages) {
                 chatgroups.findOne({_id: mongo.ObjectID(_id)}, safe.sure(cb, function (_group) {
                     if (_group.creator != _user._id) {
                         return cb(403);
@@ -261,7 +260,7 @@ Api.prototype.leaveChat = function (_data, cb) {
             return cb('Wrong data');
         }
         var _id = _params._id.toString();
-        dbHelper.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
             chatgroups.update({_id: mongo.ObjectID(_id), "users._id": _user._id}, {$pull: { users: {_id: _user._id}}}, {multi: true}, safe.sure(cb, function (_result) {
                 cb(null, true);
             }));
@@ -305,7 +304,7 @@ Api.prototype.picUpload = function (_data, cb) {
                     }));
                 },
                 function saveImage (cb) {
-                    dbHelper.collection("images", safe.sure(cb, function (images) {
+                    cokcore.collection("images", safe.sure(cb, function (images) {
                         images.insert({userId: _user._id, created: new Date(), name: newFileName}, safe.sure(cb, function () {
                             cb();
                         }));
@@ -324,7 +323,7 @@ Api.prototype.picUpload = function (_data, cb) {
 Api.prototype.mainPicUpload = function (_data, cb) {
     var self = this;
     self.picUpload(_data, safe.sure(cb, function (newFileName, _user, _params) {
-        dbHelper.collection("users", safe.sure(cb, function (users) {
+        cokcore.collection("users", safe.sure(cb, function (users) {
             users.update({_id: mongo.ObjectID(_user._id)}, {$set: { picture: newFileName}}, safe.sure(cb, function () {
                 cb(null, true);
             }));
@@ -344,7 +343,7 @@ Api.prototype.getUserPic = function (_data, cb) {
         } else {
         	ownerId = _params.ownerId.toString();
         }
-        dbHelper.collection("images", safe.sure(cb, function (images) {
+        cokcore.collection("images", safe.sure(cb, function (images) {
             images.find({userId: ownerId}).toArray(safe.sure(cb, function (_result) {
                 cb(null, _result);
             }));
@@ -363,7 +362,7 @@ Api.prototype.deletePic = function (_data, cb) {
         }
         var _id = _params._id;
         var userId = _user._id;
-        dbHelper.collection("images", safe.sure(cb, function (images) {
+        cokcore.collection("images", safe.sure(cb, function (images) {
             images.findOne({_id: mongo.ObjectID(_id), userId: userId}, safe.sure(cb, function (_result) {
                 if (_.isEmpty(_result)) {
                     cb('Wrong data');
@@ -390,12 +389,12 @@ Api.prototype.setMainPic = function (_data, cb) {
         }
         var _id = _params._id;
         var userId = _user._id;
-        dbHelper.collection("images", safe.sure(cb, function (images) {
+        cokcore.collection("images", safe.sure(cb, function (images) {
             images.findOne({_id: mongo.ObjectID(_id), userId: userId}, safe.sure(cb, function (_result) {
                 if (_.isEmpty(_result)) {
                     cb('Wrong data');
                 } else {
-                    dbHelper.collection("users", safe.sure(cb, function (users) {
+                    cokcore.collection("users", safe.sure(cb, function (users) {
                         users.update({_id: mongo.ObjectID(_user._id)}, {$set: { picture: _result.name}}, safe.sure(cb, function () {
                             cb();
                         }));

@@ -4,28 +4,6 @@ var _ = require("lodash");
 var mongo = require('mongodb');
 var safe = require('safe');
 var path = require('path');
-var _db = null;
-var collections = [];
-var cfg = null;
-var apiArr = [];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -34,7 +12,7 @@ var apiArr = [];
 
 var Core = function () {
     var self = this;
-
+    var _db = null;
 
     // for fatal error
     var exit = function (e) {
@@ -54,10 +32,9 @@ var Core = function () {
         if (! _arr.length) {
             return _cb();
         }
-        var _promise = null;
 
         if (_limit === 1) {
-            _promise = Promise.resolve(0).then(function next (i) {
+            Promise.resolve(0).then(function next (i) {
                 if (i < _arr.length) {
                     return new Promise(function (resolve, reject) {
                         _func(_arr[i], function () {
@@ -72,10 +49,15 @@ var Core = function () {
                         console.trace(e)
                     });
                 }
-            });
+            }).then(function() {
+                _cb();
+            }).catch(function(e) {
+                console.trace(e);
+                _cb(e);
+            });;
         } else {
             _arr = _.chunk(_arr, _limit);
-            _promise = Promise.resolve(0).then(function next (i) {
+            Promise.resolve(0).then(function next (i) {
                 if (i < _arr.length) {
                     var pArr = _arr[i].map(function (val) {
                         return new Promise(function (resolve, reject) {
@@ -94,14 +76,13 @@ var Core = function () {
                         return next(++i);
                     });
                 }
-            });
+            }).then(function() {
+                _cb();
+            }).catch(function(e) {
+                console.trace(e);
+                _cb(e);
+            });;
         }
-        _promise.then(function() {
-            _cb();
-        }).catch(function(e) {
-            console.trace(e);
-            _cb(e);
-        });
     };
 
     self.loop = {
@@ -120,27 +101,28 @@ var Core = function () {
         },
         limit: loop,
     };
+
+    // this object contains initialized api and mongodb collections
+    self.ctx = {
+        cfg: null,
+        api: {},
+        col: {},
+    };
+
     /*
     * async initialization api factories
     * api factory will have to include .init method
     * for initialization its requirements
     */
     var apiSingleInit = function (_path, cb) {
-
-
-
         var fileName = path.basename(_path);
         fileName = fileName.replace('.js', '');
-
-
-
-        if (apiArr[fileName]) {
+        if (self.ctx.api[fileName]) {
             return cb();
         } else {
-
             var api = require(_path);
             api.init(function (err, _api) {
-                apiArr[fileName] = _api;
+                self.ctx.api[fileName] = _api;
                 cb(err);
             });
         }
@@ -150,7 +132,7 @@ var Core = function () {
 
 
 
-    var apiLoad = function (_path, cb) {
+    self.apiLoad = function (_path, cb) {
         var checkExist = new Promise(function (_res, _rej) {
             fs.exists(_path, function (exists) {
                 if (! exists) {
@@ -184,82 +166,85 @@ var Core = function () {
         checkExist.then(function () {
             return readStat;
         }).then(function (_stat) {
-            console.log('_stat ', _stat.isFile());
             if (_stat.isFile()) {
                 return [_path];
             } else {
                 return readDir;
             }
         }).then(function (_arr) {
-            console.log('_arr ', _arr);
-            self.loop.each(_arr, apiSingleInit, function () {
-                console.log('finish');
-            });
+            self.loop.each(_arr, apiSingleInit, cb);
         }).catch(function(e) {
             console.trace(e);
+            cb(e);
         });
-
-
-        // fs.exists(_path, function (exists) {
-        //     if (! exists) {
-        //         return cb(new Error ('Module not found'));
-        //     }
-        //     fs.lstat(_path, safe.sure(cb, function (stat) {
-        //         if (stat.isFile()) {
-        //             moduleSingleInit(_path, cb);
-        //         } else {
-        //             fs.readdir(_path, safe.sure(cb, function (arr) {
-        //                 safe.forEachSeries(arr, function (_file, cb) {
-        //                     moduleSingleInit(_path + '/' + _file, cb);
-        //                 }, safe.sure(cb, function () {
-        //                     cb(null, apiArr);
-        //                 }));
-        //             }));
-        //         }
-        //     }));
-        // });
     };
 
 
-    self.ctx = {
-        config: null,
-        api: {},
-        collections: {},
-    };
+
     self.db = function (cb) {
         if (_db) {
             return cb(null, _db);
         }
-        console.log("Connecting to: " , cfg.mongo);
+        console.log("Connecting to: " , self.ctx.cfg.mongo);
         var dbc = new mongo.Db(
-            cfg.mongo.db,
-            new mongo.Server(cfg.mongo.host, cfg.mongo.port, cfg.mongo.opts), {native_parser: false, safe:true, w: 1}
+            self.ctx.cfg.mongo.db,
+            new mongo.Server(
+                self.ctx.cfg.mongo.host,
+                self.ctx.cfg.mongo.port,
+                self.ctx.cfg.mongo.opts
+            ),
+            {
+                native_parser: false,
+                safe:true,
+                w: 1
+            }
         );
-        dbc.open(safe.sure(cb, function(db) {
+        dbc.open(function(e, db) {
+            if (e) {
+                return cb(e);
+            }
             _db = db;
-            if (! cfg.mongo.auth) {
+            if (! self.ctx.cfg.mongo.auth) {
                 cb(null, _db);
             } else {
-                _db.authenticate(cfg.mongo.user, cfg.mongo.password, safe.sure(cb, function() {
-                    cb(null, _db);
-                }));
+                _db.authenticate(
+                    self.ctx.cfg.mongo.user,
+                    self.ctx.cfg.mongo.password,
+                    cb
+                );
             }
-        }));
+        });
     };
 
-    self.collection = function(name, cb) {
-        if (collections[name]) {
-            cb(null, collections[name]);
+    self.collection = function (name, cb) {
+        if (self.ctx.col[name]) {
+            cb(null, self.ctx.col[name]);
         } else {
-            self.db(safe.sure(cb, function(db) {
-                db.collection(name, function (err, collection) {
-                    console.log('Get collection ' + name);
-                    collections[name] = collection;
-                    cb(err, collection);
+            new Promise(function (resolve, reject) {
+                self.db(function(err, db) {
+                    if (err) {
+                        return reject(err);
+                    }
+                    resolve(db);
                 });
-            }));
+            }).then(function (db) {
+                return new Promise(function (resolve, reject) {
+                    db.collection(name, function (err, collection) {
+                        if (err) {
+                            return reject(err);
+                        }
+                        console.log('Get collection ' + name);
+                        self.ctx.col[name] = collection;
+                        resolve();
+                    });
+                });
+            }).then(function () {
+                cb(null, self.ctx.col[name]);
+            }).catch(function (e) {
+                console.trace(e);
+                cb(e);
+            });
         }
-
     };
     // find config for project, merge local and default
     self.init = function (_path, cb) {
@@ -282,119 +267,13 @@ var Core = function () {
             });
         });
         Promise.all([confDef, confLoc]).then(function (val) {
-            self.ctx.config = _.merge(val[0], val[1]);
-            cb(null, self.ctx.config) ;
+            self.ctx.cfg = _.merge(val[0], val[1]);
+            cb() ;
         }).catch(exit);
     };
 
-    self.apiLoad = apiLoad;
+
 };
-
-var config = function (_path) {
-    var confDef = {};
-    var confLoc = {};
-
-    if (fs.existsSync(_path + "/config-default.js")) {
-        confDef = require(_path + "/config-default.js");
-    } else {
-        console.log("config not found");
-        return null;
-    }
-    if (fs.existsSync(_path + "/config-local.js")) {
-        confLoc = require(_path + "/config-local.js");
-    }
-
-    return _.merge(confDef, confLoc);
-};
-
-
-/**
-* connect to mongo db, and collections
-*/
-var DataBase = function () {
-    var self = this;
-
-
-
-
-
-    self.db = function (cb) {
-        if (_db) {
-            return cb(null, _db);
-        }
-        console.log("Connecting to: " , cfg.mongo);
-        var dbc = new mongo.Db(
-            cfg.mongo.db,
-            new mongo.Server(cfg.mongo.host, cfg.mongo.port, cfg.mongo.opts), {native_parser: false, safe:true, w: 1}
-        );
-        dbc.open(safe.sure(cb, function(db) {
-            _db = db;
-            if (! cfg.mongo.auth) {
-                cb(null, _db);
-            } else {
-                _db.authenticate(cfg.mongo.user, cfg.mongo.password, safe.sure(cb, function() {
-                    cb(null, _db);
-                }));
-            }
-        }));
-    };
-
-    self.collection = function(name, cb) {
-        if (collections[name]) {
-            cb(null, collections[name]);
-        } else {
-            self.db(safe.sure(cb, function(db) {
-                db.collection(name, function (err, collection) {
-                    console.log('Get collection ' + name);
-                    collections[name] = collection;
-                    cb(err, collection);
-                });
-            }));
-        }
-
-    };
-}
-
-var moduleSingleInit = function (_path, cb) {
-    var fileName = path.basename(_path);
-    fileName = fileName.replace('.js', '');
-    if (apiArr[fileName]) {
-        cb(null, apiArr);
-    } else {
-        var api = require(_path);
-        api.init(safe.sure(cb, function (_api) {
-            apiArr[fileName] = _api;
-            cb(null, apiArr);
-        }));
-    }
-};
-var moduleInit = function (_path, cb) {
-    fs.exists(_path, function (exists) {
-        if (! exists) {
-            return cb(new Error ('Module not found'));
-        }
-        fs.lstat(_path, safe.sure(cb, function (stat) {
-            if (stat.isFile()) {
-                moduleSingleInit(_path, cb);
-            } else {
-                fs.readdir(_path, safe.sure(cb, function (arr) {
-                    safe.forEachSeries(arr, function (_file, cb) {
-                        moduleSingleInit(_path + '/' + _file, cb);
-                    }, safe.sure(cb, function () {
-                        cb(null, apiArr);
-                    }));
-                }));
-            }
-        }));
-    });
-};
-
-var init = function (_confPath) {
-    cfg = config(_confPath);
-    return cfg;
-};
-
-
 
 // export
 module.exports = new Core();
