@@ -1,4 +1,4 @@
-define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex", "vUserList", "vUserDetail", "vFriendList", "vReg", "vFriendReq"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex, vUserList, vUserDetail, vFriendList, vReg, vFriendReq) {
+define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex", "vUserList", "vUserDetail", "vFriendList", "vReg", "vFriendReq", "vChatPersonal"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex, vUserList, vUserDetail, vFriendList, vReg, vFriendReq, vChatPersonal) {
     "use strict";
     var Route = Backbone.Router.extend({
         routes:  {
@@ -11,7 +11,7 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
             "friend-requests": "friendReq",
             "user/:id": "userDetail",
             "chat": "chatList",
-            "chat/:id": "userDetail",
+            "chat/:id": "chatPersonal",
             '*notFound': 'notFound',
         },
         // initialize: function (options) {
@@ -73,7 +73,11 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
             $('#main').html(view.render().el);
         },
         chatList: function () {
-            var view = new vChatList();
+            // var view = new vChatList();
+            // $('#main').html(view.render().el);
+        },
+        chatPersonal: function (_id) {
+            var view = new vChatPersonal();
             $('#main').html(view.render().el);
         },
         notFound: function () {

@@ -17,40 +17,55 @@ Api.prototype.init = function (cb) {
     safe.parallel([
         function (cb) {
             cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-                self.colChatgroups = chatgroups;
                 cb();
             }));
         },
         function (cb) {
             cokcore.collection("users", safe.sure(cb, function (users) {
-                self.colUsers = users;
                 cb();
             }));
         },
         function (cb) {
             cokcore.apiLoad(__dirname + '/user.js', safe.sure(cb, function (_api) {
-                self.api.user = _api['user'];
                 cb();
             }));
         }
     ], cb);
 };
 
-
-
-
-
-
 /**
- * make private chat for 2 users
- *
+ * personal chat only for 2 users
+ * @param _id - id of user for chat
  */
 
-Api.prototype.addPrivateChat = function (_data, cb) {
+Api.prototype.getPersonalChat = function (_data, cb) {
     cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isUndefined(_params._id)) {
+            return cb ("Wrong _id");
+        }
+        var userArr = [
+            _user._id,
+            mongo.ObjectID(_params._id)
+        ];
+        cokcore.ctx.col["chatgroups"].findOne({users: userArr, type: "personal"}, safe.sure(cb, function (_cGroup) {
+            if (! _.isUndefined (_cGroup)) {
+                return cb(null, _cGroup);
+            }
 
+            var cGroup = {
+                users: userArr,
+                creator: _user._id,
+                date: new Date(),
+                type: "personal"
+             };
+            cokcore.ctx.col["chatgroups"].insert(cGroup, safe.sure(cb, function (_obj) {
+                cb(null, _obj.ops[0]);
+            }));
+        }));
     }));
 };
+
+
 /**
 * all users
 */

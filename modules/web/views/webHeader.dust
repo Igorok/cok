@@ -43,6 +43,9 @@
             "vUserList": "/javascripts/web/user/vUserList",
             "vUserDetail": "/javascripts/web/user/vUserDetail",
 
+            "vChatPersonal": "/javascripts/web/chat/vChatPersonal",
+            "mChatPersonal": "/javascripts/web/chat/mChatPersonal",
+
         },
         shim: {
             underscore: {
