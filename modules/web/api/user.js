@@ -200,9 +200,21 @@ Api.prototype.addFriendRequest = function (_data, cb) {
             return cb ("Wrong _id");
         }
         var fid = _params._id.toString();
+        var friends = _.map(_user.friends, function (val) {
+            return val._id.toString();
+        });
+        var selfFriendRequests = _.map(_user.selfFriendRequests, function (val) {
+            return val._id.toString();
+        });
+        var friendRequests = _.map(_user.friendRequests, function (val) {
+            return val._id.toString();
+        });
+
+        if (_.include(friends, fid) || _.include(selfFriendRequests, fid) || _.include(friendRequests, fid)) {
+            return cb(null, true);
+        }
+
         fid = mongo.ObjectID(fid);
-
-
         safe.parallel([
             function (cb) {
                 var setData = {

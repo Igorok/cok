@@ -1,108 +1,32 @@
 "use strict";
 var fs = require("fs");
-var _ = require("lodash");
-var mongo = require('mongodb');
-var safe = require('safe');
 var path = require('path');
-
-
-
-
+var _ = require("lodash");
+var safe = require("safe");
+var mongo = require('mongodb');
 
 
 var Core = function () {
     var self = this;
     var _db = null;
 
-    // for fatal error
-    var exit = function (e) {
-        console.trace(e);
+    /**
+     * function for fatal erros
+     * @param e - that is a error
+     */
+    self.exit = function (e) {
+        if (e) {
+            console.trace(e);
+        }
         process.exit();
     };
 
+
     /**
-    * these is a testing function to learning a native promises
+    * object contain config of application,
+    * an api that was already initialized and
+    * collections of mongodb
     */
-    var loop = function () {
-        var _arr = arguments[0];
-        var _limit = arguments[1];
-        var _func = arguments[2];
-        var _cb = arguments[3];
-
-        if (! _arr.length) {
-            return _cb();
-        }
-
-        if (_limit === 1) {
-            Promise.resolve(0).then(function next (i) {
-                if (i < _arr.length) {
-                    return new Promise(function (resolve, reject) {
-                        _func(_arr[i], function () {
-                            if (arguments[0]) {
-                                return reject(arguments[0]);
-                            }
-                            resolve();
-                        });
-                    }).then(function () {
-                        return next(++i);
-                    }).catch(function (e) {
-                        console.trace(e)
-                    });
-                }
-            }).then(function() {
-                _cb();
-            }).catch(function(e) {
-                console.trace(e);
-                _cb(e);
-            });;
-        } else {
-            _arr = _.chunk(_arr, _limit);
-            Promise.resolve(0).then(function next (i) {
-                if (i < _arr.length) {
-                    var pArr = _arr[i].map(function (val) {
-                        return new Promise(function (resolve, reject) {
-                            _func(val, function () {
-                                if (arguments[0]) {
-                                    return reject(arguments[0]);
-                                }
-                                resolve();
-                            });
-                        }).catch(function (e) {
-                            console.trace(e)
-                        });
-                    });
-
-                    return Promise.all(pArr).then(function () {
-                        return next(++i);
-                    });
-                }
-            }).then(function() {
-                _cb();
-            }).catch(function(e) {
-                console.trace(e);
-                _cb(e);
-            });;
-        }
-    };
-
-    self.loop = {
-        each: function () {
-            var _arr = arguments[0];
-            var _func = arguments[1];
-            var _cb = arguments[2];
-            return loop(_arr, 1, _func, _cb);
-        },
-        all: function () {
-            var _arr = arguments[0];
-            var _limit = _arr.length;
-            var _func = arguments[1];
-            var _cb = arguments[2];
-            return loop(_arr, _limit, _func, _cb);
-        },
-        limit: loop,
-    };
-
-    // this object contains initialized api and mongodb collections
     self.ctx = {
         cfg: null,
         api: {},
@@ -127,60 +51,43 @@ var Core = function () {
             });
         }
     };
-
-
-
-
-
+    /*
+    * my api contain factories, and init function for async initialization
+    */
     self.apiLoad = function (_path, cb) {
-        var checkExist = new Promise(function (_res, _rej) {
-            fs.exists(_path, function (exists) {
-                if (! exists) {
-                    return _rej(new Error ('Module not found'));
-                }
-                _res();
-            });
-        });
-        var readStat = new Promise(function (_res, _rej) {
-            fs.lstat(_path, function (err, stat) {
-                if (err) {
-                    return _rej(err);
-                }
-                _res(stat);
-            });
-        });
-
-        var readDir = new Promise(function (_res, _rej) {
-            fs.readdir(_path, function (err, stat) {
-                if (err) {
-                    return _rej(err);
-                }
-                var statArr = _.map(stat, function (val) {
-                    return _path + '/' + val;
+        var filesArr = [];
+        safe.series([
+            function (cb) {
+                fs.exists(_path, function (exists) {
+                    if (! exists) {
+                        return cb(new Error ('Module not found'));
+                    }
+                    cb();
                 });
-                _res(statArr);
-            });
-        });
-
-
-        checkExist.then(function () {
-            return readStat;
-        }).then(function (_stat) {
-            if (_stat.isFile()) {
-                return [_path];
-            } else {
-                return readDir;
-            }
-        }).then(function (_arr) {
-            self.loop.each(_arr, apiSingleInit, cb);
-        }).catch(function(e) {
-            console.trace(e);
-            cb(e);
-        });
+            },
+            function (cb) {
+                fs.lstat(_path, safe.sure(cb, function (_stat) {
+                    if (_stat.isFile()) {
+                        filesArr.push(_path);
+                        return cb();
+                    }
+                    fs.readdir(_path, safe.sure(cb, function (_files) {
+                        filesArr = _.map(_files, function (val) {
+                            return _path + '/' + val;
+                        });
+                        cb();
+                    }));
+                }));
+            },
+        ], safe.sure(cb, function () {
+            safe.eachSeries(filesArr, apiSingleInit, cb);
+        }));
     };
 
 
-
+    /*
+    * function for singleton save mongodb connection
+    */
     self.db = function (cb) {
         if (_db) {
             return cb(null, _db);
@@ -199,10 +106,7 @@ var Core = function () {
                 w: 1
             }
         );
-        dbc.open(function(e, db) {
-            if (e) {
-                return cb(e);
-            }
+        dbc.open(safe.sure(cb, function (db) {
             _db = db;
             if (! self.ctx.cfg.mongo.auth) {
                 cb(null, _db);
@@ -210,43 +114,43 @@ var Core = function () {
                 _db.authenticate(
                     self.ctx.cfg.mongo.user,
                     self.ctx.cfg.mongo.password,
-                    cb
+                    safe.sure(cd, function () {
+                        cb(null, _db);
+                    })
                 );
             }
-        });
+        }));
     };
 
+
+    /**
+     * singleton for saving mongodb collection in memory
+     * @param name of collection
+     */
     self.collection = function (name, cb) {
         if (self.ctx.col[name]) {
             cb(null, self.ctx.col[name]);
         } else {
-            new Promise(function (resolve, reject) {
-                self.db(function(err, db) {
-                    if (err) {
-                        return reject(err);
-                    }
-                    resolve(db);
-                });
-            }).then(function (db) {
-                return new Promise(function (resolve, reject) {
-                    db.collection(name, function (err, collection) {
-                        if (err) {
-                            return reject(err);
-                        }
-                        console.log('Get collection ' + name);
-                        self.ctx.col[name] = collection;
-                        resolve();
-                    });
-                });
-            }).then(function () {
-                cb(null, self.ctx.col[name]);
-            }).catch(function (e) {
-                console.trace(e);
-                cb(e);
-            });
+            self.db(safe.sure(cb, function(db) {
+                db.collection(name, safe.sure(cb, function (collection) {
+                    console.log('Get collection ' + name);
+                    self.ctx.col[name] = collection;
+                    cb(null, self.ctx.col[name]);
+                }));
+            }));
         }
     };
-    // find config for project, merge local and default
+
+
+    /**
+     * my function for initialization of core.
+     * It take parameters, find configuration,
+     * and later use for the application as db connections
+     * @param _path - that is a folder of .js configs
+     * required file the config-default.js,
+     * config-local.js is not included in the git control
+     * @param cb - that is a callback after a reading of directory
+     */
     self.init = function (_path, cb) {
         var confDef = new Promise (function (resolve, reject) {
             fs.exists(_path + "/config-default.js", function (exist) {
@@ -262,17 +166,15 @@ var Core = function () {
                 if (! exist) {
                     return resolve(null);
                 }
-                var conf = require(_path + "/config-default.js");
+                var conf = require(_path + "/config-local.js");
                 resolve(conf);
             });
         });
         Promise.all([confDef, confLoc]).then(function (val) {
             self.ctx.cfg = _.merge(val[0], val[1]);
             cb() ;
-        }).catch(exit);
+        }).catch(self.exit);
     };
-
-
 };
 
 // export

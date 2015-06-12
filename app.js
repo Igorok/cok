@@ -35,43 +35,27 @@ app.set('views', __dirname + '/modules/web/views');
 app.use(express.static(__dirname + '/modules/web/public'));
 app.use(errorhandler());
 
+var safe = require('safe');
 var cokcore = require('cokcore');
 
-new Promise(function (resolve, reject) {
-    cokcore.init(__dirname + '/config', function (err, cfg) {
-        if (err) {
-            return reject(err);
-        }
-        resolve();
-    });
-}).then(function () {
-    return new Promise(function (resolve, reject) {
-        cokcore.db(function (err, val) {
-            if (err) {
-                return reject(err);
-            }
-            resolve();
-        });
-    });
-}).then(function () {
-    return new Promise(function (resolve, reject) {
-        cokcore.apiLoad(__dirname + '/modules/web/api', function (err, val) {
-            if (err) {
-                return reject(err);
-            }
-            resolve();
-        });
-    });
-}).then(function () {
+
+safe.series([
+    function (cb) {
+        cokcore.init(__dirname + '/config', cb)
+    },
+    function (cb) {
+        cokcore.db(cb);
+    },
+    function (cb) {
+        cokcore.apiLoad(__dirname + '/modules/web/api', cb);
+    },
+], safe.sure(cokcore.exit, function () {
     // Routes
-    require('./modules/web/routes/index.js')(app);
-    require('./modules/web/routes/socket.js')(app, io);
+    require(__dirname + '/modules/web/routes/index.js')(app);
+    require(__dirname + '/modules/web/routes/socket.js')(app, io);
     // start server
     var port = process.env.PORT || 3000;
     server.listen(port, function () {
         console.log('Web listening at ', port);
     });
-}).catch(function (e) {
-    console.trace(e);
-    process.exit();
-});
+}));
