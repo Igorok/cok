@@ -43,13 +43,12 @@ var Core = function () {
         fileName = fileName.replace('.js', '');
         if (self.ctx.api[fileName]) {
             return cb();
-        } else {
-            var api = require(_path);
-            api.init(function (err, _api) {
-                self.ctx.api[fileName] = _api;
-                cb(err);
-            });
         }
+        var api = require(_path);
+        api.init(safe.sure(cb, function (_api) {
+            self.ctx.api[fileName] = _api;
+            cb();
+        }));
     };
     /*
     * my api contain factories, and init function for async initialization
@@ -129,16 +128,15 @@ var Core = function () {
      */
     self.collection = function (name, cb) {
         if (self.ctx.col[name]) {
-            cb(null, self.ctx.col[name]);
-        } else {
-            self.db(safe.sure(cb, function(db) {
-                db.collection(name, safe.sure(cb, function (collection) {
-                    console.log('Get collection ' + name);
-                    self.ctx.col[name] = collection;
-                    cb(null, self.ctx.col[name]);
-                }));
-            }));
+            return cb(null, self.ctx.col[name]);
         }
+        self.db(safe.sure(cb, function(db) {
+            db.collection(name, safe.sure(cb, function (collection) {
+                console.log('Get collection ' + name);
+                self.ctx.col[name] = collection;
+                cb(null, self.ctx.col[name]);
+            }));
+        }));
     };
 
 

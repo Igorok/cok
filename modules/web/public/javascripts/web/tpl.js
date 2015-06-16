@@ -1,4 +1,14 @@
 define(["dust", "dust-helpers"], function(dust, dust_helpers) {
+  // modules/web/views/web/chat/personal.dust
+  (function() {
+    dust.register("chat_personal", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div class=\"widget\"><div id=\"chatCase\"><div id=\"chatFixedItems\"><div id=\"chatItems\">history will here</div></div><div id=\"chatFormCase\"><form id=\"chatMessage\"><div class=\"input-group\"><input id=\"chatText\" type=\"text\" class=\"form-control\" required><span class=\"input-group-btn\"><button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-send\"></span></button></span></div></form></div></div></div>");
+    }
+    body_0.__dustBody = !0;
+    return body_0;
+  })();
   // modules/web/views/web/layout.dust
   (function() {
     dust.register("layout", body_0);
@@ -62,7 +72,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
         "block": body_2
       }, {}).nx(ctx.get(["picture"], false), ctx, {
         "block": body_3
-      }, {}).w("\" alt=\"\" class=\"img-thumbnail\"></div><div class=\"col-xs-9\"><a href=\"#user/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w("</a></div><div class=\"col-xs-2\"><button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-danger delFriendBtn\"><span class=\"glyphicon glyphicon-remove\"></span></button></div></div><br />");
+      }, {}).w("\" alt=\"\" class=\"img-thumbnail\"></div><div class=\"col-xs-9\"><a href=\"#user/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w("</a><br /><a href=\"#chat/").f(ctx.get(["_id"], false), ctx, "h").w("\">Send a message</a></div><div class=\"col-xs-2\"><button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-danger delFriendBtn\"><span class=\"glyphicon glyphicon-remove\"></span></button></div></div><br />");
     }
     body_1.__dustBody = !0;
 
@@ -146,6 +156,27 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_5.__dustBody = !0;
     return body_0;
   })();
+  define("chat_personal", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("chat_personal", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
   define("layout", function() {
     return function(locals, callback) {
       var rendered;
@@ -293,5 +324,5 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["layout", "login_auth", "login_registration", "message", "user_friendList", "user_index", "user_list"];
+  return ["chat_personal", "layout", "login_auth", "login_registration", "message", "user_friendList", "user_index", "user_list"];
 });

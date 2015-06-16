@@ -77,9 +77,20 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
             // $('#main').html(view.render().el);
         },
         chatPersonal: function (_id) {
-            var view = new vChatPersonal();
+            var view = new vChatPersonal({
+                _id: _id
+            });
             $('#main').html(view.render().el);
         },
+
+
+
+
+
+
+
+
+
         notFound: function () {
             window.location.hash = "#";
         }

@@ -4,16 +4,15 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
         // you can set any defaults you would like here
         idAttribute: "_id",
         defaults: {
-            login: "",
+            _id: "",
             email: "",
             picture: "",
         },
-    });
 
 
-    var collection = Backbone.Collection.extend({
-        // Reference to this collection's model.
-        model: model,
+
+
+
         getUserList: function (cb) {
             var self = this;
             var user = Api.getUser();
@@ -25,22 +24,22 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
                 cb();
             });
         },
-        getUserDetail: function (_id, cb) {
+        getPersonalChat: function (_id, cb) {
             var self = this;
             var user = Api.getUser();
             var data = {
                 token: user.token,
-                _id: (_id || user._id),
+                _id: _id,
             };
-            Api.call("user.getUserDetail", data, function (ret) {
+            Api.call("chat.getPersonalChat", data, function (ret) {
                 if (! ret && ! ret.result) {
                     return cb();
                 }
-                var model = new self.model();
-                model.set(ret.result[0]);
-                cb(model);
+                self.set(ret.result[0]);
+                cb();
             });
         },
     });
-    return collection;
+
+    return model;
 });

@@ -12,7 +12,6 @@ var Api = function () {
     self.api = {};
 };
 Api.prototype.init = function (cb) {
-    return cb();
     var self = this;
     safe.parallel([
         function (cb) {
@@ -33,38 +32,117 @@ Api.prototype.init = function (cb) {
     ], cb);
 };
 
+
+
+Api.prototype.ChatRooms = function () {
+    var self = this;
+    var rooms = {};
+
+    /**
+     * join to chat room
+     */
+    var join = function (_room, _user, cb) {
+        if (! self.rooms[_room._id]) {
+            // for understanding structure of a room
+            self.rooms[_room._id] = {
+                _id: _room._id,
+                admin: _room.admin,
+                users: _room.users,
+                type: _room.type,
+            };
+        }
+        if (! self.rooms[_room._id]users[_user._id].online ) {
+            self.rooms[_room._id]users[_user._id].online = true;
+        }
+    };
+
+
+
+
+    return {
+        join: join,
+    };
+};
+
+
 /**
  * personal chat only for 2 users
  * @param _id - id of user for chat
  */
 
-Api.prototype.getPersonalChat = function (_data, cb) {
+Api.prototype.personalChatJoin = function (_data, cb) {
     cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        if (_.isUndefined(_params._id)) {
-            return cb ("Wrong _id");
+        if (_.isUndefined(_params.personId)) {
+            return cb ("Wrong _id 1");
         }
         var userArr = [
             _user._id,
-            mongo.ObjectID(_params._id)
+            mongo.ObjectID(_params.personId)
         ];
-        cokcore.ctx.col["chatgroups"].findOne({users: userArr, type: "personal"}, safe.sure(cb, function (_cGroup) {
-            if (! _.isUndefined (_cGroup)) {
-                return cb(null, _cGroup);
-            }
 
-            var cGroup = {
-                users: userArr,
-                creator: _user._id,
-                date: new Date(),
-                type: "personal"
-             };
-            cokcore.ctx.col["chatgroups"].insert(cGroup, safe.sure(cb, function (_obj) {
-                cb(null, _obj.ops[0]);
-            }));
+        var cGroup = null;
+        safe.series([
+            function (cb) {
+                cokcore.ctx.col["chatgroups"].findOne({users: userArr, type: "personal"}, safe.sure(cb, function (_cGroup) {
+                    if (_cGroup) {
+                        cGroup = _cGroup;
+                        return cb();
+                    }
+
+                    var insObj = {
+                        users: userArr,
+                        creator: _user._id,
+                        date: new Date(),
+                        type: "personal"
+                     };
+                    cokcore.ctx.col["chatgroups"].insert(insObj, safe.sure(cb, function (_obj) {
+                        cGroup = _obj.ops[0];
+                        cb();
+                    }));
+                }));
+            },
+            function (cb) {
+                if (cGroup.users.length !== 2) {
+                    return cb("Wrong _id 2");
+                }
+                var userObj = {};
+                var nextUserId = null;
+                _.forEach(cGroup.users, function (val) {
+                    var id = val.toString();
+                    if (id === _user._id.toString()) {
+                        userObj[id] = {
+                            login: _user.login,
+                            email: _user.email,
+                            _id: _user._id,
+                            online: true,
+                        };
+                    } else {
+                        nextUserId = val;
+                    }
+                });
+                var rows = {
+                    login: 1,
+                    email: 1,
+                };
+                cokcore.ctx.col["users"].findOne({_id: nextUserId}, rows, safe.sure(cb, function (_nextUser) {
+                    if (! _nextUser) {
+                        return cb("Wrong _id 3");
+                    }
+                    userObj[_nextUser._id.toString()] = _nextUser;
+                    cGroup.userList = userObj;
+                    cb();
+                }));
+            },
+        ], safe.sure(cb, function () {
+            cb(null, cGroup, _user);
         }));
     }));
 };
 
+
+Api.prototype.personalChatMessage = function (_data, cb) {
+
+};
 
 /**
 * all users

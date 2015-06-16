@@ -6,6 +6,8 @@
         </div>
         <div class="col-xs-9">
             <a href="#user/{_id}">{login}</a>
+            <br />
+            <a href="#chat/{_id}">Send a message</a>
         </div>
         <div class="col-xs-2">
             <button data-id="{_id}" class="btn btn-sm btn-danger delFriendBtn">
