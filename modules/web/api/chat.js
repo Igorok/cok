@@ -33,38 +33,6 @@ Api.prototype.init = function (cb) {
 };
 
 
-
-Api.prototype.ChatRooms = function () {
-    var self = this;
-    var rooms = {};
-
-    /**
-     * join to chat room
-     */
-    var join = function (_room, _user, cb) {
-        if (! self.rooms[_room._id]) {
-            // for understanding structure of a room
-            self.rooms[_room._id] = {
-                _id: _room._id,
-                admin: _room.admin,
-                users: _room.users,
-                type: _room.type,
-            };
-        }
-        if (! self.rooms[_room._id]users[_user._id].online ) {
-            self.rooms[_room._id]users[_user._id].online = true;
-        }
-    };
-
-
-
-
-    return {
-        join: join,
-    };
-};
-
-
 /**
  * personal chat only for 2 users
  * @param _id - id of user for chat
@@ -105,12 +73,12 @@ Api.prototype.personalChatJoin = function (_data, cb) {
                 if (cGroup.users.length !== 2) {
                     return cb("Wrong _id 2");
                 }
-                var userObj = {};
+                var uObj = {};
                 var nextUserId = null;
                 _.forEach(cGroup.users, function (val) {
                     var id = val.toString();
                     if (id === _user._id.toString()) {
-                        userObj[id] = {
+                        uObj[id] = {
                             login: _user.login,
                             email: _user.email,
                             _id: _user._id,
@@ -128,8 +96,8 @@ Api.prototype.personalChatJoin = function (_data, cb) {
                     if (! _nextUser) {
                         return cb("Wrong _id 3");
                     }
-                    userObj[_nextUser._id.toString()] = _nextUser;
-                    cGroup.userList = userObj;
+                    uObj[_nextUser._id.toString()] = _nextUser;
+                    cGroup.uObj = uObj;
                     cb();
                 }));
             },

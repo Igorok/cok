@@ -10,3 +10,4 @@ modules/chat/public/images/users/*.jpeg
 modules/chat/public/images/users/*.gif
 .project
 .idea
+.settings

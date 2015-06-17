@@ -16,28 +16,37 @@ module.exports = function (app, io) {
 
     var ChatRooms = function () {
         var self = this;
-        self.rooms = {};
-        self.join = join;
+
 
 
         /**
          * join to chat room
          */
         var join = function (_room, _user, cb) {
-            if (! self.rooms[_room._id]) {
+            var rId = _room._id.toString();
+            if (! self.rooms[rId]) {
                 // for understanding structure of a room
-                self.rooms[_room._id] = {
-                    _id: _room._id,
+                self.rooms[rId] = {
+                    _id: rId,
                     admin: _room.admin,
-                    users: _room.users,
+                    users: {},
+                    uObj: _room.uObj,
                     type: _room.type,
                 };
+                _.forOwn(_room.uObj, function (val) {
+                    var uId = val._id.toString();
+                    self.rooms[rId].users[uId] = {
+                        _id: uId,
+                        login: val.login,
+                        status: 'off',
+                    };
+                });
             }
-            if (! self.rooms[_room._id]users[_user.token].online ) {
-                self.rooms[_room._id]users[_user.token].online = true;
-                self.rooms[_room._id]users[_user.token].activeTime = new Date();
-            }
-            cb();
+            var pub = {
+                _id: self.rooms[rId]._id,
+                users: self.rooms[rId].users,
+            };
+            cb(null, pub);
         };
 
         /**
@@ -45,32 +54,40 @@ module.exports = function (app, io) {
          * i don't want to check token into the db every time
          */
         var message = function (msg, cb) {
-
-            if (! self.rooms[msg._roomId]) {
+            console.log('message ');
+            if (! self.rooms[msg.room]) {
                 return cb(404);
             }
-            if (! self.rooms[_roomId]users[msg._userToken]) {
+            if (! self.rooms[msg.room].uObj[msg.user._id]) {
                 return cb(403);
             }
+            if (_.isEmpty(msg.message)) {
+                return false;
+            }
+            self.rooms[msg.room].uObj[msg.user._id].activeTime = new Date();
 
-            self.rooms[_roomId]users[msg._userToken].activeTime = new Date();
-            cb(null, msg.message);
+            cb(null, msg);
         };
 
 
+
+
+
+
+        self.rooms = {};
+        self.join = join;
+        self.message = message;
     };
 
 
     io.use(function (socket, next) {
+        var cr = new ChatRooms();
         var emitError = function (err) {
             console.trace(err);
             return socket.emit('err', err);
         };
-        var userChats = {};
-
-        var uObj = null;
         socket.on('joinPersonal', function (_obj) {
-            console.log("joinPersonal")
+            console.log("joinPersonal");
             if (_.isEmpty(_obj)) {
                 return emitError(404);
             }
@@ -79,23 +96,19 @@ module.exports = function (app, io) {
             };
             data.params.push(_obj);
             cokcore.ctx.api["chat"].personalChatJoin(data, safe.sure(emitError, function (_group, _user) {
-                // console.log('_group ', _group, _user);
-                var uId = _user._id.toString();
-                var gId = _group._id.toString();
-                uObj = _user;
-                if (! userChats[uId]) {
-                    userChats[uId] = {};
-                }
-                if (! userChats[uId][gId]) {
-                    userChats[uId][gId] = _group;
-                }
-
-                socket.broadcast.to(_group._id.toString()).emit('joinPersonal', {user: _user});
-                socket.emit('joinPersonal', _group);
+                cr.join(_group, _user, safe.sure(emitError, function (_room) {
+                    socket.broadcast.to(_room._id).emit('joinPersonal', {user: _user._id.toString()});
+                    socket.emit('joinPersonal', _room);
+                }));
             }));
         });
 
-
+        socket.on('message', function (_obj) {
+            cr.message(_obj, safe.sure(emitError, function (msg) {
+                socket.broadcast.to(msg.room).emit('message', msg);
+                socket.emit('message', msg);
+            }));
+        });
         next();
     });
 

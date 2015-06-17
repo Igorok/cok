@@ -1,20 +1,35 @@
 define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mChatPersonal", "io", "api"], function ($, _, backbone, dust, tpl, Msg, mChatPersonal, io, Api) {
     'use strict';
+
+
     var view = Backbone.View.extend({
         events: {
-            "click button.addFriendBtn": "friendAprove",
+            "submit #chatMessage": "message",
         },
         initialize: function (data) {
             if (window.socket) {
                 window.socket.destroy();
             }
             this.user = Api.getUser();
+            this.room = null;
             this.personId = data._id;
             this.model = new mChatPersonal();
         },
         render: function () {
             this.startChat();
             return this;
+        },
+        message: function () {
+            var self = this;
+            window.socket.emit("message", {
+                user: {
+                    token: self.user.token,
+                    _id: self.user._id,
+                },
+                room: self.room,
+                message: 'this.personId',
+            });
+            return false;
         },
         startChat: function () {
             var self = this;
@@ -24,15 +39,37 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mChatPer
 
             window.socket = new io(window.location.origin, { forceNew: true });
             // window.socket.connect();
-            window.socket.emit("joinPersonal", {token: self.user.token, personId: this.personId});
+            window.socket.emit("joinPersonal", {
+                token: self.user.token,
+                personId: this.personId
+            });
             window.socket.on("err", function (err) {
                 return Msg.showError(null, JSON.stringify(err));
             });
 
             window.socket.on("joinPersonal", function (data) {
-
-                console.log('data ', data);
+                dust.render("chat_personal", {data: data}, function (err, text) {
+                    if (err) {
+                        return Msg.showError(null, JSON.stringify(err));
+                    }
+                    self.room = data._id;
+                    console.log('data ', data);
+                    self.$el.html(text);
+                    return self;
+                });
             });
+            window.socket.on("message", function (msg) {
+                console.log('msg ', msg);
+            });
+
+            //  window.socket.emit("joinPersonal", {
+            //     user: {
+            //         _id: self.user._id,
+            //         token: self.user.token,
+            //     },
+            //     personId: this.personId
+            // });
+
 
             // var formData = {
             //     token: token,
