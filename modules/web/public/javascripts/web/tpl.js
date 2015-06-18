@@ -4,7 +4,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("chat_personal", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"widget\"><div id=\"chatCase\"><div id=\"chatFixedItems\"><div id=\"chatItems\">history will here</div></div><div id=\"chatFormCase\"><form id=\"chatMessage\"><div class=\"input-group\"><input id=\"chatText\" type=\"text\" class=\"form-control\" required><span class=\"input-group-btn\"><button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-send\"></span></button></span></div></form></div></div></div>");
+      return chk.w("<div class=\"widget\"><div id=\"chatCase\"><div id=\"chatFixedItems\"><div id=\"uList\"></div><div id=\"chatItems\">history will here</div></div><div id=\"chatFormCase\"><form id=\"chatMessage\"><div class=\"input-group\"><input id=\"chatText\" type=\"text\" class=\"form-control\" required><span class=\"input-group-btn\"><button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-send\"></span></button></span></div></form></div></div></div>");
     }
     body_0.__dustBody = !0;
     return body_0;

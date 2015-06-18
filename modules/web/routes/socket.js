@@ -43,7 +43,7 @@ module.exports = function (app, io) {
                 });
             }
             var pub = {
-                _id: self.rooms[rId]._id,
+                _id: self.rooms[rId]._id.toString(),
                 users: self.rooms[rId].users,
             };
             cb(null, pub);
@@ -54,7 +54,6 @@ module.exports = function (app, io) {
          * i don't want to check token into the db every time
          */
         var message = function (msg, cb) {
-            console.log('message ');
             if (! self.rooms[msg.room]) {
                 return cb(404);
             }
@@ -97,14 +96,22 @@ module.exports = function (app, io) {
             data.params.push(_obj);
             cokcore.ctx.api["chat"].personalChatJoin(data, safe.sure(emitError, function (_group, _user) {
                 cr.join(_group, _user, safe.sure(emitError, function (_room) {
-                    socket.broadcast.to(_room._id).emit('joinPersonal', {user: _user._id.toString()});
-                    socket.emit('joinPersonal', _room);
+                    console.log('join ', _room._id);
+                    socket.join(_room._id, safe.sure(emitError, function () {
+                        socket.broadcast.to(_room._id).emit('joinUser', {user: _user._id.toString()});
+                        socket.emit('joinPersonal', _room);
+                    }));
+
+
+
                 }));
             }));
         });
 
         socket.on('message', function (_obj) {
             cr.message(_obj, safe.sure(emitError, function (msg) {
+                console.log('room ', msg.room);
+
                 socket.broadcast.to(msg.room).emit('message', msg);
                 socket.emit('message', msg);
             }));

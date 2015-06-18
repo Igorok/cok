@@ -43,26 +43,25 @@ Api.prototype.personalChatJoin = function (_data, cb) {
         if (_.isUndefined(_params.personId)) {
             return cb ("Wrong _id 1");
         }
-        var userArr = [
-            _user._id,
-            mongo.ObjectID(_params.personId)
-        ];
 
         var cGroup = null;
         safe.series([
             function (cb) {
-                cokcore.ctx.col["chatgroups"].findOne({users: userArr, type: "personal"}, safe.sure(cb, function (_cGroup) {
+                cokcore.ctx.col["chatgroups"].findOne({$and: [{'users._id':  _user._id}, {'users._id':  mongo.ObjectID(_params.personId)}], type: 'personal'}, safe.sure(cb, function (_cGroup) {
                     if (_cGroup) {
                         cGroup = _cGroup;
                         return cb();
                     }
 
                     var insObj = {
-                        users: userArr,
+                        users:[
+                            {_id: _user._id},
+                            {_id: mongo.ObjectID(_params.personId)},
+                        ],
                         creator: _user._id,
                         date: new Date(),
                         type: "personal"
-                     };
+                    };
                     cokcore.ctx.col["chatgroups"].insert(insObj, safe.sure(cb, function (_obj) {
                         cGroup = _obj.ops[0];
                         cb();
@@ -76,7 +75,7 @@ Api.prototype.personalChatJoin = function (_data, cb) {
                 var uObj = {};
                 var nextUserId = null;
                 _.forEach(cGroup.users, function (val) {
-                    var id = val.toString();
+                    var id = val._id.toString();
                     if (id === _user._id.toString()) {
                         uObj[id] = {
                             login: _user.login,
@@ -85,7 +84,7 @@ Api.prototype.personalChatJoin = function (_data, cb) {
                             online: true,
                         };
                     } else {
-                        nextUserId = val;
+                        nextUserId = val._id;
                     }
                 });
                 var rows = {

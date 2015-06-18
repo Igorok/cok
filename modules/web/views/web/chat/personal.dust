@@ -1,6 +1,7 @@
 <div class="widget">
     <div id="chatCase">
         <div id="chatFixedItems">
+            <div id="uList"></div>
             <div id="chatItems">
                 history will here
             </div>
