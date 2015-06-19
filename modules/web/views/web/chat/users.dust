@@ -1,0 +1,3 @@
+{#users}
+    <span class="label label-{status}" id="{_id}">{login}</span>&nbsp;
+{/users}

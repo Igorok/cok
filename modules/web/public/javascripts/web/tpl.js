@@ -4,9 +4,26 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("chat_personal", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"widget\"><div id=\"chatCase\"><div id=\"chatFixedItems\"><div id=\"uList\"></div><div id=\"chatItems\">history will here</div></div><div id=\"chatFormCase\"><form id=\"chatMessage\"><div class=\"input-group\"><input id=\"chatText\" type=\"text\" class=\"form-control\" required><span class=\"input-group-btn\"><button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-send\"></span></button></span></div></form></div></div></div>");
+      return chk.w("<div class=\"widget\"><div id=\"chatCase\"><div id=\"chatFixedItems\"><p id=\"uList\" class='h4'></p><div id=\"chatItems\">history will here</div></div><div id=\"chatFormCase\"><form id=\"chatMessage\"><div class=\"input-group\"><input id=\"chatText\" type=\"text\" class=\"form-control\" required><span class=\"input-group-btn\"><button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-send\"></span></button></span></div></form></div></div></div>");
     }
     body_0.__dustBody = !0;
+    return body_0;
+  })();
+  // modules/web/views/web/chat/users.dust
+  (function() {
+    dust.register("chat_users", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.s(ctx.get(["users"], false), ctx, {
+        "block": body_1
+      }, {});
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("<span class=\"label label-").f(ctx.get(["status"], false), ctx, "h").w("\" id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w("</span>&nbsp;");
+    }
+    body_1.__dustBody = !0;
     return body_0;
   })();
   // modules/web/views/web/layout.dust
@@ -177,6 +194,27 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
+  define("chat_users", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("chat_users", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
   define("layout", function() {
     return function(locals, callback) {
       var rendered;
@@ -324,5 +362,5 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["chat_personal", "layout", "login_auth", "login_registration", "message", "user_friendList", "user_index", "user_list"];
+  return ["chat_personal", "chat_users", "layout", "login_auth", "login_registration", "message", "user_friendList", "user_index", "user_list"];
 });

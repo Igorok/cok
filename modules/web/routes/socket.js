@@ -16,35 +16,60 @@ module.exports = function (app, io) {
 
     var ChatRooms = function () {
         var self = this;
-
-
+        var rooms = {};
+        var users = {};
+        var getUserStatus = function (uDate) {
+            var diff = moment().diff(moment(uDate), 'minutes');
+            if (! uDate || (diff > 10)) {
+                return 'off';
+            } else if (diff > 5) {
+                return 'suspend';
+            } else {
+                return 'on';
+            }
+        };
+        var updateUser = function (uObj) {
+            if (! users[uObj._id]) {
+                users[uObj._id] = uObj;
+            }
+            users[uObj._id].status = getUserStatus(uObj.date);
+        };
+        var getUser = function (uId) {
+            if (! users[uId]) {
+                return null;
+            }
+            return {
+                _id: users[uId]._id,
+                login: users[uId].login,
+                status: users[uId].status,
+            };
+        };
 
         /**
          * join to chat room
          */
         var join = function (_room, _user, cb) {
             var rId = _room._id.toString();
-            if (! self.rooms[rId]) {
+            if (! rooms[rId]) {
                 // for understanding structure of a room
-                self.rooms[rId] = {
+                rooms[rId] = {
                     _id: rId,
                     admin: _room.admin,
                     users: {},
-                    uObj: _room.uObj,
                     type: _room.type,
                 };
+
                 _.forOwn(_room.uObj, function (val) {
-                    var uId = val._id.toString();
-                    self.rooms[rId].users[uId] = {
-                        _id: uId,
-                        login: val.login,
-                        status: 'off',
-                    };
+                    val._id = val._id.toString();
+                    updateUser(val);
+                    rooms[rId].users[val._id] = getUser(val._id);
                 });
+
+
             }
             var pub = {
-                _id: self.rooms[rId]._id.toString(),
-                users: self.rooms[rId].users,
+                _id: rooms[rId]._id.toString(),
+                users: rooms[rId].users,
             };
             cb(null, pub);
         };
@@ -54,17 +79,20 @@ module.exports = function (app, io) {
          * i don't want to check token into the db every time
          */
         var message = function (msg, cb) {
-            if (! self.rooms[msg.room]) {
+            if (! rooms[msg.room]) {
                 return cb(404);
             }
-            if (! self.rooms[msg.room].uObj[msg.user._id]) {
+            if (
+                ! rooms[msg.room].users[msg.user._id] ||
+                (users[msg.user._id].token !== msg.user.token)
+            ) {
                 return cb(403);
             }
             if (_.isEmpty(msg.message)) {
                 return false;
             }
-            self.rooms[msg.room].uObj[msg.user._id].activeTime = new Date();
-
+            users[msg.user._id].date = new Date();
+            users[msg.user._id].status = getUserStatus(users[msg.user._id].date);
             cb(null, msg);
         };
 
@@ -73,9 +101,19 @@ module.exports = function (app, io) {
 
 
 
-        self.rooms = {};
+
         self.join = join;
         self.message = message;
+        self.getRoomUsers = function (_rId, cb) {
+            if (! _rId || ! rooms[_rId]) {
+                return cb(404);
+            }
+            _.forOwn(rooms[_rId].users, function (val) {
+                val = getUser(val._id);
+            });
+
+            return cb(null, rooms[_rId].users);
+        };
     };
 
 
@@ -86,7 +124,6 @@ module.exports = function (app, io) {
             return socket.emit('err', err);
         };
         socket.on('joinPersonal', function (_obj) {
-            console.log("joinPersonal");
             if (_.isEmpty(_obj)) {
                 return emitError(404);
             }
@@ -94,23 +131,36 @@ module.exports = function (app, io) {
                 params: []
             };
             data.params.push(_obj);
-            cokcore.ctx.api["chat"].personalChatJoin(data, safe.sure(emitError, function (_group, _user) {
+            cokcore.ctx.api["chat"].joinPersonal(data, safe.sure(emitError, function (_group, _user) {
                 cr.join(_group, _user, safe.sure(emitError, function (_room) {
                     console.log('join ', _room._id);
                     socket.join(_room._id, safe.sure(emitError, function () {
                         socket.broadcast.to(_room._id).emit('joinUser', {user: _user._id.toString()});
                         socket.emit('joinPersonal', _room);
                     }));
-
-
-
                 }));
             }));
         });
 
         socket.on('message', function (_obj) {
-            cr.message(_obj, safe.sure(emitError, function (msg) {
-                console.log('room ', msg.room);
+            var msg = null;
+            var users = null;
+            safe.series([
+                function (cb) {
+                    cr.message(_obj, safe.sure(cb, function (_msg) {
+                        msg = _msg;
+                        cb();
+                    }));
+                },
+                function (cb) {
+                    cr.getRoomUsers(msg.room, safe.sure(emitError, function (_users) {
+                        users = _users;
+                        cb();
+                    }));
+                },
+            ], safe.sure(emitError, function (argument) {
+                socket.broadcast.to(msg.room).emit('freshUsers', users);
+                socket.emit('freshUsers', users);
 
                 socket.broadcast.to(msg.room).emit('message', msg);
                 socket.emit('message', msg);

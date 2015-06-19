@@ -1,4 +1,4 @@
-define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mChatPersonal", "io", "api"], function ($, _, backbone, dust, tpl, Msg, mChatPersonal, io, Api) {
+define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "api"], function ($, _, backbone, dust, tpl, Msg, io, Api) {
     'use strict';
 
 
@@ -11,7 +11,11 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mChatPer
             this.user = Api.getUser();
             this.room = null;
             this.personId = data._id;
-            this.model = new mChatPersonal();
+            this.statuses = {
+                'off': 'danger',
+                'suspend': 'warning',
+                'on': 'success',
+            };
         },
         render: function () {
             this.startChat();
@@ -35,6 +39,26 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mChatPer
             });
             return false;
         },
+
+        renderUsers: function (users) {
+            var self = this;
+            var uArr = [];
+            _.each(users, function (val) {
+                uArr.push({
+                    _id: val._id,
+                    login: val.login,
+                    status: self.statuses[val.status],
+                });
+            });
+            dust.render("chat_users", {users: uArr}, function (err, text) {
+                if (err) {
+                    return Msg.showError(null, JSON.stringify(err));
+                }
+                self.$el.find("#uList").html(text);
+                return self;
+            });
+        },
+
         startChat: function () {
             var self = this;
             if (! self.personId) {
@@ -53,14 +77,13 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mChatPer
 
             self.socket.on("joinPersonal", function (data) {
                 console.log('data ', data);
-
-                dust.render("chat_personal", {data: data}, function (err, text) {
+                dust.render("chat_personal", {}, function (err, text) {
                     if (err) {
                         return Msg.showError(null, JSON.stringify(err));
                     }
                     self.room = data._id;
-
                     self.$el.html(text);
+                    self.renderUsers(data.users);
                     return self;
                 });
             });
@@ -72,6 +95,9 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mChatPer
             self.socket.on("message", function (msg) {
                 console.log('msg ', msg);
                 self.$el.find('#chatItems').append('<p>'+msg.message+'</p>');
+            });
+            self.socket.on("freshUsers", function (users) {
+                self.renderUsers(users);
             });
 
             //  window.socket.emit("joinPersonal", {

@@ -114,6 +114,7 @@ Api.prototype.checkAuth = function (_data, cb) {
         friendRequests: 1,
         selfFriendRequests: 1,
         friends: 1,
+        token: 1,
     };
     cokcore.ctx.col["users"].findOne({token: token, status: 1}, rows, safe.sure(cb, function (_user) {
         if (! _user) {

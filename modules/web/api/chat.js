@@ -20,6 +20,11 @@ Api.prototype.init = function (cb) {
             }));
         },
         function (cb) {
+            cokcore.collection("chatmessages", safe.sure(cb, function (chatmessages) {
+                cb();
+            }));
+        },
+        function (cb) {
             cokcore.collection("users", safe.sure(cb, function (users) {
                 cb();
             }));
@@ -38,7 +43,7 @@ Api.prototype.init = function (cb) {
  * @param _id - id of user for chat
  */
 
-Api.prototype.personalChatJoin = function (_data, cb) {
+Api.prototype.joinPersonal = function (_data, cb) {
     cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isUndefined(_params.personId)) {
             return cb ("Wrong _id 1");
@@ -81,7 +86,8 @@ Api.prototype.personalChatJoin = function (_data, cb) {
                             login: _user.login,
                             email: _user.email,
                             _id: _user._id,
-                            online: true,
+                            token: _user.token,
+                            date: new Date(),
                         };
                     } else {
                         nextUserId = val._id;
@@ -90,6 +96,7 @@ Api.prototype.personalChatJoin = function (_data, cb) {
                 var rows = {
                     login: 1,
                     email: 1,
+                    token: 1,
                 };
                 cokcore.ctx.col["users"].findOne({_id: nextUserId}, rows, safe.sure(cb, function (_nextUser) {
                     if (! _nextUser) {
@@ -107,8 +114,15 @@ Api.prototype.personalChatJoin = function (_data, cb) {
 };
 
 
-Api.prototype.personalChatMessage = function (_data, cb) {
-
+Api.prototype.chatMessage = function (_data, cb) {
+    //
+    // chatmessages.insert({
+    //     userId: cUser._id,
+    //     chatId: chatId,
+    //     chatText : msg.chatText.toString(),
+    //     date: new Date()
+    // }, cb);
+    //
 };
 
 /**
