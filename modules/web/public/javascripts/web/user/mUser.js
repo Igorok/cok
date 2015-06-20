@@ -17,7 +17,7 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
         getUserList: function (cb) {
             var self = this;
             var user = Api.getUser();
-            Api.call("user.getUserList", {token: user.token}, function (ret) {
+            Api.call("user.getUserList", {uId: user._id, token: user.token}, function (ret) {
                 if (! ret && ! ret.result) {
                     return cb();
                 }
@@ -29,6 +29,7 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
             var self = this;
             var user = Api.getUser();
             var data = {
+                uId: user._id,
                 token: user.token,
                 _id: (_id || user._id),
             };

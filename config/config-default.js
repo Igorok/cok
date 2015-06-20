@@ -11,5 +11,11 @@ module.exports = {
             auto_reconnect: true,
             poolSize: 40
         }
+    },
+    redis: {
+        host: "localhost",
+        port: 6379,
+        auth: false,
+        password: ""
     }
 };

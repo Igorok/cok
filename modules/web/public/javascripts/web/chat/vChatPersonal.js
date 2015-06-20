@@ -13,7 +13,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
             this.personId = data._id;
             this.statuses = {
                 'off': 'danger',
-                'suspend': 'warning',
+                'absent': 'warning',
                 'on': 'success',
             };
             this.users = null;
@@ -31,11 +31,9 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
             self.$el.find('#chatText').val('');
 
             self.socket.emit("message", {
-                user: {
-                    token: self.user.token,
-                    _id: self.user._id,
-                },
-                room: self.room,
+                uId: self.user._id,
+                token: self.user.token,
+                rId: self.room,
                 message: msg,
             });
             return false;
@@ -45,11 +43,16 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
             var self = this;
             var uArr = [];
             _.each(users, function (val) {
-                uArr.push({
+                var user = {
                     _id: val._id,
-                    login: val.login,
                     status: self.statuses[val.status],
-                });
+                };
+                if (val._id === self.user._id) {
+                    user.login = 'I';
+                } else {
+                    user.login = val.login;
+                }
+                uArr.push(user);
             });
             dust.render("chat_users", {users: uArr}, function (err, text) {
                 if (err) {
@@ -66,24 +69,26 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                 return false;
             }
 
-            self.socket = new io(window.location.origin, { forceNew: true });
-            // window.socket.connect();
+            self.socket = new io(window.location.origin);
+            console.log('startChat');
             self.socket.emit("joinPersonal", {
+                uId: self.user._id,
                 token: self.user.token,
-                personId: this.personId
+                personId: self.personId
             });
             self.socket.on("err", function (err) {
                 return Msg.showError(null, JSON.stringify(err));
             });
 
             self.socket.on("joinPersonal", function (data) {
-                console.log('data ', data);
-                dust.render("chat_personal", {}, function (err, text) {
+                console.log(data);
+                dust.render("chat_personal", {history: data.history}, function (err, text) {
                     if (err) {
                         return Msg.showError(null, JSON.stringify(err));
                     }
                     self.room = data._id;
                     self.$el.html(text);
+
                     self.users = data.users
                     self.renderUsers(data.users);
                     return self;
@@ -94,17 +99,16 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
             });
 
 
-            self.socket.on("message", function (msg) {
-                console.log('msg ', msg);
+            self.socket.on("message", function (_obj) {
+                console.log('msg ', _obj);
                 self.$el.find('#chatItems').append(
                     '<p>' +
-                    self.users[msg.user._id].login + ' ' + msg.date + ' '+ msg.message +
+                    self.users[_obj.uId].login + ' ' + _obj.date + ' '+ _obj.msg +
                     '</p>'
                 );
             });
-            self.socket.on("freshUsers", function (users) {
-                console.log("freshUsers ", users);
-                self.renderUsers(users);
+            self.socket.on("freshStatuses", function (_obj) {
+                self.renderUsers(_obj.users);
             });
 
             //  window.socket.emit("joinPersonal", {

@@ -4,9 +4,16 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("chat_personal", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"widget\"><div id=\"chatCase\"><div id=\"chatFixedItems\"><p id=\"uList\" class='h4'></p><div id=\"chatItems\">history will here</div></div><div id=\"chatFormCase\"><form id=\"chatMessage\"><div class=\"input-group\"><input id=\"chatText\" type=\"text\" class=\"form-control\" required><span class=\"input-group-btn\"><button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-send\"></span></button></span></div></form></div></div></div>");
+      return chk.w("<div class=\"widget\"><div id=\"chatCase\"><div id=\"chatFixedItems\"><p id=\"uList\" class='h4'></p><div id=\"chatItems\">").s(ctx.get(["history"], false), ctx, {
+        "block": body_1
+      }, {}).w("</div></div><div id=\"chatFormCase\"><form id=\"chatMessage\"><div class=\"input-group\"><input id=\"chatText\" type=\"text\" class=\"form-control\" required><span class=\"input-group-btn\"><button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-send\"></span></button></span></div></form></div></div></div>");
     }
     body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("<p>").f(ctx.get(["login"], false), ctx, "h").w("&nbsp;").f(ctx.get(["msg"], false), ctx, "h").w("&nbsp;").f(ctx.get(["date"], false), ctx, "h").w("</p>");
+    }
+    body_1.__dustBody = !0;
     return body_0;
   })();
   // modules/web/views/web/chat/users.dust

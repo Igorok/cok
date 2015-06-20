@@ -10,6 +10,25 @@ var collections = cokcore.collections;
 var Api = function () {
     var self = this;
     self.api = {};
+    self.getUserStatus = function (_id, cb) {
+        cokcore.ctx.redis.get(_id, safe.sure(cb, function (_user) {
+            if (! _user) {
+                return cb(null, 'off');
+            }
+            _user = JSON.parse(_user);
+            if (! _user.date) {
+                return cb(null, 'off');
+            }
+            var diff = moment().diff(moment(_user.date), 'minutes');
+            if (diff > 30) {
+                return cb(null, 'off');
+            } else if (diff > 15) {
+                return cb(null, 'absent');
+            } else {
+                return cb(null, 'on');
+            }
+        }));
+    };
 };
 Api.prototype.init = function (cb) {
     var self = this;
@@ -38,91 +57,139 @@ Api.prototype.init = function (cb) {
 };
 
 
+
 /**
  * personal chat only for 2 users
  * @param _id - id of user for chat
  */
-
 Api.prototype.joinPersonal = function (_data, cb) {
+     var self = this;
+     cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+         if (_.isUndefined(_params.personId)) {
+             return cb ("Wrong _id 1");
+         }
+         var uId = mongo.ObjectID(_user._id);
+         var cRoom = null;
+         var rId = null;
+         var users = {};
+         var history = [];
+         safe.series([
+             function (cb) {
+                 cokcore.ctx.col["chatgroups"].findOne({$and: [{'users._id':  uId}, {'users._id':  mongo.ObjectID(_params.personId)}], type: 'personal'}, safe.sure(cb, function (_obj) {
+                     if (_obj) {
+                         cRoom = _obj;
+                         return cb();
+                     }
+
+                     var insObj = {
+                         users:[
+                             {_id: uId},
+                             {_id: mongo.ObjectID(_params.personId)},
+                         ],
+                         creator: uId,
+                         date: new Date(),
+                         type: "personal"
+                     };
+                     cokcore.ctx.col["chatgroups"].insert(insObj, safe.sure(cb, function (result) {
+                         cRoom = result.ops[0];
+                         cb();
+                     }));
+                 }));
+             },
+             function (cb) {
+                 if (cRoom.users.length !== 2) {
+                     return cb("Wrong _id 2");
+                 }
+                 rId = cRoom._id.toString();
+                 var userIds = _.pluck(cRoom.users, '_id');
+                 cokcore.ctx.col["users"].find({_id: {$in: userIds}}, {login: 1}).toArray(safe.sure(cb, function (_arr) {
+                     safe.each(_arr, function(_usr, cb) {
+                         var id = _usr._id.toString();
+                         users[id] = {
+                             _id: id,
+                             login: _usr.login,
+                         }
+                         self.getUserStatus(id, safe.sure(cb, function (status) {
+                             users[id].status = status;
+                             cb();
+                         }));
+
+                     }, cb);
+                 }));
+             },
+             function (cb) {
+                 cokcore.ctx.col["chatmessages"].find({rId: cRoom._id}, {$sort: {date: -1}, limit: 100}).toArray(safe.sure(cb, function (_arr) {
+                     _.forEach(_arr, function (val) {
+                         var msg = {
+                             login: users[uId.toString()].login,
+                             msg: val.msg,
+                             date: moment(val.date).format('YYYY-MM-DD HH:mm'),
+                         };
+                         history.push(msg);
+                     });
+                     cb();
+                 }));
+             },
+             function (cb) {
+                 if (_.include(_user.rooms, rId)) {
+                     return cb();
+                 }
+                 _user.rooms.push(rId);
+
+                 cokcore.ctx.redis.set(_user._id, JSON.stringify(_user), safe.sure(cb, function () {
+                     cb();
+                 }));
+             },
+         ], safe.sure(cb, function () {
+             var data = {
+                 _id: cRoom._id.toString(),
+                 users: users,
+                 history: history,
+             };
+             cb(null, data);
+         }));
+     }));
+ };
+
+
+
+
+
+/*
+{
+    user: {
+        uId: self.user._id,
+        token: self.user.token,
+        _id: self.user._id,
+    },
+    rId: self.room,
+    message: msg,
+}
+*/
+Api.prototype.message = function (_data, cb) {
     cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        if (_.isUndefined(_params.personId)) {
-            return cb ("Wrong _id 1");
+        if (_.isUndefined(_params.rId)) {
+            return cb ("wrong rId");
         }
+        if (! _.include(_user.rooms, _params.rId)) {
+            return cb ("chat room not found");
+        }
+        var insObj = {
+            uId: mongo.ObjectID(_user._id),
+            rId: mongo.ObjectID(_params.rId),
+            msg: _.escape(_params.message),
+            date: new Date()
+        };
 
-        var cGroup = null;
-        safe.series([
-            function (cb) {
-                cokcore.ctx.col["chatgroups"].findOne({$and: [{'users._id':  _user._id}, {'users._id':  mongo.ObjectID(_params.personId)}], type: 'personal'}, safe.sure(cb, function (_cGroup) {
-                    if (_cGroup) {
-                        cGroup = _cGroup;
-                        return cb();
-                    }
-
-                    var insObj = {
-                        users:[
-                            {_id: _user._id},
-                            {_id: mongo.ObjectID(_params.personId)},
-                        ],
-                        creator: _user._id,
-                        date: new Date(),
-                        type: "personal"
-                    };
-                    cokcore.ctx.col["chatgroups"].insert(insObj, safe.sure(cb, function (_obj) {
-                        cGroup = _obj.ops[0];
-                        cb();
-                    }));
-                }));
-            },
-            function (cb) {
-                if (cGroup.users.length !== 2) {
-                    return cb("Wrong _id 2");
-                }
-                var uObj = {};
-                var nextUserId = null;
-                _.forEach(cGroup.users, function (val) {
-                    var id = val._id.toString();
-                    if (id === _user._id.toString()) {
-                        uObj[id] = {
-                            login: _user.login,
-                            email: _user.email,
-                            _id: _user._id,
-                            token: _user.token,
-                            date: new Date(),
-                        };
-                    } else {
-                        nextUserId = val._id;
-                    }
-                });
-                var rows = {
-                    login: 1,
-                    email: 1,
-                    token: 1,
-                };
-                cokcore.ctx.col["users"].findOne({_id: nextUserId}, rows, safe.sure(cb, function (_nextUser) {
-                    if (! _nextUser) {
-                        return cb("Wrong _id 3");
-                    }
-                    uObj[_nextUser._id.toString()] = _nextUser;
-                    cGroup.uObj = uObj;
-                    cb();
-                }));
-            },
-        ], safe.sure(cb, function () {
-            cb(null, cGroup, _user);
+        cokcore.ctx.col["chatmessages"].insert(insObj, safe.sure(cb, function () {
+            cb(null, {
+                uId: _user._id,
+                rId: _params.rId,
+                msg: insObj.msg,
+                date: insObj.date
+            });
         }));
     }));
-};
-
-
-Api.prototype.chatMessage = function (_data, cb) {
-    //
-    // chatmessages.insert({
-    //     userId: cUser._id,
-    //     chatId: chatId,
-    //     chatText : msg.chatText.toString(),
-    //     date: new Date()
-    // }, cb);
-    //
 };
 
 /**

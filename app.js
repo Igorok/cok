@@ -47,6 +47,9 @@ safe.series([
         cokcore.db(cb);
     },
     function (cb) {
+        cokcore.redis(cb);
+    },
+    function (cb) {
         cokcore.apiLoad(__dirname + '/modules/web/api', cb);
     },
 ], safe.sure(cokcore.exit, function () {

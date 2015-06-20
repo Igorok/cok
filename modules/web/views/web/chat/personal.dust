@@ -3,7 +3,11 @@
         <div id="chatFixedItems">
             <p id="uList" class='h4'></p>
             <div id="chatItems">
-                history will here
+                {#history}
+                    <p>
+                        {login}&nbsp;{msg}&nbsp;{date}
+                    </p>
+                {/history}
             </div>
         </div>
         <div id="chatFormCase">
