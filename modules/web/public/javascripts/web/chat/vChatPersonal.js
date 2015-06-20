@@ -16,6 +16,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                 'suspend': 'warning',
                 'on': 'success',
             };
+            this.users = null;
         },
         render: function () {
             this.startChat();
@@ -83,6 +84,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                     }
                     self.room = data._id;
                     self.$el.html(text);
+                    self.users = data.users
                     self.renderUsers(data.users);
                     return self;
                 });
@@ -94,9 +96,14 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
 
             self.socket.on("message", function (msg) {
                 console.log('msg ', msg);
-                self.$el.find('#chatItems').append('<p>'+msg.message+'</p>');
+                self.$el.find('#chatItems').append(
+                    '<p>' +
+                    self.users[msg.user._id].login + ' ' + msg.date + ' '+ msg.message +
+                    '</p>'
+                );
             });
             self.socket.on("freshUsers", function (users) {
+                console.log("freshUsers ", users);
                 self.renderUsers(users);
             });
 
