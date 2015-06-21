@@ -39,18 +39,20 @@ module.exports = function (app, io) {
                 return emitError(404);
             }
             var data = {
-                params: []
+                params: [],
             };
             data.params.push(_obj);
             cokcore.ctx.api["chat"].message(data, safe.sure(emitError, function (data) {
                 socket.broadcast.to(data.rId).emit('message', {
                     msg: data.msg,
                     uId: data.uId,
+                    login: data.login,
                     date: data.date,
                 });
                 socket.emit('message', {
                     msg: data.msg,
                     uId: data.uId,
+                    login: data.login,
                     date: data.date,
                 });
             }));

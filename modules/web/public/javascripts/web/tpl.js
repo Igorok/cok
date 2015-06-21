@@ -1,19 +1,29 @@
 define(["dust", "dust-helpers"], function(dust, dust_helpers) {
+  // modules/web/views/web/chat/message.dust
+  (function() {
+    dust.register("chat_message", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.s(ctx.get(["message"], false), ctx, {
+        "block": body_1
+      }, {});
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("<div class=\"row\"><div class=\"col-xs-10\"><a href=\"#/user/").f(ctx.get(["uId"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w("</a><br />").f(ctx.get(["msg"], false), ctx, "h").w("</div><div class=\"col-xs-2\">").f(ctx.get(["date"], false), ctx, "h").w("</div></div>");
+    }
+    body_1.__dustBody = !0;
+    return body_0;
+  })();
   // modules/web/views/web/chat/personal.dust
   (function() {
     dust.register("chat_personal", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"widget\"><div id=\"chatCase\"><div id=\"chatFixedItems\"><p id=\"uList\" class='h4'></p><div id=\"chatItems\">").s(ctx.get(["history"], false), ctx, {
-        "block": body_1
-      }, {}).w("</div></div><div id=\"chatFormCase\"><form id=\"chatMessage\"><div class=\"input-group\"><input id=\"chatText\" type=\"text\" class=\"form-control\" required><span class=\"input-group-btn\"><button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-send\"></span></button></span></div></form></div></div></div>");
+      return chk.w("<div id=\"chatCase\" class=\"widget\"><div id=\"uList\"></div><div id=\"chatItems\"><div id=\"messages\"></div></div><div id=\"chatFormCase\"><form id=\"chatMessage\"><div class=\"input-group\"><input id=\"chatText\" type=\"text\" class=\"form-control\" required><span class=\"input-group-btn\"><button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-send\"></span></button></span></div></form></div></div>");
     }
     body_0.__dustBody = !0;
-
-    function body_1(chk, ctx) {
-      return chk.w("<p>").f(ctx.get(["login"], false), ctx, "h").w("&nbsp;").f(ctx.get(["msg"], false), ctx, "h").w("&nbsp;").f(ctx.get(["date"], false), ctx, "h").w("</p>");
-    }
-    body_1.__dustBody = !0;
     return body_0;
   })();
   // modules/web/views/web/chat/users.dust
@@ -38,7 +48,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("layout", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a href=\"#\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Account</a></li><li><a data-toggle=\"collapse\" href=\"#user\"  aria-expanded=\"false\" aria-controls=\"users\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"user\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#user\">Users List</a></li><li><a href=\"#friend\">Friends List</a></li><li><a href=\"#friend-requests\">Friends Requests</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#chat\"  aria-expanded=\"false\" aria-controls=\"chat\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-envelope\"></span>Chats</a><ul id=\"chat\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#chat\">Chats List</a></li><li><a href=\"#chat/-1\">New chat</a></li></ul></li><li><a href=\"#logout\"><span class=\"glyphicon glyphicon-log-out\"></span>&nbsp;Logout</a></li></ul></div><div id=\"main\" class=\"col-md-10\"></div>");
+      return chk.w("<div class=\"row\"><div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a href=\"#\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Account</a></li><li><a data-toggle=\"collapse\" href=\"#user\"  aria-expanded=\"false\" aria-controls=\"users\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"user\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#user\">Users List</a></li><li><a href=\"#friend\">Friends List</a></li><li><a href=\"#friend-requests\">Friends Requests</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#chat\"  aria-expanded=\"false\" aria-controls=\"chat\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-envelope\"></span>Chats</a><ul id=\"chat\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#chat\">Chats List</a></li><li><a href=\"#chat/-1\">New chat</a></li></ul></li><li><a href=\"#logout\"><span class=\"glyphicon glyphicon-log-out\"></span>&nbsp;Logout</a></li></ul></div><div id=\"main\" class=\"col-md-10\"></div></div>");
     }
     body_0.__dustBody = !0;
     return body_0;
@@ -180,6 +190,27 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_5.__dustBody = !0;
     return body_0;
   })();
+  define("chat_message", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("chat_message", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
   define("chat_personal", function() {
     return function(locals, callback) {
       var rendered;
@@ -369,5 +400,5 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["chat_personal", "chat_users", "layout", "login_auth", "login_registration", "message", "user_friendList", "user_index", "user_list"];
+  return ["chat_message", "chat_personal", "chat_users", "layout", "login_auth", "login_registration", "message", "user_friendList", "user_index", "user_list"];
 });

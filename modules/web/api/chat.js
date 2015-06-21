@@ -121,9 +121,10 @@ Api.prototype.joinPersonal = function (_data, cb) {
                  cokcore.ctx.col["chatmessages"].find({rId: cRoom._id}, {$sort: {date: -1}, limit: 100}).toArray(safe.sure(cb, function (_arr) {
                      _.forEach(_arr, function (val) {
                          var msg = {
-                             login: users[uId.toString()].login,
+                             uId: val.uId.toString(),
+                             login: users[val.uId.toString()].login,
                              msg: val.msg,
-                             date: moment(val.date).format('YYYY-MM-DD HH:mm'),
+                             date: moment(val.date).calendar(),
                          };
                          history.push(msg);
                      });
@@ -184,9 +185,10 @@ Api.prototype.message = function (_data, cb) {
         cokcore.ctx.col["chatmessages"].insert(insObj, safe.sure(cb, function () {
             cb(null, {
                 uId: _user._id,
+                login: _user.login,
                 rId: _params.rId,
                 msg: insObj.msg,
-                date: insObj.date
+                date: moment(insObj.date).calendar(),
             });
         }));
     }));

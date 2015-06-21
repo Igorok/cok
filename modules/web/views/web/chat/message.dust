@@ -1,0 +1,12 @@
+{#message}
+    <div class="row">
+        <div class="col-xs-10">
+            <a href="#/user/{uId}">{login}</a>
+            <br />
+            {msg}
+        </div>
+        <div class="col-xs-2">
+            {date}
+        </div>
+    </div>
+{/message}
