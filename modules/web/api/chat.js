@@ -20,6 +20,8 @@ var Api = function () {
                 return cb(null, 'off');
             }
             var diff = moment().diff(moment(_user.date), 'minutes');
+
+            console.log('getUserStatus ', _user.login, _user.date, diff);
             if (diff > 30) {
                 return cb(null, 'off');
             } else if (diff > 15) {
@@ -193,6 +195,78 @@ Api.prototype.message = function (_data, cb) {
         }));
     }));
 };
+
+Api.prototype.checkStatus = function (_data, cb) {
+    var self = this;
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isUndefined(_params.rId)) {
+            return cb ("wrong rId");
+        }
+        var rId = _params.rId.toString();
+        if (! _.include(_user.rooms, rId)) {
+            return cb ("chat room not found");
+        }
+
+
+        var cRoom = null;
+        var users = {};
+        safe.series([
+            function (cb) {
+                cokcore.ctx.col["chatgroups"].findOne({_id: mongo.ObjectID(rId), "users._id": mongo.ObjectID(_user._id)}, safe.sure(cb, function (_obj) {
+                    if (_obj) {
+                        cRoom = _obj;
+                        return cb();
+                    }
+                    _.pull(_user.rooms, rId);
+                    cokcore.ctx.redis.set(user._id, JSON.stringify(user), safe.sure(cb, function () {
+                        cb("chat room not found");
+                    }));
+                }));
+            },
+            function (cb) {
+                var userIds = _.pluck(cRoom.users, '_id');
+                safe.each(userIds, function(_id, cb) {
+                    var id = _id.toString();
+                    users[id] = {
+                        _id: id,
+                    }
+                    self.getUserStatus(id, safe.sure(cb, function (status) {
+                        users[id].status = status;
+                        cb();
+                    }));
+
+                }, cb);
+            },
+        ], safe.sure(cb, function () {
+            cb(null, users);
+        }));
+
+    }));
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
 * all users

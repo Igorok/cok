@@ -25,7 +25,7 @@ module.exports = function (app, io) {
             data.params.push(_obj);
             cokcore.ctx.api["chat"].joinPersonal(data, safe.sure(emitError, function (data) {
                 socket.join(data._id, safe.sure(emitError, function () {
-                    socket.broadcast.to(data._id).emit('freshStatuses', {_id: data._id, users: data.users});
+                    socket.broadcast.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
                     socket.emit('joinPersonal', {_id: data._id, users: data.users, history: data.history});
                 }));
             }));
@@ -57,6 +57,25 @@ module.exports = function (app, io) {
                 });
             }));
         });
+
+        /**
+         * check users statuses
+         */
+        socket.on('checkStatus', function (_obj) {
+            if (_.isEmpty(_obj)) {
+                return emitError(404);
+            }
+            var data = {
+                params: [],
+            };
+            data.params.push(_obj);
+            cokcore.ctx.api["chat"].checkStatus(data, safe.sure(emitError, function (users) {
+                socket.emit('freshStatus', {users: users});
+            }));
+        });
+
+
+
         next();
     });
 };

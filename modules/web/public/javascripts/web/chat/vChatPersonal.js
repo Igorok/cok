@@ -18,6 +18,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                 'on': 'success',
             };
             self.users = null;
+            self.checkStatus = null;
             $(window).on("resize", self.resize);
         },
         render: function () {
@@ -76,6 +77,18 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
             });
         },
 
+        freshStatus: function (arr) {
+            var self = this;
+            _.each(arr, function (val) {
+                var elem = self.$el.find("#" + val._id);
+                var status = 'label-' + self.statuses[val.status];
+                if (elem.hasClass(status)) {
+                    return;
+                }
+                elem.removeClass().addClass('label ' + status);
+            });
+        },
+
         startChat: function () {
             var self = this;
             if (! self.personId) {
@@ -83,7 +96,6 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
             }
 
             self.socket = new io(window.location.origin);
-            console.log('startChat');
             self.socket.emit("joinPersonal", {
                 uId: self.user._id,
                 token: self.user.token,
@@ -108,17 +120,33 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                 });
             });
             self.socket.on("joinUser", function (data) {
-                console.log('joinUser ', data);
+                var arr = [{
+                    _id: _obj.uId,
+                    status: 'on',
+                }];
+                self.freshStatus(arr);
             });
 
 
             self.socket.on("message", function (_obj) {
-                console.log('msg ', _obj);
                 self.renderMessage(_obj);
+                var arr = [{
+                    _id: _obj.uId,
+                    status: 'on',
+                }];
+                self.freshStatus(arr);
             });
-            self.socket.on("freshStatuses", function (_obj) {
-                self.renderUsers(_obj.users);
+            self.socket.on("freshStatus", function (_obj) {
+                self.freshStatus(_obj.users);
             });
+            self.checkStatus = setInterval(function () {
+                var data = {
+                    uId: self.user._id,
+                    token: self.user.token,
+                    rId: self.room,
+                };
+                self.socket.emit("checkStatus", data);
+            }, 5 * 60 * 1000);
         },
         resize: function () {
             var wHeight = $(window).height();
