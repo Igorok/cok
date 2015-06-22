@@ -11,44 +11,16 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_0.__dustBody = !0;
 
     function body_1(chk, ctx) {
-      return chk.w("<div class=\"row\"><div class=\"col-xs-1\"><img src=\"").s(ctx.get(["picture"], false), ctx, {
+      return chk.w("<div class=\"row\"><div class=\"col-xs-9\"><a href=\"#chat-group/").f(ctx.get(["_id"], false), ctx, "h").w("\">").s(ctx.get(["users"], false), ctx, {
         "block": body_2
-      }, {}).nx(ctx.get(["picture"], false), ctx, {
-        "block": body_3
-      }, {}).w("\" alt=\"\" class=\"img-thumbnail\"></div><div class=\"col-xs-9\"><a href=\"#user/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w("</a>").s(ctx.get(["friend"], false), ctx, {
-        "block": body_4
-      }, {}).w("</div><div class=\"col-xs-2\">").s(ctx.get(["friend"], false), ctx, {
-        "block": body_5
-      }, {}).nx(ctx.get(["friend"], false), ctx, {
-        "block": body_6
-      }, {}).w("</div></div><br />");
+      }, {}).w("</a></div><div class=\"col-xs-2\">").f(ctx.get(["fDate"], false), ctx, "h").w("</div></div><br />");
     }
     body_1.__dustBody = !0;
 
     function body_2(chk, ctx) {
-      return chk.w("/images/users/");
+      return chk.w("<span>").f(ctx.get(["login"], false), ctx, "h").w("</span>&nbsp;");
     }
     body_2.__dustBody = !0;
-
-    function body_3(chk, ctx) {
-      return chk.w("/images/no-avatar.jpg");
-    }
-    body_3.__dustBody = !0;
-
-    function body_4(chk, ctx) {
-      return chk.w("<br /><a href=\"#chat/").f(ctx.get(["_id"], false), ctx, "h").w("\">Send a message</a>");
-    }
-    body_4.__dustBody = !0;
-
-    function body_5(chk, ctx) {
-      return chk.w("<button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-danger delFriendBtn\"><span class=\"glyphicon glyphicon-remove\"></span></button>");
-    }
-    body_5.__dustBody = !0;
-
-    function body_6(chk, ctx) {
-      return chk.w("<button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-success addFriendBtn\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
-    }
-    body_6.__dustBody = !0;
     return body_0;
   })();
   // modules/web/views/web/chat/message.dust

@@ -4,6 +4,7 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
         // you can set any defaults you would like here
         idAttribute: "_id",
         defaults: {
+            _id: "-1",
             users: [],
         },
     });
@@ -12,14 +13,14 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
     var collection = Backbone.Collection.extend({
         // Reference to this collection's model.
         model: model,
-        getUserList: function (cb) {
+        getChatList: function (cb) {
             var self = this;
             var user = Api.getUser();
-            Api.call("user.getChatList", {uId: user._id, token: user.token}, function (ret) {
+            Api.call("chat.getChatList", {uId: user._id, token: user.token}, function (ret) {
                 if (! ret && ! ret.result) {
                     return cb();
                 }
-                self.reset(ret.result[0]);
+                self.set(ret.result[0]);
                 cb();
             });
         },

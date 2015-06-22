@@ -5,7 +5,6 @@ var moment = require('moment');
 var mongo = require('mongodb');
 var fs = require('fs');
 var cokcore = require('cokcore');
-var collections = cokcore.collections;
 
 var Api = function () {
     var self = this;
@@ -21,7 +20,6 @@ var Api = function () {
             }
             var diff = moment().diff(moment(_user.date), 'minutes');
 
-            console.log('getUserStatus ', _user.login, _user.date, diff);
             if (diff > 30) {
                 return cb(null, 'off');
             } else if (diff > 15) {
@@ -196,6 +194,9 @@ Api.prototype.message = function (_data, cb) {
     }));
 };
 
+/**
+* a request from a browser to take a actual statuses of users
+*/
 Api.prototype.checkStatus = function (_data, cb) {
     var self = this;
     cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
@@ -271,57 +272,102 @@ Api.prototype.checkStatus = function (_data, cb) {
 /**
 * all users
 */
-
 Api.prototype.getChatList = function (_data, cb) {
     cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-            cokcore.collection("users", safe.sure(cb, function (users) {
-                var result = [];
-                var userIds = [];
-                var userObj = {};
-                safe.series([
-                    function (cb) {
-                        chatgroups.find({"users._id": _user._id}, {sort: {date: -1}}).toArray(safe.sure(cb, function (groupsArr) {
-                            _.each(groupsArr, function (curentGroup) {
-                                _.each(curentGroup.users, function (curentUser) {
-                                    if (! _.contains(userIds, mongo.ObjectID(curentUser._id))) {
-                                        userIds.push(mongo.ObjectID(curentUser._id));
-                                    }
-                                });
-                            });
-                            result = groupsArr;
-                            cb();
-                        }));
-                    },
-                    function (cb) {
-                        users.find({_id: {$in: userIds}}, {login: 1, picture: 1, email: 1}).toArray(safe.sure(cb, function (userArr) {
-                            _.each(userArr, function (curentUser) {
-                                userObj[curentUser._id] = curentUser;
-                            });
-                            cb();
-                        }));
-                    },
-                ], safe.sure(cb, function () {
-                    _.each(result, function (val) {
-                        val.fDate = moment(val.date).format('DD/MM/YYYY HH:mm');
-                        _.each(val.users, function (curentUser) {
-                            if (userObj[curentUser._id]) {
-                                curentUser.login = userObj[curentUser._id].login;
-                                curentUser.email = userObj[curentUser._id].email;
-                                curentUser.picture = userObj[curentUser._id].picture;
+        var groupsArr = [];
+        var userIds = [];
+        var userObj = {};
+        safe.series([
+            function (cb) {
+                cokcore.ctx.col.chatgroups.find({"users._id": mongo.ObjectID(_user._id), type: 'group'}, {sort: {date: -1}}).toArray(safe.sure(cb, function (arr) {
+                    _.forEach(arr, function (curentGroup) {
+                        _.forEach(curentGroup.users, function (curentUser) {
+                            if (! _.contains(userIds, curentUser._id)) {
+                                userIds.push(curentUser._id);
                             }
                         });
-
-                        if (val.creator == _user._id) {
-                            val.crPermission = true;
-                        }
                     });
-                    cb(null, result);
+                    groupsArr = arr;
+                    cb();
                 }));
-            }));
+            },
+            function (cb) {
+                cokcore.ctx.col.users.find({_id: {$in: userIds}}, {login: 1, email: 1}).toArray(safe.sure(cb, function (arr) {
+                    _.forEach(arr, function (curentUser) {
+                        userObj[curentUser._id.toString()] = curentUser;
+                    });
+                    cb();
+                }));
+            },
+        ], safe.sure(cb, function () {
+            _.forEach(groupsArr, function (val) {
+                val.fDate = moment(val.date).calendar();
+                _.forEach(val.users, function (curentUser) {
+                    var uId = curentUser._id.toString();
+                    if (userObj[uId]) {
+                        curentUser.login = userObj[uId].login;
+                        curentUser.email = userObj[uId].email;
+                    }
+                });
+
+                if (val.creator == _user._id) {
+                    val.edit = true;
+                }
+            });
+            cb(null, groupsArr);
         }));
     }));
 };
+// Api.prototype.getChatList = function (_data, cb) {
+//     cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+//         cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+//             cokcore.collection("users", safe.sure(cb, function (users) {
+//                 var result = [];
+//                 var userIds = [];
+//                 var userObj = {};
+//                 safe.series([
+//                     function (cb) {
+//                         chatgroups.find({"users._id": _user._id}, {sort: {date: -1}}).toArray(safe.sure(cb, function (groupsArr) {
+//                             _.each(groupsArr, function (curentGroup) {
+//                                 _.each(curentGroup.users, function (curentUser) {
+//                                     if (! _.contains(userIds, mongo.ObjectID(curentUser._id))) {
+//                                         userIds.push(mongo.ObjectID(curentUser._id));
+//                                     }
+//                                 });
+//                             });
+//                             result = groupsArr;
+//                             cb();
+//                         }));
+//                     },
+//                     function (cb) {
+//                         users.find({_id: {$in: userIds}}, {login: 1, picture: 1, email: 1}).toArray(safe.sure(cb, function (userArr) {
+//                             _.each(userArr, function (curentUser) {
+//                                 userObj[curentUser._id] = curentUser;
+//                             });
+//                             cb();
+//                         }));
+//                     },
+//                 ], safe.sure(cb, function () {
+//                     _.each(result, function (val) {
+//                         val.fDate = moment(val.date).format('DD/MM/YYYY HH:mm');
+//                         _.each(val.users, function (curentUser) {
+//                             if (userObj[curentUser._id]) {
+//                                 curentUser.login = userObj[curentUser._id].login;
+//                                 curentUser.email = userObj[curentUser._id].email;
+//                                 curentUser.picture = userObj[curentUser._id].picture;
+//                             }
+//                         });
+//
+//                         if (val.creator == _user._id) {
+//                             val.crPermission = true;
+//                         }
+//                     });
+//                     cb(null, result);
+//                 }));
+//             }));
+//         }));
+//     }));
+// };
 
 /**
 * add new chat group
