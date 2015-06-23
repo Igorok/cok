@@ -1,8 +1,9 @@
 <div class="widget">
+    <a href="#chat-room-edit/-1">New room</a>
     {#data}
     <div class="row">
         <div class="col-xs-9">
-            <a href="#chat-group/{_id}">
+            <a href="#chat-room/{_id}">
             {#users}
                 <span>{login}</span>&nbsp;
             {/users}

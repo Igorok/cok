@@ -9,6 +9,7 @@ var cokcore = require('cokcore');
 var Api = function () {
     var self = this;
     self.api = {};
+    // private function, only for api
     self.getUserStatus = function (_id, cb) {
         cokcore.ctx.redis.get(_id, safe.sure(cb, function (_user) {
             if (! _user) {
@@ -75,7 +76,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
          var history = [];
          safe.series([
              function (cb) {
-                 cokcore.ctx.col["chatgroups"].findOne({$and: [{'users._id':  uId}, {'users._id':  mongo.ObjectID(_params.personId)}], type: 'personal'}, safe.sure(cb, function (_obj) {
+                 cokcore.ctx.col.chatgroups.findOne({$and: [{'users._id':  uId}, {'users._id':  mongo.ObjectID(_params.personId)}], type: 'personal'}, safe.sure(cb, function (_obj) {
                      if (_obj) {
                          cRoom = _obj;
                          return cb();
@@ -90,7 +91,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
                          date: new Date(),
                          type: "personal"
                      };
-                     cokcore.ctx.col["chatgroups"].insert(insObj, safe.sure(cb, function (result) {
+                     cokcore.ctx.col.chatgroups.insert(insObj, safe.sure(cb, function (result) {
                          cRoom = result.ops[0];
                          cb();
                      }));
@@ -102,7 +103,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
                  }
                  rId = cRoom._id.toString();
                  var userIds = _.pluck(cRoom.users, '_id');
-                 cokcore.ctx.col["users"].find({_id: {$in: userIds}}, {login: 1}).toArray(safe.sure(cb, function (_arr) {
+                 cokcore.ctx.col.users.find({_id: {$in: userIds}}, {login: 1}).toArray(safe.sure(cb, function (_arr) {
                      safe.each(_arr, function(_usr, cb) {
                          var id = _usr._id.toString();
                          users[id] = {
@@ -118,7 +119,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
                  }));
              },
              function (cb) {
-                 cokcore.ctx.col["chatmessages"].find({rId: cRoom._id}, {$sort: {date: -1}, limit: 100}).toArray(safe.sure(cb, function (_arr) {
+                 cokcore.ctx.col.chatmessages.find({rId: cRoom._id}, {$sort: {date: -1}, limit: 100}).toArray(safe.sure(cb, function (_arr) {
                      _.forEach(_arr, function (val) {
                          var msg = {
                              uId: val.uId.toString(),
@@ -182,7 +183,7 @@ Api.prototype.message = function (_data, cb) {
             date: new Date()
         };
 
-        cokcore.ctx.col["chatmessages"].insert(insObj, safe.sure(cb, function () {
+        cokcore.ctx.col.chatmessages.insert(insObj, safe.sure(cb, function () {
             cb(null, {
                 uId: _user._id,
                 login: _user.login,
@@ -213,7 +214,7 @@ Api.prototype.checkStatus = function (_data, cb) {
         var users = {};
         safe.series([
             function (cb) {
-                cokcore.ctx.col["chatgroups"].findOne({_id: mongo.ObjectID(rId), "users._id": mongo.ObjectID(_user._id)}, safe.sure(cb, function (_obj) {
+                cokcore.ctx.col.chatgroups.findOne({_id: mongo.ObjectID(rId), "users._id": mongo.ObjectID(_user._id)}, safe.sure(cb, function (_obj) {
                     if (_obj) {
                         cRoom = _obj;
                         return cb();
@@ -244,30 +245,6 @@ Api.prototype.checkStatus = function (_data, cb) {
 
     }));
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
 * all users
@@ -318,56 +295,88 @@ Api.prototype.getChatList = function (_data, cb) {
         }));
     }));
 };
-// Api.prototype.getChatList = function (_data, cb) {
-//     cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
-//         cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-//             cokcore.collection("users", safe.sure(cb, function (users) {
-//                 var result = [];
-//                 var userIds = [];
-//                 var userObj = {};
-//                 safe.series([
-//                     function (cb) {
-//                         chatgroups.find({"users._id": _user._id}, {sort: {date: -1}}).toArray(safe.sure(cb, function (groupsArr) {
-//                             _.each(groupsArr, function (curentGroup) {
-//                                 _.each(curentGroup.users, function (curentUser) {
-//                                     if (! _.contains(userIds, mongo.ObjectID(curentUser._id))) {
-//                                         userIds.push(mongo.ObjectID(curentUser._id));
-//                                     }
-//                                 });
-//                             });
-//                             result = groupsArr;
-//                             cb();
-//                         }));
-//                     },
-//                     function (cb) {
-//                         users.find({_id: {$in: userIds}}, {login: 1, picture: 1, email: 1}).toArray(safe.sure(cb, function (userArr) {
-//                             _.each(userArr, function (curentUser) {
-//                                 userObj[curentUser._id] = curentUser;
-//                             });
-//                             cb();
-//                         }));
-//                     },
-//                 ], safe.sure(cb, function () {
-//                     _.each(result, function (val) {
-//                         val.fDate = moment(val.date).format('DD/MM/YYYY HH:mm');
-//                         _.each(val.users, function (curentUser) {
-//                             if (userObj[curentUser._id]) {
-//                                 curentUser.login = userObj[curentUser._id].login;
-//                                 curentUser.email = userObj[curentUser._id].email;
-//                                 curentUser.picture = userObj[curentUser._id].picture;
-//                             }
-//                         });
-//
-//                         if (val.creator == _user._id) {
-//                             val.crPermission = true;
-//                         }
-//                     });
-//                     cb(null, result);
-//                 }));
-//             }));
-//         }));
-//     }));
-// };
+
+
+Api.prototype.getEditRoom = function (_data, cb) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isEmpty(_params) || ! _params.rId) {
+            return cb('Room id is required');
+        }
+        var rId = _params.rId.toString();
+        if (rId === '-1') {
+            // find user friends
+        } else {
+            // find user friends + data of room
+        }
+    }));
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+* add new chat group
+*/
+Api.prototype.addChatRoom = function (_data, cb) {
+    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isEmpty(_params) || _.isEmpty(_params.users) || ! _.isArray(_params.users)) {
+            return cb('Wrong data');
+        }
+        cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+            var userArr = [];
+            if (! _.contains(_params.users, _user._id)) {
+                userArr.push({_id: _user._id});
+            }
+            _.each(_params.users, function (val) {
+                userArr.push({_id: val.toString()});
+            });
+            chatgroups.insert({users: userArr, creator: _user._id, date: new Date()}, safe.sure(cb, function () {
+                cb(null, true);
+            }));
+        }));
+    }));
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
 * add new chat group

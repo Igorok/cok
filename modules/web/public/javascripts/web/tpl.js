@@ -1,17 +1,27 @@
 define(["dust", "dust-helpers"], function(dust, dust_helpers) {
+  // modules/web/views/web/chat/form.dust
+  (function() {
+    dust.register("chat_form", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div id=\"chatCase\" class=\"widget\"><div id=\"uList\"></div><div id=\"chatItems\"><div id=\"messages\"></div></div><div id=\"chatFormCase\"><form id=\"chatMessage\"><div class=\"input-group\"><input id=\"chatText\" type=\"text\" class=\"form-control\" required><span class=\"input-group-btn\"><button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-send\"></span></button></span></div></form></div></div>");
+    }
+    body_0.__dustBody = !0;
+    return body_0;
+  })();
   // modules/web/views/web/chat/list.dust
   (function() {
     dust.register("chat_list", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"widget\">").s(ctx.get(["data"], false), ctx, {
+      return chk.w("<div class=\"widget\"><a href=\"#chat-room-edit/-1\">New room</a>").s(ctx.get(["data"], false), ctx, {
         "block": body_1
       }, {}).w("</div>");
     }
     body_0.__dustBody = !0;
 
     function body_1(chk, ctx) {
-      return chk.w("<div class=\"row\"><div class=\"col-xs-9\"><a href=\"#chat-group/").f(ctx.get(["_id"], false), ctx, "h").w("\">").s(ctx.get(["users"], false), ctx, {
+      return chk.w("<div class=\"row\"><div class=\"col-xs-9\"><a href=\"#chat-room/").f(ctx.get(["_id"], false), ctx, "h").w("\">").s(ctx.get(["users"], false), ctx, {
         "block": body_2
       }, {}).w("</a></div><div class=\"col-xs-2\">").f(ctx.get(["fDate"], false), ctx, "h").w("</div></div><br />");
     }
@@ -46,6 +56,16 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
 
     function body_0(chk, ctx) {
       return chk.w("<div id=\"chatCase\" class=\"widget\"><div id=\"uList\"></div><div id=\"chatItems\"><div id=\"messages\"></div></div><div id=\"chatFormCase\"><form id=\"chatMessage\"><div class=\"input-group\"><input id=\"chatText\" type=\"text\" class=\"form-control\" required><span class=\"input-group-btn\"><button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-send\"></span></button></span></div></form></div></div>");
+    }
+    body_0.__dustBody = !0;
+    return body_0;
+  })();
+  // modules/web/views/web/chat/roomEdit.dust
+  (function() {
+    dust.register("chat_roomEdit", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div class=\"widget\">room edit</div>");
     }
     body_0.__dustBody = !0;
     return body_0;
@@ -112,6 +132,30 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return chk.w("<h4>").f(ctx.getPath(true, []), ctx, "h").w("</h4>");
     }
     body_1.__dustBody = !0;
+    return body_0;
+  })();
+  // modules/web/views/web/user/detail.dust
+  (function() {
+    dust.register("user_detail", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div class=\"row widget\"><div class=\"col-md-3\"><img src=\"").s(ctx.get(["picture"], false), ctx, {
+        "block": body_1
+      }, {}).nx(ctx.get(["picture"], false), ctx, {
+        "block": body_2
+      }, {}).w("\" alt=\"\" class=\"img-thumbnail\"><br /><a href=\"#/chat/").f(ctx.get(["_id"], false), ctx, "h").w("\">Write a message</a></div><div class=\"col-md-9\"><br><p>").f(ctx.get(["login"], false), ctx, "h").w("</p><p>").f(ctx.get(["email"], false), ctx, "h").w("</p></div></div>");
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("/images/users/");
+    }
+    body_1.__dustBody = !0;
+
+    function body_2(chk, ctx) {
+      return chk.w("/images/no-avatar.jpg");
+    }
+    body_2.__dustBody = !0;
     return body_0;
   })();
   // modules/web/views/web/user/friendList.dust
@@ -221,6 +265,27 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_6.__dustBody = !0;
     return body_0;
   })();
+  define("chat_form", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("chat_form", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
   define("chat_list", function() {
     return function(locals, callback) {
       var rendered;
@@ -268,6 +333,27 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       var rendered;
 
       dust.render("chat_personal", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
+  define("chat_roomEdit", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("chat_roomEdit", locals, function(err, result) {
         if (typeof callback === "function") {
           try {
             callback(err, result);
@@ -389,6 +475,27 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
+  define("user_detail", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("user_detail", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
   define("user_friendList", function() {
     return function(locals, callback) {
       var rendered;
@@ -452,5 +559,5 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["chat_list", "chat_message", "chat_personal", "chat_users", "layout", "login_auth", "login_registration", "message", "user_friendList", "user_index", "user_list"];
+  return ["chat_form", "chat_list", "chat_message", "chat_personal", "chat_roomEdit", "chat_users", "layout", "login_auth", "login_registration", "message", "user_detail", "user_friendList", "user_index", "user_list"];
 });

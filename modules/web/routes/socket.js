@@ -23,7 +23,7 @@ module.exports = function (app, io) {
                 params: []
             };
             data.params.push(_obj);
-            cokcore.ctx.api["chat"].joinPersonal(data, safe.sure(emitError, function (data) {
+            cokcore.ctx.api.chat.joinPersonal(data, safe.sure(emitError, function (data) {
                 socket.join(data._id, safe.sure(emitError, function () {
                     socket.broadcast.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
                     socket.emit('joinPersonal', {_id: data._id, users: data.users, history: data.history});
@@ -42,7 +42,7 @@ module.exports = function (app, io) {
                 params: [],
             };
             data.params.push(_obj);
-            cokcore.ctx.api["chat"].message(data, safe.sure(emitError, function (data) {
+            cokcore.ctx.api.chat.message(data, safe.sure(emitError, function (data) {
                 socket.broadcast.to(data.rId).emit('message', {
                     msg: data.msg,
                     uId: data.uId,
@@ -69,7 +69,7 @@ module.exports = function (app, io) {
                 params: [],
             };
             data.params.push(_obj);
-            cokcore.ctx.api["chat"].checkStatus(data, safe.sure(emitError, function (users) {
+            cokcore.ctx.api.chat.checkStatus(data, safe.sure(emitError, function (users) {
                 socket.emit('freshStatus', {users: users});
             }));
         });
@@ -124,7 +124,7 @@ module.exports = function (app, io) {
 //                 params: []
 //             };
 //             data.params.push(_obj);
-//             cokcore.ctx.api["chat"].joinPersonal(data, safe.sure(emitError, function (_group, _user) {
+//             cokcore.ctx.api.chat.joinPersonal(data, safe.sure(emitError, function (_group, _user) {
 //
 //
 //                 console.log('_group ', _group);

@@ -1,0 +1,16 @@
+<div id="chatCase" class="widget">
+    <div id="uList"></div>
+    <div id="chatItems">
+        <div id="messages"></div>
+    </div>
+    <div id="chatFormCase">
+        <form id="chatMessage">
+            <div class="input-group">
+                <input id="chatText" type="text" class="form-control" required>
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-send"></span></button>
+                </span>
+            </div>
+        </form>
+    </div>
+</div>

@@ -44,8 +44,10 @@
             "vUserDetail": "/javascripts/web/user/vUserDetail",
 
             "vChatPersonal": "/javascripts/web/chat/vChatPersonal",
+            "vChatRoomEdit": "/javascripts/web/chat/vChatRoomEdit",
             "vChatList": "/javascripts/web/chat/vChatList",
             "mChatList": "/javascripts/web/chat/mChatList",
+            "mChatRoomEdit": "/javascripts/web/chat/mChatRoomEdit",
 
         },
         shim: {

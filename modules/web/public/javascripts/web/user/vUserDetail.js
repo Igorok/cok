@@ -13,12 +13,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mUser"],
         renderUser: function (cb) {
             var self = this;
             self.model.getUserDetail(self._id, function (_model) {
-                var data = {
-                    login: _model.get('login'),
-                    email: _model.get('email'),
-                    picture: _model.get('picture'),
-                };
-                dust.render("user_index", data, function (err, text) {
+                dust.render("user_detail", _model.toJSON(), function (err, text) {
                     if (err) {
                         console.trace(err);
                     }

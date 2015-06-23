@@ -33,7 +33,7 @@ Api.prototype.Registration = function (_data, cb) {
     var login = params.login.toString().trim();
     var email = params.email.toString().trim();
     var password = params.password.toString().trim();
-    cokcore.ctx.col["users"].find({$or : [{login: login}, {email: email}]}).toArray(safe.sure(cb, function (_result) {
+    cokcore.ctx.col.users.find({$or : [{login: login}, {email: email}]}).toArray(safe.sure(cb, function (_result) {
         if (! _.isEmpty(_result)) {
             return cb (" Username or email already registered");
         }
@@ -48,7 +48,7 @@ Api.prototype.Registration = function (_data, cb) {
             created: new Date(),
             status: 1
         };
-        cokcore.ctx.col["users"].insert(newUser, safe.sure(cb, function (_result) {
+        cokcore.ctx.col.users.insert(newUser, safe.sure(cb, function (_result) {
             cb(null, true);
         }));
     }));
@@ -68,7 +68,7 @@ Api.prototype.Authorise = function (_data, cb) {
     var uId = null;
     safe.series([
         function (cb) {
-            cokcore.ctx.col["users"].findOne({login: login, status: 1}, safe.sure(cb, function (_obj) {
+            cokcore.ctx.col.users.findOne({login: login, status: 1}, safe.sure(cb, function (_obj) {
                 var hash = crypto.createHash('sha1');
                 hash = hash.update(password).digest('hex');
                 if (! _obj || (hash != _obj.password)) {
@@ -162,7 +162,7 @@ Api.prototype.getUserList = function (_data, cb) {
         var users = [];
         safe.series([
             function (cb) {
-                cokcore.ctx.col["users"].findOne({_id: uId}, safe.sure(cb, function (_obj) {
+                cokcore.ctx.col.users.findOne({_id: uId}, safe.sure(cb, function (_obj) {
                     _.each(_obj.friends, function (val) {
                         friendObj[val._id.toString()] = val;
                     });
@@ -176,7 +176,7 @@ Api.prototype.getUserList = function (_data, cb) {
                 }));
             },
             function (cb) {
-                cokcore.ctx.col["users"].find({_id: {$ne: uId}, status: 1}, {login: 1, email: 1}).toArray(safe.sure(cb, function (_arr) {
+                cokcore.ctx.col.users.find({_id: {$ne: uId}, status: 1}, {login: 1, email: 1}).toArray(safe.sure(cb, function (_arr) {
                     _.each(_arr, function (val) {
                         // hide friend button
                         if (friendObj[val._id.toString()]) {
@@ -212,7 +212,7 @@ Api.prototype.getUserDetail = function (_data, cb) {
             selfFriendRequests: 1,
             friends: 1,
         };
-        cokcore.ctx.col["users"].findOne({_id: _id, status: 1}, rows, safe.sure(cb, function (_result) {
+        cokcore.ctx.col.users.findOne({_id: _id, status: 1}, rows, safe.sure(cb, function (_result) {
             cb (null, _result);
         }));
     }));
@@ -236,7 +236,7 @@ Api.prototype.addFriendRequest = function (_data, cb) {
         var friendRequests = null;
         safe.series([
             function (cb) {
-                cokcore.ctx.col["users"].findOne({_id: uId}, safe.sure(cb, function (_obj) {
+                cokcore.ctx.col.users.findOne({_id: uId}, safe.sure(cb, function (_obj) {
                     uObj = _obj;
                     cb();
                 }));
@@ -264,7 +264,7 @@ Api.prototype.addFriendRequest = function (_data, cb) {
                                 selfFriendRequests: {_id: fid},
                             },
                         };
-                        cokcore.ctx.col["users"].update({_id: uId}, setData, cb);
+                        cokcore.ctx.col.users.update({_id: uId}, setData, cb);
                     },
                     function (cb) {
                         var setData = {
@@ -272,7 +272,7 @@ Api.prototype.addFriendRequest = function (_data, cb) {
                                 friendRequests: {_id: uId},
                             },
                         };
-                        cokcore.ctx.col["users"].update({_id: fid}, setData, cb);
+                        cokcore.ctx.col.users.update({_id: fid}, setData, cb);
                     },
 
                 ], safe.sure(cb, function () {
@@ -300,7 +300,7 @@ Api.prototype.addFriend = function (_data, cb) {
 
         safe.parallel([
             function (cb) {
-                cokcore.ctx.col["users"].findOne({_id: uId, "friendRequests._id": mongo.ObjectID(frId)}, safe.sure(cb, function (cUser) {
+                cokcore.ctx.col.users.findOne({_id: uId, "friendRequests._id": mongo.ObjectID(frId)}, safe.sure(cb, function (cUser) {
                     if (! cUser) {
                         return cb ("Request from friend is not defined");
                     }
@@ -313,11 +313,11 @@ Api.prototype.addFriend = function (_data, cb) {
                             friendRequests: {_id: mongo.ObjectID(frId)},
                         }
                     };
-                    cokcore.ctx.col["users"].update({_id: cUser._id}, updateObj, cb);
+                    cokcore.ctx.col.users.update({_id: cUser._id}, updateObj, cb);
                 }));
             },
             function (cb) {
-                cokcore.ctx.col["users"].findOne({_id: mongo.ObjectID(frId), "selfFriendRequests._id": uId}, safe.sure(cb, function (reqUser) {
+                cokcore.ctx.col.users.findOne({_id: mongo.ObjectID(frId), "selfFriendRequests._id": uId}, safe.sure(cb, function (reqUser) {
                     if (! reqUser) {
                         return cb ("Request to friend is not defined");
                     }
@@ -330,7 +330,7 @@ Api.prototype.addFriend = function (_data, cb) {
                             selfFriendRequests: {_id: uId},
                         }
                     };
-                    cokcore.ctx.col["users"].update({_id: reqUser._id}, updateObj, cb);
+                    cokcore.ctx.col.users.update({_id: reqUser._id}, updateObj, cb);
                 }));
             },
         ], safe.sure(cb, function () {
@@ -349,7 +349,7 @@ Api.prototype.getFriendList = function (_data, cb) {
         var friends = null;
         safe.series([
             function (cb) {
-                cokcore.ctx.col["users"].findOne({_id: uId}, safe.sure(cb, function (_obj) {
+                cokcore.ctx.col.users.findOne({_id: uId}, safe.sure(cb, function (_obj) {
                     uObj = _obj;
                     cb();
                 }));
@@ -359,7 +359,7 @@ Api.prototype.getFriendList = function (_data, cb) {
                     return cb();
                 }
                 var frIds = _.pluck(uObj.friends, '_id');
-                cokcore.ctx.col["users"].find({_id: {$in: frIds}}, {login: 1, email: 1, picture: 1}).toArray(safe.sure(cb, function (_arr) {
+                cokcore.ctx.col.users.find({_id: {$in: frIds}}, {login: 1, email: 1, picture: 1}).toArray(safe.sure(cb, function (_arr) {
                     friends = _arr;
                     cb();
                 }));
@@ -379,7 +379,7 @@ Api.prototype.getFriendRequests = function (_data, cb) {
         var friends = null;
         safe.series([
             function (cb) {
-                cokcore.ctx.col["users"].findOne({_id: uId}, safe.sure(cb, function (_obj) {
+                cokcore.ctx.col.users.findOne({_id: uId}, safe.sure(cb, function (_obj) {
                     uObj = _obj;
                     cb();
                 }));
@@ -389,7 +389,7 @@ Api.prototype.getFriendRequests = function (_data, cb) {
                     return cb();
                 }
                 var frIds = _.pluck(uObj.friendRequests, '_id');
-                cokcore.ctx.col["users"].find({_id: {$in: frIds}}, {login: 1, email: 1, picture: 1}).toArray(safe.sure(cb, function (_arr) {
+                cokcore.ctx.col.users.find({_id: {$in: frIds}}, {login: 1, email: 1, picture: 1}).toArray(safe.sure(cb, function (_arr) {
                     friends = _arr;
                     cb();
                 }));
@@ -413,10 +413,10 @@ Api.prototype.deleteFriend = function (_data, cb) {
 
         safe.parallel([
             function (cb) {
-                cokcore.ctx.col["users"].update({_id: uId}, {$pull: {friends: {_id: mongo.ObjectID(frId)}}}, cb)
+                cokcore.ctx.col.users.update({_id: uId}, {$pull: {friends: {_id: mongo.ObjectID(frId)}}}, cb)
             },
             function (cb) {
-                cokcore.ctx.col["users"].update({_id: mongo.ObjectID(frId)}, {$pull: {friends: {_id: uId}}}, cb)
+                cokcore.ctx.col.users.update({_id: mongo.ObjectID(frId)}, {$pull: {friends: {_id: uId}}}, cb)
             },
         ], safe.sure(cb, function () {
             cb(null, true);
