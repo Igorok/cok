@@ -1,4 +1,4 @@
-define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "api", "mChatList"], function ($, _, backbone, dust, tpl, Msg, io, Api, mChatList) {
+define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "api", "mChat"], function ($, _, backbone, dust, tpl, Msg, io, Api, mChat) {
     'use strict';
 
 
@@ -9,7 +9,8 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
         initialize: function (data) {
             var self = this;
             self.user = Api.getUser();
-            self.model = new mChatList();
+            self.model = new mChat();
+
         },
         render: function () {
             this.renderList();

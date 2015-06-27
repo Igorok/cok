@@ -13,6 +13,17 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
     var collection = Backbone.Collection.extend({
         // Reference to this collection's model.
         model: model,
+        getChatList: function (cb) {
+            var self = this;
+            var user = Api.getUser();
+            Api.call("chat.getChatList", {uId: user._id, token: user.token}, function (ret) {
+                if (! ret && ! ret.result) {
+                    return cb();
+                }
+                self.set(ret.result[0]);
+                cb();
+            });
+        },
         getEditRoom: function (_id, cb) {
             var self = this;
             var user = Api.getUser();

@@ -65,7 +65,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("chat_roomEdit", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"widget\">room edit</div>");
+      return chk.w("<div class=\"widget\">room edit<div class=\"form-group\"><label for=\"users\">users</label><input type=\"text\" class=\"form-control\" id=\"users\" placeholder=\"users\" list=\"browsers\" /></div></div>");
     }
     body_0.__dustBody = !0;
     return body_0;
@@ -92,7 +92,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("layout", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"row\"><div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a href=\"#\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Account</a></li><li><a data-toggle=\"collapse\" href=\"#user\"  aria-expanded=\"false\" aria-controls=\"users\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"user\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#user\">Users List</a></li><li><a href=\"#friend\">Friends List</a></li><li><a href=\"#friend-requests\">Friends Requests</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#chat\"  aria-expanded=\"false\" aria-controls=\"chat\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-envelope\"></span>Chats</a><ul id=\"chat\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#chat\">Chats List</a></li><li><a href=\"#chat/-1\">New chat</a></li></ul></li><li><a href=\"#logout\"><span class=\"glyphicon glyphicon-log-out\"></span>&nbsp;Logout</a></li></ul></div><div id=\"main\" class=\"col-md-10\"></div></div>");
+      return chk.w("<div class=\"row\"><div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a href=\"#\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Account</a></li><li><a data-toggle=\"collapse\" href=\"#user\"  aria-expanded=\"false\" aria-controls=\"users\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"user\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#user\">Users List</a></li><li><a href=\"#friend\">Friends List</a></li><li><a href=\"#friend-requests\">Friends Requests</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#chat\"  aria-expanded=\"false\" aria-controls=\"chat\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-envelope\"></span>Chats</a><ul id=\"chat\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#chat-room\">Chats List</a></li><li><a href=\"#chat-room-edit/-1\">New chat</a></li></ul></li><li><a href=\"#logout\"><span class=\"glyphicon glyphicon-log-out\"></span>&nbsp;Logout</a></li></ul></div><div id=\"main\" class=\"col-md-10\"></div></div>");
     }
     body_0.__dustBody = !0;
     return body_0;

@@ -17,6 +17,8 @@
             "jquery": "jquery",
             "storageapi": "storageapi",
             "bootstrap": "bootstrap",
+            "typeahead": "bootstrap3-typeahead",
+            "tagsinput": "bootstrap-tagsinput",
             "underscore": "underscore",
             "backbone": "backbone",
             "dust": "dust-full",
@@ -46,8 +48,7 @@
             "vChatPersonal": "/javascripts/web/chat/vChatPersonal",
             "vChatRoomEdit": "/javascripts/web/chat/vChatRoomEdit",
             "vChatList": "/javascripts/web/chat/vChatList",
-            "mChatList": "/javascripts/web/chat/mChatList",
-            "mChatRoomEdit": "/javascripts/web/chat/mChatRoomEdit",
+            "mChat": "/javascripts/web/chat/mChat",
 
         },
         shim: {
@@ -60,6 +61,13 @@
             },
             bootstrap: {
                 deps:["jquery"]
+            },
+
+            typeahead: {
+                deps:["jquery"]
+            },
+            tagsinput: {
+                deps:["jquery", "bootstrap", "typeahead"]
             },
             storageapi: {
                 deps:["jquery"]

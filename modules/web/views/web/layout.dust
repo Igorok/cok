@@ -24,8 +24,8 @@
                     Chats
                 </a>
                 <ul id="chat" class="nav nav-pills nav-stacked collapse nav-child">
-                    <li><a href="#chat">Chats List</a></li>
-                    <li><a href="#chat/-1">New chat</a></li>
+                    <li><a href="#chat-room">Chats List</a></li>
+                    <li><a href="#chat-room-edit/-1">New chat</a></li>
                 </ul>
             </li>
             <li>

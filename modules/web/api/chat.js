@@ -65,7 +65,7 @@ Api.prototype.init = function (cb) {
  */
 Api.prototype.joinPersonal = function (_data, cb) {
      var self = this;
-     cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+     cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
          if (_.isUndefined(_params.personId)) {
              return cb ("Wrong _id 1");
          }
@@ -169,7 +169,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
 }
 */
 Api.prototype.message = function (_data, cb) {
-    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isUndefined(_params.rId)) {
             return cb ("wrong rId");
         }
@@ -200,7 +200,7 @@ Api.prototype.message = function (_data, cb) {
 */
 Api.prototype.checkStatus = function (_data, cb) {
     var self = this;
-    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isUndefined(_params.rId)) {
             return cb ("wrong rId");
         }
@@ -250,7 +250,7 @@ Api.prototype.checkStatus = function (_data, cb) {
 * all users
 */
 Api.prototype.getChatList = function (_data, cb) {
-    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         var groupsArr = [];
         var userIds = [];
         var userObj = {};
@@ -298,16 +298,45 @@ Api.prototype.getChatList = function (_data, cb) {
 
 
 Api.prototype.getEditRoom = function (_data, cb) {
-    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || ! _params.rId) {
             return cb('Room id is required');
         }
         var rId = _params.rId.toString();
-        if (rId === '-1') {
-            // find user friends
-        } else {
-            // find user friends + data of room
-        }
+        var userObj = null;
+        var friendIds = null;
+        var friendObj = null;
+
+        var result = {
+            _id: _params.rId,
+            users: {},
+            creator: null,
+            date: null,
+            type: null,
+        };
+        safe.series([
+            function (cb) {
+                cokcore.ctx.col.users.findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (_obj) {
+                    userObj = _obj;
+                    friendIds = _.pluck(userObj.friends, '_id');
+                    cb();
+                }));
+            },
+            function (cb) {
+                cokcore.ctx.col.users.find({_id: {$in: friendIds}}, {login: 1}).toArray(safe.sure(cb, function (_arr) {
+                    friendObj = _.indexBy(_arr, '_id');
+                    result.users = _.toArray(friendObj);
+                    cb();
+                }));
+            },
+            // function (cb) {},
+            // function (cb) {},
+        ], safe.sure(cb, function () {
+            cb(null, result);
+        }));
+        // if (rId === '-1') {
+        // } else {
+        // }
     }));
 };
 
@@ -332,7 +361,7 @@ Api.prototype.getEditRoom = function (_data, cb) {
 * add new chat group
 */
 Api.prototype.addChatRoom = function (_data, cb) {
-    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params.users) || ! _.isArray(_params.users)) {
             return cb('Wrong data');
         }
@@ -382,7 +411,7 @@ Api.prototype.addChatRoom = function (_data, cb) {
 * add new chat group
 */
 Api.prototype.addChat = function (_data, cb) {
-    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params.users) || ! _.isArray(_params.users)) {
             return cb('Wrong data');
         }
@@ -406,7 +435,7 @@ Api.prototype.addChat = function (_data, cb) {
 * edit chat group
 */
 Api.prototype.editChat = function (_data, cb) {
-    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id) || _.isEmpty(_params.users) || ! _.isArray(_params.users)) {
             return cb('Wrong data');
         }
@@ -447,7 +476,7 @@ Api.prototype.editChat = function (_data, cb) {
 * get edit chat
 */
 Api.prototype.getEditChat = function (_data, cb) {
-    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
             return cb('Wrong data');
         }
@@ -511,7 +540,7 @@ Api.prototype.getEditChat = function (_data, cb) {
 * remove chat group
 */
 Api.prototype.removeChat = function (_data, cb) {
-    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
             return cb('Wrong data');
         }
@@ -543,7 +572,7 @@ Api.prototype.removeChat = function (_data, cb) {
 * remove chat group
 */
 Api.prototype.leaveChat = function (_data, cb) {
-    cokcore.ctx.api["user"].checkAuth (_data, safe.sure(cb, function (_user, _params) {
+    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
         if (_.isEmpty(_params) || _.isEmpty(_params._id)) {
             return cb('Wrong data');
         }

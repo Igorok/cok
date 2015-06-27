@@ -1,4 +1,8 @@
 <div class="widget">
     room edit
 
+    <div class="form-group">
+        <label for="users">users</label>
+        <input type="text" class="form-control" id="users" placeholder="users" list="browsers" />
+    </div>
 </div>
