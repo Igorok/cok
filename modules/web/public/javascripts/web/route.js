@@ -10,9 +10,8 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
             "user/:id": "userDetail",
             "friend": "friendList",
             "friend-requests": "friendReq",
-            "chat": "chatList",
             "chat/:id": "chatPersonal",
-            "chat-room/:id": "chatRoom",
+            "chat-room": "chatRoom",
             "chat-room-edit/:id": "chatRoomEdit",
             '*notFound': 'notFound',
         },
@@ -72,10 +71,6 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
             var view = new vUserDetail({
                 _id: options
             });
-            $('#main').html(view.render().el);
-        },
-        chatList: function () {
-            var view = new vChatList();
             $('#main').html(view.render().el);
         },
         chatRoom: function () {

@@ -21,9 +21,9 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_0.__dustBody = !0;
 
     function body_1(chk, ctx) {
-      return chk.w("<div class=\"row\"><div class=\"col-xs-9\"><a href=\"#chat-room/").f(ctx.get(["_id"], false), ctx, "h").w("\">").s(ctx.get(["users"], false), ctx, {
+      return chk.w("<div class=\"row\"><div class=\"col-xs-8\"><a href=\"#chat-room/").f(ctx.get(["_id"], false), ctx, "h").w("\">").s(ctx.get(["users"], false), ctx, {
         "block": body_2
-      }, {}).w("</a></div><div class=\"col-xs-2\">").f(ctx.get(["fDate"], false), ctx, "h").w("</div></div><br />");
+      }, {}).w("</a></div><div class=\"col-xs-2\">").f(ctx.get(["fcDate"], false), ctx, "h").w("<br />").f(ctx.get(["fuDate"], false), ctx, "h").w("</div><div class=\"col-xs-2\"><a href=\"#chat-room-edit/").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-default\"><span class=\"glyphicon glyphicon-pencil\"></span></a></div></div><br />");
     }
     body_1.__dustBody = !0;
 
@@ -65,7 +65,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("chat_roomEdit", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"widget\">room edit<div class=\"form-group\"><label for=\"users\">users</label><input type=\"text\" class=\"form-control\" id=\"users\" placeholder=\"users\" list=\"browsers\" /></div></div>");
+      return chk.w("<div class=\"widget\">room edit<form id=\"chatRoomEdit\"><div class=\"row\"><div class=\"col-md-11\"><input type=\"text\" class=\"form-control\" id=\"users\" placeholder=\"users\" list=\"browsers\" /></div><div class=\"col-md-1\"><button type=\"submit\" class=\"btn btn-default\"><span class=\"glyphicon glyphicon-floppy-disk\"></span></button></div></div></form></div>");
     }
     body_0.__dustBody = !0;
     return body_0;

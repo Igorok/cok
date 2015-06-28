@@ -6,6 +6,10 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
         defaults: {
             _id: "-1",
             users: [],
+            friends: [],
+            creator: null,
+            date: null,
+            type: null,
         },
     });
 
@@ -35,6 +39,17 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
                 cb();
             });
         },
+        chatRoomEdit: function (rId, uIds, cb) {
+            var self = this;
+            var user = Api.getUser();
+            var _obj = {
+                uId: user._id,
+                token: user.token,
+                rId: rId,
+                uIds: uIds,
+            };
+            Api.call("chat.chatRoomEdit", _obj, cb);
+        }
     });
     return collection;
 });

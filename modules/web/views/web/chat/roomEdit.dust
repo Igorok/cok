@@ -1,8 +1,15 @@
 <div class="widget">
     room edit
-
-    <div class="form-group">
-        <label for="users">users</label>
-        <input type="text" class="form-control" id="users" placeholder="users" list="browsers" />
-    </div>
+    <form id="chatRoomEdit">
+        <div class="row">
+            <div class="col-md-11">
+                <input type="text" class="form-control" id="users" placeholder="users" list="browsers" />
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-default">
+                    <span class="glyphicon glyphicon-floppy-disk"></span>
+                </button>
+            </div>
+        </div>
+    </form>
 </div>

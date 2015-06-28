@@ -2,7 +2,7 @@
     <a href="#chat-room-edit/-1">New room</a>
     {#data}
     <div class="row">
-        <div class="col-xs-9">
+        <div class="col-xs-8">
             <a href="#chat-room/{_id}">
             {#users}
                 <span>{login}</span>&nbsp;
@@ -10,7 +10,14 @@
             </a>
         </div>
         <div class="col-xs-2">
-            {fDate}
+            {fcDate}
+            <br />
+            {fuDate}
+        </div>
+        <div class="col-xs-2">
+            <a href="#chat-room-edit/{_id}" class="btn btn-default">
+                <span class="glyphicon glyphicon-pencil"></span>
+            </a>
         </div>
     </div>
     <br />

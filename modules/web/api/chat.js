@@ -278,7 +278,8 @@ Api.prototype.getChatList = function (_data, cb) {
             },
         ], safe.sure(cb, function () {
             _.forEach(groupsArr, function (val) {
-                val.fDate = moment(val.date).calendar();
+                val.fcDate = val.cDate ? moment(val.cDate).calendar() : null;
+                val.fuDate = val.uDate ? moment(val.uDate).calendar() : null;
                 _.forEach(val.users, function (curentUser) {
                     var uId = curentUser._id.toString();
                     if (userObj[uId]) {
@@ -303,42 +304,200 @@ Api.prototype.getEditRoom = function (_data, cb) {
             return cb('Room id is required');
         }
         var rId = _params.rId.toString();
-        var userObj = null;
-        var friendIds = null;
-        var friendObj = null;
+        var usersIds = null;
+
 
         var result = {
             _id: _params.rId,
-            users: {},
+            users: [],
             creator: null,
             date: null,
             type: null,
+            friends: [],
         };
         safe.series([
             function (cb) {
                 cokcore.ctx.col.users.findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (_obj) {
-                    userObj = _obj;
-                    friendIds = _.pluck(userObj.friends, '_id');
+                    usersIds = _.pluck(_obj.friends, '_id');
                     cb();
                 }));
             },
             function (cb) {
-                cokcore.ctx.col.users.find({_id: {$in: friendIds}}, {login: 1}).toArray(safe.sure(cb, function (_arr) {
-                    friendObj = _.indexBy(_arr, '_id');
-                    result.users = _.toArray(friendObj);
+                if (rId === '-1') {
+                    return cb();
+                }
+                cokcore.ctx.col.chatgroups.findOne({_id: mongo.ObjectID(rId)}, safe.sure(cb, function (_obj) {
+                    result = _obj;
+                    usersIds.concat(_.pluck(_obj.users, '_id'));
                     cb();
                 }));
             },
-            // function (cb) {},
-            // function (cb) {},
+            function (cb) {
+                cokcore.ctx.col.users.find({_id: {$in: usersIds}}, {login: 1}).toArray(safe.sure(cb, function (_arr) {
+                    result.friends = _arr;
+                    var usersObj = _.indexBy(_arr, '_id');
+                    if (! result.users.length) {
+                        return cb();
+                    }
+                    result.users = _.map(result.users, function (val) {
+                        return usersObj[val._id.toString()];
+                    });
+                    cb();
+                }));
+            },
         ], safe.sure(cb, function () {
             cb(null, result);
         }));
-        // if (rId === '-1') {
-        // } else {
-        // }
     }));
 };
+
+
+
+
+
+// chatRoomEdit
+Api.prototype.chatRoomEdit = function (_data, cb) {
+    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (_.isEmpty(_params) || _.isEmpty(_params.rId) || _.isEmpty(_params.uIds)) {
+            return cb('Wrong data');
+        }
+        var roomId = _params.rId.toString();
+        var userIds = _params.uIds.toString().split(',');
+        var userId = mongo.ObjectID(_user._id);
+
+        userIds = _.map(userIds, function (val) {
+            return {_id: mongo.ObjectID(val)};
+        });
+        userIds.push({
+            _id: userId,
+        });
+        if (roomId === '-1') {
+            return Api.prototype.addRoom(userId, userIds, cb);
+        }
+        roomId = mongo.ObjectID(roomId);
+        Api.prototype.editRoom(userId, roomId, userIds, cb);
+    }));
+};
+
+
+
+Api.prototype.addRoom = function (userId, userIds, cb) {
+    var newRoom = {
+        users: userIds,
+        creator: userId,
+        cDate: new Date(),
+        type: "group"
+    };
+
+    var rId = null;
+    safe.series([
+        function (cb) {
+            cokcore.ctx.col.chatgroups.insert(newRoom, safe.sure(cb, function (_obj) {
+                newRoom = _obj.ops[0];
+                rId = newRoom._id.toString();
+                cb();
+            }));
+        },
+        function (cb) {
+            safe.each(newRoom.users, function (_obj, cb) {
+                var uId = _obj._id.toString();
+                var uObj = null;
+                cokcore.ctx.redis.get(uId, safe.sure(cb, function (_user) {
+                    if (! _user) {
+                        return cb();
+                    }
+                    uObj = JSON.parse(_user);
+                    if (_.include(uObj.rooms, rId)) {
+                        return cb();
+                    }
+                    uObj.rooms.push(rId);
+                    cokcore.ctx.redis.set(uId, JSON.stringify(uObj), cb);
+                }));
+            }, cb);
+        },
+    ], safe.sure(cb, function () {
+        cb();
+    }));
+};
+
+Api.prototype.editRoom = function (userId, roomId, userIds, cb) {
+    var newRoom = {
+        users: userIds,
+        creator: userId,
+        cDate: new Date(),
+        type: "group"
+    };
+    var oldRoom = null;
+    var rId = roomId.toString();
+    safe.series([
+        function (cb) {
+            cokcore.ctx.col.chatgroups.findOne({_id: roomId}, safe.sure(cb, function (_obj) {
+                oldRoom = _obj;
+                cb();
+            }));
+        },
+        function (cb) {
+            cokcore.ctx.col.chatgroups.update({_id: roomId}, {$set: {users: newRoom.users}}, cb);
+        },
+        function (cb) {
+            var uDeleted = _.difference(oldRoom.users, newRoom.users);
+            safe.each(uDeleted, function (_obj, cb) {
+                var uId = _obj._id.toString();
+                var uObj = null;
+                cokcore.ctx.redis.get(uId, safe.sure(cb, function (_user) {
+                    if (! _user) {
+                        return cb();
+                    }
+                    uObj = JSON.parse(_user);
+                    if (! _.include(uObj.rooms, rId)) {
+                        return cb();
+                    }
+                    _.pull(uObj.rooms, rId);
+                    cokcore.ctx.redis.set(uId, JSON.stringify(uObj), cb);
+                }));
+            }, cb);
+        },
+        function (cb) {
+            safe.each(newRoom.users, function (_obj, cb) {
+                var uId = _obj._id.toString();
+                var uObj = null;
+                cokcore.ctx.redis.get(uId, safe.sure(cb, function (_user) {
+                    if (! _user) {
+                        return cb();
+                    }
+                    uObj = JSON.parse(_user);
+                    if (_.include(uObj.rooms, rId)) {
+                        return cb();
+                    }
+                    uObj.rooms.push(rId);
+                    cokcore.ctx.redis.set(uId, JSON.stringify(uObj), cb);
+                }));
+            }, cb);
+        },
+    ], cb);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
