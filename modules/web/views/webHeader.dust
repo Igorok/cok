@@ -46,6 +46,7 @@
             "vUserDetail": "/javascripts/web/user/vUserDetail",
 
             "vChatPersonal": "/javascripts/web/chat/vChatPersonal",
+            "vChatRoom": "/javascripts/web/chat/vChatRoom",
             "vChatRoomEdit": "/javascripts/web/chat/vChatRoomEdit",
             "vChatList": "/javascripts/web/chat/vChatList",
             "mChat": "/javascripts/web/chat/mChat",

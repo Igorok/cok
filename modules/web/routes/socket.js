@@ -31,6 +31,27 @@ module.exports = function (app, io) {
             }));
         });
 
+
+
+        /**
+         * join room
+         * take token, users ids and returned a room id and users with statuses
+         */
+        socket.on('joinRoom', function (_obj) {
+            if (_.isEmpty(_obj)) {
+                return emitError(404);
+            }
+            var data = {
+                params: []
+            };
+            data.params.push(_obj);
+            cokcore.ctx.api.chat.joinRoom(data, safe.sure(emitError, function (data) {
+                socket.join(data._id, safe.sure(emitError, function () {
+                    socket.broadcast.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
+                    socket.emit('joinRoom', {_id: data._id, users: data.users, history: data.history});
+                }));
+            }));
+        });
         /**
          * chat message
          */

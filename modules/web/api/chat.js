@@ -155,6 +155,87 @@ Api.prototype.joinPersonal = function (_data, cb) {
 
 
 
+ /**
+  * chat room any count of users
+  * @param _id - id of user for chat
+  */
+ Api.prototype.joinRoom = function (_data, cb) {
+      var self = this;
+      cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+          if (_.isUndefined(_params.rId)) {
+              return cb ("Wrong rId");
+          }
+          var uId = mongo.ObjectID(_user._id);
+          var rId = mongo.ObjectID(_params.rId);
+          var cRoom = null;
+          var users = {};
+          var history = [];
+
+          safe.series([
+              function (cb) {
+                  safe.parallel([
+                      function (cb) {
+                          cokcore.ctx.col.chatgroups.findOne({_id: rId, 'users._id': uId}, safe.sure(cb, function (_obj) {
+                              if (! _obj) {
+                                  return cb(404);
+                              }
+                              cRoom = _obj;
+                              cb();
+                          }));
+                      },
+                      function (cb) {
+                          cokcore.ctx.col.chatmessages.find({rId: rId}, {$sort: {date: -1}, limit: 100}).toArray(safe.sure(cb, function (_arr) {
+                              history = _arr;
+                              cb();
+                          }));
+                      },
+                  ], cb);
+              },
+              function (cb) {
+                  var userIds = _.pluck(cRoom.users, '_id');
+                  cokcore.ctx.col.users.find({_id: {$in: userIds}}, {login: 1}).toArray(safe.sure(cb, function (_arr) {
+                      safe.each(_arr, function(_usr, cb) {
+                          var id = _usr._id.toString();
+                          users[id] = {
+                              _id: id,
+                              login: _usr.login,
+                          }
+                          self.getUserStatus(id, safe.sure(cb, function (status) {
+                              users[id].status = status;
+                              cb();
+                          }));
+
+                      }, cb);
+                  }));
+              },
+              function (cb) {
+                  history = _.map(history, function (val) {
+                      return {
+                          uId: val.uId.toString(),
+                          login: users[val.uId.toString()].login,
+                          msg: val.msg,
+                          date: moment(val.date).calendar(),
+                      };
+                  });
+                  if (_.include(_user.rooms, rId)) {
+                      return cb();
+                  }
+                  _user.rooms.push(rId);
+                  cokcore.ctx.redis.set(_user._id, JSON.stringify(_user), safe.sure(cb, function () {
+                      cb();
+                  }));
+              },
+          ], safe.sure(cb, function () {
+              var data = {
+                  _id: cRoom._id.toString(),
+                  users: users,
+                  history: history,
+              };
+              cb(null, data);
+          }));
+      }));
+  };
+
 
 
 /*
