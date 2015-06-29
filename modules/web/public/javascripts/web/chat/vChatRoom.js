@@ -9,7 +9,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
         initialize: function (data) {
             var self = this;
             self._id = data._id;
-            self.socket = null
+            self.socket = new io(window.location.origin);
             self.user = Api.getUser();
             self.statuses = {
                 'off': 'danger',
@@ -94,7 +94,6 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                 return false;
             }
 
-            self.socket = new io(window.location.origin);
             self.socket.emit("joinRoom", {
                 uId: self.user._id,
                 token: self.user.token,

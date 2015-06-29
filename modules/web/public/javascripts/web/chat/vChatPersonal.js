@@ -8,7 +8,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
         },
         initialize: function (data) {
             var self = this;
-            self.socket = null
+            self.socket = new io(window.location.origin);
             self.user = Api.getUser();
             self.room = null;
             self.personId = data._id;
@@ -95,7 +95,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                 return false;
             }
 
-            self.socket = new io(window.location.origin);
+
             self.socket.emit("joinPersonal", {
                 uId: self.user._id,
                 token: self.user.token,
