@@ -116,7 +116,7 @@ var Core = function () {
                 _db.authenticate(
                     self.ctx.cfg.mongo.user,
                     self.ctx.cfg.mongo.password,
-                    safe.sure(cd, function () {
+                    safe.sure(cb, function () {
                         cb(null, _db);
                     })
                 );
@@ -191,6 +191,22 @@ var Core = function () {
         });
         Promise.all([confDef, confLoc]).then(function (val) {
             self.ctx.cfg = _.merge(val[0], val[1]);
+
+            if (process.env.MONGOHOST) {
+                self.ctx.cfg.mongo.auth = true;
+                self.ctx.cfg.mongo.host = process.env.MONGOHOST;
+                self.ctx.cfg.mongo.port = process.env.MONGOPORT;
+                self.ctx.cfg.mongo.user = process.env.MONGOUSER;
+                self.ctx.cfg.mongo.password = process.env.MONGOPASSWORD;
+            }
+
+            if (process.env.REDISHOST) {
+                self.ctx.cfg.redis.auth = true;
+                self.ctx.cfg.redis.host = process.env.REDISHOST;
+                self.ctx.cfg.redis.port = process.env.REDISPORT;
+                self.ctx.cfg.redis.password = process.env.REDISPASSWORD;
+            }
+
             cb() ;
         }).catch(self.exit);
     };
