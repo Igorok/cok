@@ -194,17 +194,17 @@ var Core = function () {
 
             if (process.env.MONGOHOST) {
                 self.ctx.cfg.mongo.auth = true;
-                self.ctx.cfg.mongo.host = process.env.MONGOHOST;
-                self.ctx.cfg.mongo.port = process.env.MONGOPORT;
-                self.ctx.cfg.mongo.user = process.env.MONGOUSER;
-                self.ctx.cfg.mongo.password = process.env.MONGOPASSWORD;
+                self.ctx.cfg.mongo.host = process.env.MONGOHOST.toString();
+                self.ctx.cfg.mongo.port = parseInt(process.env.MONGOPORT);
+                self.ctx.cfg.mongo.user = process.env.MONGOUSER.toString();
+                self.ctx.cfg.mongo.password = process.env.MONGOPASSWORD.toString();
             }
 
             if (process.env.REDISHOST) {
                 self.ctx.cfg.redis.auth = true;
-                self.ctx.cfg.redis.host = process.env.REDISHOST;
-                self.ctx.cfg.redis.port = process.env.REDISPORT;
-                self.ctx.cfg.redis.password = process.env.REDISPASSWORD;
+                self.ctx.cfg.redis.host = process.env.REDISHOST.toString();
+                self.ctx.cfg.redis.port = parseInt(process.env.REDISPORT);
+                self.ctx.cfg.redis.password = process.env.REDISPASSWORD.toString();
             }
 
             cb() ;
