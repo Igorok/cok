@@ -16,6 +16,7 @@ module.exports = function (app, io) {
          * take token, users ids and returned a room id and users with statuses
          */
         socket.on('joinPersonal', function (_obj) {
+            console.log('joinPersonal');
             if (_.isEmpty(_obj)) {
                 return emitError(404);
             }
@@ -24,10 +25,15 @@ module.exports = function (app, io) {
             };
             data.params.push(_obj);
             cokcore.ctx.api.chat.joinPersonal(data, safe.sure(emitError, function (data) {
-                socket.join(data._id, safe.sure(emitError, function () {
-                    socket.broadcast.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
+                if(socket.rooms.indexOf(data._id) >= 0) {
+                    socket.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
                     socket.emit('joinPersonal', {_id: data._id, users: data.users, history: data.history});
-                }));
+                } else {
+                    socket.join(data._id, safe.sure(emitError, function () {
+                        socket.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
+                        socket.emit('joinPersonal', {_id: data._id, users: data.users, history: data.history});
+                    }));
+                }
             }));
         });
 
@@ -46,10 +52,16 @@ module.exports = function (app, io) {
             };
             data.params.push(_obj);
             cokcore.ctx.api.chat.joinRoom(data, safe.sure(emitError, function (data) {
-                socket.join(data._id, safe.sure(emitError, function () {
-                    socket.broadcast.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
+                if(socket.rooms.indexOf(data._id) >= 0) {
+                    socket.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
                     socket.emit('joinRoom', {_id: data._id, users: data.users, history: data.history});
-                }));
+                } else {
+                    socket.join(data._id, safe.sure(emitError, function () {
+                        socket.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
+                        socket.emit('joinRoom', {_id: data._id, users: data.users, history: data.history});
+                    }));
+                }
+
             }));
         });
         /**
@@ -64,7 +76,7 @@ module.exports = function (app, io) {
             };
             data.params.push(_obj);
             cokcore.ctx.api.chat.message(data, safe.sure(emitError, function (data) {
-                socket.broadcast.to(data.rId).emit('message', {
+                socket.to(data.rId).emit('message', {
                     msg: data.msg,
                     uId: data.uId,
                     login: data.login,
@@ -96,7 +108,11 @@ module.exports = function (app, io) {
         });
 
 
-
+        // leave room
+        socket.on('disconnect', function() {
+            console.log('disconnect')
+            socket.leaveAll();
+        });
         next();
     });
 };
