@@ -6,10 +6,8 @@
         </div>
         <div class="col-xs-9">
             <a href="#user/{_id}">{login}</a>
-            {#friend}
             <br />
             <a href="#chat/{_id}">Send a message</a>
-            {/friend}
         </div>
         <div class="col-xs-2">
             {#friend}

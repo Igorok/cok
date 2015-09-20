@@ -1,4 +1,4 @@
-define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", "vIndex", "vUserList", "vUserDetail", "vFriendList", "vReg", "vFriendReq", "vChatPersonal", "vChatList", "vChatRoomEdit", "vChatRoom"], function ($, _, Backbone, dust, Api, Msg, vAuth, vIndex, vUserList, vUserDetail, vFriendList, vReg, vFriendReq, vChatPersonal, vChatList, vChatRoomEdit, vChatRoom) {
+define (["jquery", "underscore", "backbone", "dust", "io", "api", "message", "vAuth", "vIndex", "vUserList", "vUserDetail", "vFriendList", "vReg", "vFriendReq", "vChatPersonal", "vChatList", "vChatRoomEdit", "vChatRoom"], function ($, _, Backbone, dust, io, Api, Msg, vAuth, vIndex, vUserList, vUserDetail, vFriendList, vReg, vFriendReq, vChatPersonal, vChatList, vChatRoomEdit, vChatRoom) {
     "use strict";
     var Route = Backbone.Router.extend({
         routes:  {
@@ -21,6 +21,22 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
         // },
         execute: function(callback, args, name) {
             var self = this;
+            if (window.socket) {
+                var eArr = [
+                    "joinPersonal",
+                    "joinRoom",
+                    "joinUser",
+                    "freshStatus",
+                    "message",
+                    "err",
+                ];
+                _.each(eArr, function (_ev) {
+                    window.socket.removeAllListeners(_ev);
+                });
+                window.socket.close();
+            }
+
+
             if ((name === 'auth') || (name === 'registration')) {
                 callback.apply(this, args);
             } else {
@@ -37,6 +53,10 @@ define (["jquery", "underscore", "backbone", "dust", "api", "message", "vAuth", 
                     });
                 }
             }
+
+
+
+
         },
 
 

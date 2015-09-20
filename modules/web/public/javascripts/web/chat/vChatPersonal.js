@@ -8,10 +8,21 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
         },
         initialize: function (data) {
             var self = this;
-            self.socket = io.connect(window.location.hostname);
+            if (! data._id) {
+                return Msg.showError(null, JSON.stringify("Not found"));
+            }
+
             self.user = Api.getUser();
             self.room = null;
             self.personId = data._id;
+            if (! window.socket) {
+                window.socket = io.connect(window.location.hostname);
+            } else {
+                window.socket.connect();
+            }
+
+            self.socket = window.socket;
+
             self.statuses = {
                 'off': 'danger',
                 'absent': 'warning',
@@ -89,13 +100,29 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
             });
         },
 
+        renderChat: function (data) {
+            var self = this;
+
+            dust.render("chat_form", {}, function (err, text) {
+                if (err) {
+                    return Msg.showError(null, JSON.stringify(err));
+                }
+                self.room = data._id;
+                self.$el.html(text);
+
+                self.users = data.users
+                self.renderMessage(data.history);
+                self.renderUsers(data.users);
+                return self;
+            });
+        },
+
         startChat: function () {
             var self = this;
             if (! self.personId) {
                 return false;
             }
 
-            console.log('startChat ', self.socket);
             self.socket.emit("joinPersonal", {
                 uId: self.user._id,
                 token: self.user.token,
@@ -106,18 +133,8 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
             });
 
             self.socket.on("joinPersonal", function (data) {
-                dust.render("chat_form", {}, function (err, text) {
-                    if (err) {
-                        return Msg.showError(null, JSON.stringify(err));
-                    }
-                    self.room = data._id;
-                    self.$el.html(text);
 
-                    self.users = data.users
-                    self.renderMessage(data.history);
-                    self.renderUsers(data.users);
-                    return self;
-                });
+                return self.renderChat(data);
             });
             self.socket.on("joinUser", function (data) {
                 var arr = [{
@@ -128,14 +145,16 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
             });
 
 
-            self.socket.on("message", function (_obj) {
-                self.renderMessage(_obj);
+            self.socket.on("message", function (data) {
+
+                self.renderMessage(data);
                 var arr = [{
-                    _id: _obj.uId,
+                    _id: data.uId,
                     status: 'on',
                 }];
                 self.freshStatus(arr);
             });
+
             self.socket.on("freshStatus", function (_obj) {
                 self.freshStatus(_obj.users);
             });

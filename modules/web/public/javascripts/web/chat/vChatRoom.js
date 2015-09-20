@@ -8,8 +8,19 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
         },
         initialize: function (data) {
             var self = this;
+            if (! data._id) {
+                return Msg.showError(null, JSON.stringify("Not found"));
+            }
+
             self._id = data._id;
-            self.socket = io.connect(window.location.hostname);
+            if (! window.socket) {
+                window.socket = io.connect(window.location.hostname);
+            } else {
+                window.socket.connect();
+            }
+
+            self.socket = window.socket;
+
             self.user = Api.getUser();
             self.statuses = {
                 'off': 'danger',
@@ -93,7 +104,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
             if (! self._id) {
                 return false;
             }
-            console.log('startChat ', self.socket);
+
 
 
             self.socket.emit("joinRoom", {

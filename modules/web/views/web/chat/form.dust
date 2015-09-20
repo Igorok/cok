@@ -6,7 +6,7 @@
     <div id="chatFormCase">
         <form id="chatMessage">
             <div class="input-group">
-                <input id="chatText" type="text" class="form-control" required>
+                <input id="chatText" type="text" class="form-control" required autofocus />
                 <span class="input-group-btn">
                     <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-send"></span></button>
                 </span>
