@@ -21,22 +21,6 @@ define (["jquery", "underscore", "backbone", "dust", "io", "api", "message", "vA
         // },
         execute: function(callback, args, name) {
             var self = this;
-            if (window.socket) {
-                var eArr = [
-                    "joinPersonal",
-                    "joinRoom",
-                    "joinUser",
-                    "freshStatus",
-                    "message",
-                    "err",
-                ];
-                _.each(eArr, function (_ev) {
-                    window.socket.removeAllListeners(_ev);
-                });
-                window.socket.close();
-            }
-
-
             if ((name === 'auth') || (name === 'registration')) {
                 callback.apply(this, args);
             } else {
@@ -53,10 +37,6 @@ define (["jquery", "underscore", "backbone", "dust", "io", "api", "message", "vA
                     });
                 }
             }
-
-
-
-
         },
 
 
@@ -99,6 +79,7 @@ define (["jquery", "underscore", "backbone", "dust", "io", "api", "message", "vA
             $('#main').html(view.render().el);
         },
         chatRoom: function (_id) {
+            socketClose();
             var view = new vChatRoom({
                 _id: _id
             });
@@ -111,6 +92,7 @@ define (["jquery", "underscore", "backbone", "dust", "io", "api", "message", "vA
             $('#main').html(view.render().el);
         },
         chatPersonal: function (_id) {
+            socketClose();
             var view = new vChatPersonal({
                 _id: _id
             });
@@ -130,7 +112,22 @@ define (["jquery", "underscore", "backbone", "dust", "io", "api", "message", "vA
         }
     });
 
-
+    var socketClose = function () {
+        if (window.socket) {
+            var eArr = [
+                "joinPersonal",
+                "joinRoom",
+                "joinUser",
+                "freshStatus",
+                "message",
+                "err",
+            ];
+            _.each(eArr, function (_ev) {
+                window.socket.removeAllListeners(_ev);
+            });
+            window.socket.close();
+        }
+    };
     var init = function () {
         new Route({});
         Backbone.history.start();
