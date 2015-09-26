@@ -194,11 +194,11 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("user_index", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"row widget\"><div class=\"col-md-3\"><img src=\"").s(ctx.get(["picture"], false), ctx, {
+      return chk.w("<div class=\"widget\"><div class=\"row\"><div class=\"col-md-3\"><img src=\"").s(ctx.get(["picture"], false), ctx, {
         "block": body_1
       }, {}).nx(ctx.get(["picture"], false), ctx, {
         "block": body_2
-      }, {}).w("\" alt=\"\" class=\"img-thumbnail\"></div><div class=\"col-md-9\"><br><p>").f(ctx.get(["login"], false), ctx, "h").w("</p><p>").f(ctx.get(["email"], false), ctx, "h").w("</p></div></div>");
+      }, {}).w("\" alt=\"\" class=\"img-thumbnail\"></div><div class=\"col-md-9\"><br><p>").f(ctx.get(["login"], false), ctx, "h").w("</p><p>").f(ctx.get(["email"], false), ctx, "h").w("</p></div></div></div>");
     }
     body_0.__dustBody = !0;
 
