@@ -260,6 +260,7 @@ Api.prototype.addFriendRequest = function (_data, cb) {
                 safe.parallel([
                     function (cb) {
                         var setData = {
+                            $set: {updated: new Date()},
                             $addToSet: {
                                 selfFriendRequests: {_id: fid},
                             },
@@ -268,6 +269,7 @@ Api.prototype.addFriendRequest = function (_data, cb) {
                     },
                     function (cb) {
                         var setData = {
+                            $set: {updated: new Date()},
                             $addToSet: {
                                 friendRequests: {_id: uId},
                             },
@@ -305,6 +307,7 @@ Api.prototype.addFriend = function (_data, cb) {
                         return cb ("Request from friend is not defined");
                     }
                     var updateObj = {
+                        $set: {updated: new Date()},
                         $addToSet: {
                             friends: {_id: mongo.ObjectID(frId)}
                         },
@@ -322,6 +325,7 @@ Api.prototype.addFriend = function (_data, cb) {
                         return cb ("Request to friend is not defined");
                     }
                     var updateObj = {
+                        $set: {updated: new Date()},
                         $addToSet: {
                             friends: {_id: uId}
                         },
@@ -413,10 +417,16 @@ Api.prototype.deleteFriend = function (_data, cb) {
 
         safe.parallel([
             function (cb) {
-                cokcore.ctx.col.users.update({_id: uId}, {$pull: {friends: {_id: mongo.ObjectID(frId)}}}, cb)
+                cokcore.ctx.col.users.update({_id: uId}, {
+                    $pull: {friends: {_id: mongo.ObjectID(frId)}},
+                    $set: {updated: new Date()},
+                }, cb)
             },
             function (cb) {
-                cokcore.ctx.col.users.update({_id: mongo.ObjectID(frId)}, {$pull: {friends: {_id: uId}}}, cb)
+                cokcore.ctx.col.users.update({_id: mongo.ObjectID(frId)}, {
+                    $pull: {friends: {_id: uId}},
+                    $set: {updated: new Date()},
+                }, cb)
             },
         ], safe.sure(cb, function () {
             cb(null, true);

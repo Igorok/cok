@@ -33,21 +33,25 @@ var Api = function () {
 };
 Api.prototype.init = function (cb) {
     var self = this;
-    safe.parallel([
+    safe.series([
         function (cb) {
-            cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
-                cb();
-            }));
-        },
-        function (cb) {
-            cokcore.collection("chatmessages", safe.sure(cb, function (chatmessages) {
-                cb();
-            }));
-        },
-        function (cb) {
-            cokcore.collection("users", safe.sure(cb, function (users) {
-                cb();
-            }));
+            safe.parallel([
+                function (cb) {
+                    cokcore.collection("chatgroups", safe.sure(cb, function (chatgroups) {
+                        cb();
+                    }));
+                },
+                function (cb) {
+                    cokcore.collection("chatmessages", safe.sure(cb, function (chatmessages) {
+                        cb();
+                    }));
+                },
+                function (cb) {
+                    cokcore.collection("users", safe.sure(cb, function (users) {
+                        cb();
+                    }));
+                },
+            ], cb);
         },
         function (cb) {
             cokcore.apiLoad(__dirname + '/user.js', safe.sure(cb, function (_api) {
