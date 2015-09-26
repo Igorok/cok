@@ -229,11 +229,13 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
         "block": body_2
       }, {}).nx(ctx.get(["picture"], false), ctx, {
         "block": body_3
-      }, {}).w("\" alt=\"\" class=\"img-thumbnail\"></div><div class=\"col-xs-9\"><a href=\"#user/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w("</a><br /><a href=\"#chat/").f(ctx.get(["_id"], false), ctx, "h").w("\">Send a message</a></div><div class=\"col-xs-2\">").s(ctx.get(["friend"], false), ctx, {
-        "block": body_4
-      }, {}).nx(ctx.get(["friend"], false), ctx, {
+      }, {}).w("\" alt=\"\" class=\"img-thumbnail\"></div><div class=\"col-xs-9\"><a href=\"#user/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["login"], false), ctx, "h").w("</a><br /><a href=\"#chat/").f(ctx.get(["_id"], false), ctx, "h").w("\">Send a message</a></div><div class=\"col-xs-2\">").h("eq", ctx, {
+        "else": body_4,
         "block": body_5
-      }, {}).w("</div></div><br />");
+      }, {
+        "key": ctx.get(["friend"], false),
+        "value": 1
+      }).w("</div></div><br />");
     }
     body_1.__dustBody = !0;
 
@@ -248,12 +250,12 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_3.__dustBody = !0;
 
     function body_4(chk, ctx) {
-      return chk.w("<button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-danger delFriendBtn\"><span class=\"glyphicon glyphicon-remove\"></span></button>");
+      return chk.w("<button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-success addFriendBtn\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
     }
     body_4.__dustBody = !0;
 
     function body_5(chk, ctx) {
-      return chk.w("<button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-success addFriendBtn\"><span class=\"glyphicon glyphicon-plus\"></span></button>");
+      return chk.w("<button data-id=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" class=\"btn btn-sm btn-danger delFriendBtn\"><span class=\"glyphicon glyphicon-remove\"></span></button>");
     }
     body_5.__dustBody = !0;
     return body_0;

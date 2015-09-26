@@ -10,16 +10,15 @@
             <a href="#chat/{_id}">Send a message</a>
         </div>
         <div class="col-xs-2">
-            {#friend}
+            {@eq key=friend value=1}
                 <button data-id="{_id}" class="btn btn-sm btn-danger delFriendBtn">
                     <span class="glyphicon glyphicon-remove"></span>
                 </button>
-            {/friend}
-            {^friend}
+            {:else}
                 <button data-id="{_id}" class="btn btn-sm btn-success addFriendBtn">
                     <span class="glyphicon glyphicon-plus"></span>
                 </button>
-            {/friend}
+            {/eq}
         </div>
     </div>
     <br />

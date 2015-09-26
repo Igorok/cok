@@ -180,7 +180,9 @@ Api.prototype.getUserList = function (_data, cb) {
                     _.each(_arr, function (val) {
                         // hide friend button
                         if (friendObj[val._id.toString()]) {
-                            val.friend = true;
+                            val.friend = 1;
+                        } else {
+                            val.friend = 0;
                         }
                         users.push(val);
                     });
@@ -412,18 +414,18 @@ Api.prototype.deleteFriend = function (_data, cb) {
         if (_.isEmpty(_params._id)) {
             return cb ("_id is required");
         }
-        var frId = _params._id.toString();
+        var frId = mongo.ObjectID(_params._id.toString());
         var uId = mongo.ObjectID(_user._id);
 
         safe.parallel([
             function (cb) {
                 cokcore.ctx.col.users.update({_id: uId}, {
-                    $pull: {friends: {_id: mongo.ObjectID(frId)}},
+                    $pull: {friends: {_id: frId}},
                     $set: {updated: new Date()},
                 }, cb)
             },
             function (cb) {
-                cokcore.ctx.col.users.update({_id: mongo.ObjectID(frId)}, {
+                cokcore.ctx.col.users.update({_id: frId}, {
                     $pull: {friends: {_id: uId}},
                     $set: {updated: new Date()},
                 }, cb)
