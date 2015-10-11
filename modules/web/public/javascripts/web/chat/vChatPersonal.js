@@ -1,4 +1,4 @@
-define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "api"], function ($, _, backbone, dust, tpl, Msg, io, Api) {
+define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "api", "mChat"], function ($, _, backbone, dust, tpl, Msg, io, Api, mChat) {
     'use strict';
 
 
@@ -12,6 +12,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                 return Msg.showError(null, JSON.stringify("Not found"));
             }
 
+            self.model = new mChat();
             self.user = Api.getUser();
             self.room = null;
             self.personId = data._id;
@@ -110,9 +111,11 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                 self.room = data._id;
                 self.$el.html(text);
 
-                self.users = data.users
-                self.renderMessage(data.history);
+                self.users = data.users;
                 self.renderUsers(data.users);
+                self.model.getRoomMessages(data._id, function (_arr) {
+                    self.renderMessage(_arr);
+                });
                 return self;
             });
         },
@@ -133,7 +136,6 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
             });
 
             self.socket.on("joinPersonal", function (data) {
-
                 return self.renderChat(data);
             });
             self.socket.on("joinUser", function (data) {

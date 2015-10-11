@@ -33,6 +33,7 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
                 token: user.token,
                 _id: (_id || user._id),
             };
+
             Api.call("user.getUserDetail", data, function (ret) {
                 if (! ret && ! ret.result) {
                     return cb();

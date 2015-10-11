@@ -62,6 +62,80 @@ Api.prototype.init = function (cb) {
 };
 
 
+/**
+* get history of messages for chat room
+* @param _params.rId - id of chat room
+* @param _params.limit - limit of messages
+* @param _params.fDate - date for start messages find
+*/
+Api.prototype.getRoomMessages = function (_data, cb) {
+    var self = this;
+    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
+        if (! _params.rId) {
+            return cb("wrong room");
+        }
+        if (! _params.limit && ! _params.fDate) {
+            return cb("parameter of the limit is required");
+        }
+        var query = {
+            _id: mongo.ObjectID(_params.rId.toString()),
+            "users._id": mongo.ObjectID(_user._id),
+        };
+        if (_params.fDate) {
+            query.date = {
+                $gt: new Date(_params.fDate.toString()),
+            }
+        }
+
+        var opts = {
+            sort: {date: -1}
+        }
+        if (_params.limit) {
+            opts.limit = parseInt(_params.limit);
+        }
+        var gObj = null;
+        var uObj = {};
+        var msgArr = [];
+        safe.series([
+            function (cb) {
+                cokcore.ctx.col.chatgroups.findOne(query, safe.sure(cb, function (_obj) {
+                    if (! _obj) {
+                        return cb ("Room not found");
+                    }
+                    gObj = _obj;
+                    cb();
+                }));
+            },
+            function (cb) {
+                var ids = _.pluck(gObj.users, '_id');
+                cokcore.ctx.col.users.find({_id: {$in: ids}}, {login: 1}).toArray(safe.sure(cb, function (_arr) {
+                    _.each(_arr, function (val) {
+                        uObj[val._id] = val.login;
+                    });
+                    cb();
+                }));
+            },
+            function (cb) {
+                cokcore.ctx.col.chatmessages.find({rId: gObj._id}, opts).toArray(safe.sure(cb, function (_arr) {
+                    _.forEachRight(_arr, function (val) {
+                        var uId = val.uId.toString();
+                        var msg = {
+                            uId: uId,
+                            login: uObj[uId],
+                            msg: val.msg,
+                            date: moment(val.date).calendar(),
+                        };
+                        msgArr.push(msg);
+                    });
+                    cb();
+                }));
+            },
+        ], safe.sure(cb, function () {
+            cb(null, msgArr);
+        }));
+
+    }));
+};
 
 /**
  * personal chat only for 2 users
@@ -123,20 +197,6 @@ Api.prototype.joinPersonal = function (_data, cb) {
                  }));
              },
              function (cb) {
-                 cokcore.ctx.col.chatmessages.find({rId: cRoom._id}, {$sort: {date: -1}, limit: 100}).toArray(safe.sure(cb, function (_arr) {
-                     _.forEach(_arr, function (val) {
-                         var msg = {
-                             uId: val.uId.toString(),
-                             login: users[val.uId.toString()].login,
-                             msg: val.msg,
-                             date: moment(val.date).calendar(),
-                         };
-                         history.push(msg);
-                     });
-                     cb();
-                 }));
-             },
-             function (cb) {
                  if (_.include(_user.rooms, rId)) {
                      return cb();
                  }
@@ -148,9 +208,8 @@ Api.prototype.joinPersonal = function (_data, cb) {
              },
          ], safe.sure(cb, function () {
              var data = {
-                 _id: cRoom._id.toString(),
+                 _id: rId,
                  users: users,
-                 history: history,
              };
              cb(null, data);
          }));
@@ -173,27 +232,16 @@ Api.prototype.joinPersonal = function (_data, cb) {
           var rId = mongo.ObjectID(_params.rId);
           var cRoom = null;
           var users = {};
-          var history = [];
 
           safe.series([
               function (cb) {
-                  safe.parallel([
-                      function (cb) {
-                          cokcore.ctx.col.chatgroups.findOne({_id: rId, 'users._id': uId}, safe.sure(cb, function (_obj) {
-                              if (! _obj) {
-                                  return cb(404);
-                              }
-                              cRoom = _obj;
-                              cb();
-                          }));
-                      },
-                      function (cb) {
-                          cokcore.ctx.col.chatmessages.find({rId: rId}, {$sort: {date: -1}, limit: 100}).toArray(safe.sure(cb, function (_arr) {
-                              history = _arr;
-                              cb();
-                          }));
-                      },
-                  ], cb);
+                  cokcore.ctx.col.chatgroups.findOne({_id: rId, 'users._id': uId}, safe.sure(cb, function (_obj) {
+                      if (! _obj) {
+                          return cb(404);
+                      }
+                      cRoom = _obj;
+                      cb();
+                  }));
               },
               function (cb) {
                   var userIds = _.pluck(cRoom.users, '_id');
@@ -213,14 +261,6 @@ Api.prototype.joinPersonal = function (_data, cb) {
                   }));
               },
               function (cb) {
-                  history = _.map(history, function (val) {
-                      return {
-                          uId: val.uId.toString(),
-                          login: users[val.uId.toString()].login,
-                          msg: val.msg,
-                          date: moment(val.date).calendar(),
-                      };
-                  });
                   if (_.include(_user.rooms, rId)) {
                       return cb();
                   }
@@ -233,7 +273,6 @@ Api.prototype.joinPersonal = function (_data, cb) {
               var data = {
                   _id: cRoom._id.toString(),
                   users: users,
-                  history: history,
               };
               cb(null, data);
           }));

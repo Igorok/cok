@@ -151,6 +151,17 @@ Api.prototype.logout = function (_data, cb) {
         cokcore.ctx.redis.del(_params.token, {}, cb);
     }));
 };
+
+
+Api.prototype.getUserUpdated = function (_data, cb) {
+    Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
+        cokcore.ctx.col.users.findOne({_id: mongo.ObjectID(_user._id)}, {updated: 1}, safe.sure(cb, function (_obj) {
+            var updated = _obj.updated || null;
+            cb(null, updated)
+        }));
+    }));
+};
+
 /**
 * all users
 */
