@@ -153,14 +153,85 @@ Api.prototype.logout = function (_data, cb) {
 };
 
 
-Api.prototype.getUserUpdated = function (_data, cb) {
+
+
+/**
+* user list for mobile
+* @param date - date of last request of user list
+* @return retObj.act - boolean, check of actuality information for requested date
+* @return retObj.data - array of users if information did changed
+*/
+Api.prototype.getMobileUserList = function (_data, cb) {
     Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
-        cokcore.ctx.col.users.findOne({_id: mongo.ObjectID(_user._id)}, {updated: 1}, safe.sure(cb, function (_obj) {
-            var updated = _obj.updated || null;
-            cb(null, updated)
+        var uId = mongo.ObjectID(_user._id);
+        var uArr = [];
+        var friendObj = {};
+        var reqDt = _params.date || null;
+        var retObj = {
+            act: true,
+            data: [],
+        };
+
+        cokcore.ctx.col.users.findOne({_id: mongo.ObjectID(_user._id)}, safe.sure(cb, function (_obj) {
+            var upDt = _obj.updated || null;
+            // check that date of last request later last update of user
+            if (reqDt && (new Date(reqDt).valueOf() > new Date(upDt).valueOf())) {
+                return cb(null, retObj);
+            }
+
+            _.each(_obj.friends, function (val) {
+                friendObj[val._id.toString()] = val;
+            });
+            _.each(_obj.selfFriendRequests, function (val) {
+                friendObj[val._id.toString()] = val;
+            });
+            _.each(_obj.friendRequests, function (val) {
+                friendObj[val._id.toString()] = val;
+            });
+
+            cokcore.ctx.col.users.find({_id: {$ne: uId}, status: 1}, {login: 1, email: 1}).toArray(safe.sure(cb, function (_arr) {
+                retObj.act = false;
+                _.each(_arr, function (val) {
+                    // hide friend button
+                    if (friendObj[val._id.toString()]) {
+                        val.friend = 1;
+                    } else {
+                        val.friend = 0;
+                    }
+                    retObj.data.push(val);
+                });
+
+                cb(null, retObj);
+            }));
+
         }));
     }));
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
 * all users
