@@ -62,84 +62,12 @@ Api.prototype.init = function (cb) {
 };
 
 
-/**
-* get history of messages for chat room
-* @param _params.rId - id of chat room
-* @param _params.limit - limit of messages
-* @param _params.fDate - date for start messages find
-*/
-Api.prototype.getRoomMessages = function (_data, cb) {
-    var self = this;
-    cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-        if (! _params.rId) {
-            return cb("wrong room");
-        }
-        if (! _params.limit && ! _params.fDate) {
-            return cb("parameter of the limit is required");
-        }
-        var query = {
-            _id: mongo.ObjectID(_params.rId.toString()),
-            "users._id": mongo.ObjectID(_user._id),
-        };
-        if (_params.fDate) {
-            query.date = {
-                $gt: new Date(_params.fDate.toString()),
-            }
-        }
-
-        var opts = {
-            sort: {date: -1}
-        }
-        if (_params.limit) {
-            opts.limit = parseInt(_params.limit);
-        }
-        var gObj = null;
-        var uObj = {};
-        var msgArr = [];
-        safe.series([
-            function (cb) {
-                cokcore.ctx.col.chatgroups.findOne(query, safe.sure(cb, function (_obj) {
-                    if (! _obj) {
-                        return cb ("Room not found");
-                    }
-                    gObj = _obj;
-                    cb();
-                }));
-            },
-            function (cb) {
-                var ids = _.pluck(gObj.users, '_id');
-                cokcore.ctx.col.users.find({_id: {$in: ids}}, {login: 1}).toArray(safe.sure(cb, function (_arr) {
-                    _.each(_arr, function (val) {
-                        uObj[val._id] = val.login;
-                    });
-                    cb();
-                }));
-            },
-            function (cb) {
-                cokcore.ctx.col.chatmessages.find({rId: gObj._id}, opts).toArray(safe.sure(cb, function (_arr) {
-                    _.forEachRight(_arr, function (val) {
-                        var uId = val.uId.toString();
-                        var msg = {
-                            uId: uId,
-                            login: uObj[uId],
-                            msg: val.msg,
-                            date: moment(val.date).calendar(),
-                        };
-                        msgArr.push(msg);
-                    });
-                    cb();
-                }));
-            },
-        ], safe.sure(cb, function () {
-            cb(null, msgArr);
-        }));
-
-    }));
-};
 
 /**
  * personal chat only for 2 users
  * @param _id - id of user for chat
+ * @param _params.limit - limit of messages
+ * @param _params.fDate - date for start messages find
  */
 Api.prototype.joinPersonal = function (_data, cb) {
      var self = this;
@@ -152,6 +80,21 @@ Api.prototype.joinPersonal = function (_data, cb) {
          var rId = null;
          var users = {};
          var history = [];
+
+        // query for messages
+        var msgQwe = {};
+        if (_params.fDate) {
+            msgQwe.date = {
+                $gt: new Date(_params.fDate.toString()),
+            }
+        }
+        var msgOpt = {
+            sort: {date: -1}
+        }
+        if (_params.limit) {
+            msgOpt.limit = parseInt(_params.limit);
+        }
+
          safe.series([
              function (cb) {
                  cokcore.ctx.col.chatgroups.findOne({$and: [{'users._id':  uId}, {'users._id':  mongo.ObjectID(_params.personId)}], type: 'personal'}, safe.sure(cb, function (_obj) {
@@ -179,8 +122,10 @@ Api.prototype.joinPersonal = function (_data, cb) {
                  if (cRoom.users.length !== 2) {
                      return cb("Wrong _id 2");
                  }
+                 msgQwe.rId = cRoom._id;
                  rId = cRoom._id.toString();
                  var userIds = _.pluck(cRoom.users, '_id');
+
                  cokcore.ctx.col.users.find({_id: {$in: userIds}}, {login: 1}).toArray(safe.sure(cb, function (_arr) {
                      safe.each(_arr, function(_usr, cb) {
                          var id = _usr._id.toString();
@@ -197,6 +142,21 @@ Api.prototype.joinPersonal = function (_data, cb) {
                  }));
              },
              function (cb) {
+                 cokcore.ctx.col.chatmessages.find(msgQwe, msgOpt).toArray(safe.sure(cb, function (_arr) {
+                     _.forEachRight(_arr, function (val) {
+                         var uId = val.uId.toString();
+                         var msg = {
+                             uId: uId,
+                             login: users[uId].login,
+                             msg: val.msg,
+                             date: moment(val.date).calendar(),
+                         };
+                         history.push(msg);
+                     });
+                     cb();
+                 }));
+             },
+             function (cb) {
                  if (_.include(_user.rooms, rId)) {
                      return cb();
                  }
@@ -210,6 +170,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
              var data = {
                  _id: rId,
                  users: users,
+                 history: history,
              };
              cb(null, data);
          }));
