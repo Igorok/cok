@@ -179,6 +179,7 @@ Api.prototype.getMobileUserList = function (_data, cb) {
                 return cb(null, retObj);
             }
 
+            retObj.act = false;
             _.each(_obj.friends, function (val) {
                 friendObj[val._id.toString()] = val;
             });
@@ -190,7 +191,6 @@ Api.prototype.getMobileUserList = function (_data, cb) {
             });
 
             cokcore.ctx.col.users.find({_id: {$ne: uId}, status: 1}, {login: 1, email: 1}).toArray(safe.sure(cb, function (_arr) {
-                retObj.act = false;
                 _.each(_arr, function (val) {
                     // hide friend button
                     if (friendObj[val._id.toString()]) {
@@ -208,6 +208,38 @@ Api.prototype.getMobileUserList = function (_data, cb) {
     }));
 };
 
+
+/**
+* friends list
+*/
+Api.prototype.getMobileFriendList = function (_data, cb) {
+    Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
+        var uId = mongo.ObjectID(_user._id);
+        var reqDt = _params.date || null;
+        var retObj = {
+            act: true,
+            data: [],
+        };
+
+        cokcore.ctx.col.users.findOne({_id: uId}, safe.sure(cb, function (_obj) {
+            var upDt = _obj.updated || null;
+            // check that date of last request later last update of user
+            if (reqDt && (new Date(reqDt).valueOf() > new Date(upDt).valueOf())) {
+                return cb(null, retObj);
+            }
+
+            retObj.act = false;
+            if (! _obj.friends || ! _obj.friends.length) {
+                return cb(null, retObj);
+            }
+            var frIds = _.pluck(_obj.friends, '_id');
+            cokcore.ctx.col.users.find({_id: {$in: frIds}}, {login: 1, email: 1, picture: 1}).toArray(safe.sure(cb, function (_arr) {
+                retObj.data = _arr;
+                cb(null, retObj);
+            }));
+        }));
+    }));
+};
 
 
 
@@ -427,9 +459,24 @@ Api.prototype.addFriend = function (_data, cb) {
     }));
 };
 
-/**
-* friends list
-*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Api.prototype.getFriendList = function (_data, cb) {
     Api.prototype.checkAuth(_data, safe.sure(cb, function (_user, _params) {
         var uId = mongo.ObjectID(_user._id);
