@@ -115,8 +115,6 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                 self.renderUsers(data.users);
                 self.renderMessage(data.history);
 
-                console.log('data.history ', data.history);
-
                 return self;
             });
         },

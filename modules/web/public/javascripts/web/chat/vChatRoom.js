@@ -112,6 +112,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                 uId: self.user._id,
                 token: self.user.token,
                 rId: self._id,
+                limit: 100,
             });
             self.socket.on("err", function (err) {
                 return Msg.showError(null, JSON.stringify(err));
@@ -126,9 +127,8 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
 
                     self.users = data.users
                     self.renderUsers(data.users);
-                    self.model.getRoomMessages(data._id, function (_arr) {
-                        self.renderMessage(_arr);
-                    });
+                    self.renderMessage(data.history);
+
                     return self;
                 });
             });

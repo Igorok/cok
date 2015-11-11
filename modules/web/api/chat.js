@@ -179,20 +179,39 @@ Api.prototype.joinPersonal = function (_data, cb) {
 
 
 
- /**
-  * chat room any count of users
-  * @param _id - id of user for chat
-  */
+/**
+ * personal chat only for 2 users
+ * @param _params.rId - id of chat room
+ * @param _params.limit - limit of messages
+ * @param _params.fDate - date for start messages find
+ */
  Api.prototype.joinRoom = function (_data, cb) {
       var self = this;
       cokcore.ctx.api.user.checkAuth (_data, safe.sure(cb, function (_user, _params) {
-          if (_.isUndefined(_params.rId)) {
-              return cb ("Wrong rId");
-          }
-          var uId = mongo.ObjectID(_user._id);
-          var rId = mongo.ObjectID(_params.rId);
-          var cRoom = null;
-          var users = {};
+            if (_.isUndefined(_params.rId)) {
+                return cb ("Wrong rId");
+            }
+            var uId = mongo.ObjectID(_user._id);
+            var rId = mongo.ObjectID(_params.rId);
+            var cRoom = null;
+            var users = {};
+            var history = [];
+
+            // query for messages
+            var msgQwe = {};
+            if (_params.fDate) {
+                msgQwe.date = {
+                    $gt: new Date(_params.fDate.toString()),
+                }
+            }
+            var msgOpt = {
+                sort: {date: -1}
+            }
+            if (_params.limit) {
+                msgOpt.limit = parseInt(_params.limit);
+            }
+
+
 
           safe.series([
               function (cb) {
@@ -201,6 +220,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
                           return cb(404);
                       }
                       cRoom = _obj;
+                      msgQwe.rId = _obj._id;
                       cb();
                   }));
               },
@@ -222,6 +242,21 @@ Api.prototype.joinPersonal = function (_data, cb) {
                   }));
               },
               function (cb) {
+                 cokcore.ctx.col.chatmessages.find(msgQwe, msgOpt).toArray(safe.sure(cb, function (_arr) {
+                     _.forEachRight(_arr, function (val) {
+                         var uId = val.uId.toString();
+                         var msg = {
+                             uId: uId,
+                             login: users[uId].login,
+                             msg: val.msg,
+                             date: moment(val.date).calendar(),
+                         };
+                         history.push(msg);
+                     });
+                     cb();
+                 }));
+              },
+              function (cb) {
                   if (_.include(_user.rooms, rId)) {
                       return cb();
                   }
@@ -234,6 +269,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
               var data = {
                   _id: cRoom._id.toString(),
                   users: users,
+                  history: history,
               };
               cb(null, data);
           }));
