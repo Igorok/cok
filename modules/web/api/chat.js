@@ -85,7 +85,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
         var msgQwe = {};
         if (_params.fDate) {
             msgQwe.date = {
-                $gt: new Date(_params.fDate.toString()),
+                $gte: new Date(parseInt(_params.fDate) * 1000),
             }
         }
         var msgOpt = {
@@ -150,6 +150,8 @@ Api.prototype.joinPersonal = function (_data, cb) {
                              login: users[uId].login,
                              msg: val.msg,
                              date: moment(val.date).calendar(),
+                             dt: parseInt(val.date.valueOf() / 1000),
+                             rId: rId,
                          };
                          history.push(msg);
                      });
@@ -201,7 +203,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
             var msgQwe = {};
             if (_params.fDate) {
                 msgQwe.date = {
-                    $gt: new Date(_params.fDate.toString()),
+                    $gt: new Date(parseInt(_params.fDate) * 1000),
                 }
             }
             var msgOpt = {
@@ -250,6 +252,8 @@ Api.prototype.joinPersonal = function (_data, cb) {
                              login: users[uId].login,
                              msg: val.msg,
                              date: moment(val.date).calendar(),
+                             dt: parseInt(val.date.valueOf() / 1000),
+                             rId: rId,
                          };
                          history.push(msg);
                      });
@@ -311,6 +315,7 @@ Api.prototype.message = function (_data, cb) {
                 rId: _params.rId,
                 msg: insObj.msg,
                 date: moment(insObj.date).calendar(),
+                dt: parseInt(insObj.date.valueOf() / 1000),
             });
         }));
     }));

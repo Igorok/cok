@@ -81,12 +81,14 @@ module.exports = function (app, io) {
                     uId: data.uId,
                     login: data.login,
                     date: data.date,
+                    rId: data.rId,
                 });
                 socket.emit('message', {
                     msg: data.msg,
                     uId: data.uId,
                     login: data.login,
                     date: data.date,
+                    rId: data.rId,
                 });
             }));
         });
