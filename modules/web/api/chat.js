@@ -85,7 +85,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
         var msgQwe = {};
         if (_params.fDate) {
             msgQwe.date = {
-                $gte: new Date(parseInt(_params.fDate) * 1000),
+                $gt: new Date(parseInt(_params.fDate) * 1000 + 1000),
             }
         }
         var msgOpt = {
@@ -143,6 +143,9 @@ Api.prototype.joinPersonal = function (_data, cb) {
              },
              function (cb) {
                  cokcore.ctx.col.chatmessages.find(msgQwe, msgOpt).toArray(safe.sure(cb, function (_arr) {
+                     if (! _arr || ! _arr.length) {
+                         return cb();
+                     }
                      _.forEachRight(_arr, function (val) {
                          var uId = val.uId.toString();
                          var msg = {
@@ -150,7 +153,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
                              login: users[uId].login,
                              msg: val.msg,
                              date: moment(val.date).calendar(),
-                             dt: parseInt(val.date.valueOf() / 1000),
+                             dt: Math.round(val.date.valueOf() / 1000),
                              rId: rId,
                          };
                          history.push(msg);
@@ -203,7 +206,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
             var msgQwe = {};
             if (_params.fDate) {
                 msgQwe.date = {
-                    $gt: new Date(parseInt(_params.fDate) * 1000),
+                    $gt: new Date(parseInt(_params.fDate) * 1000 + 1000),
                 }
             }
             var msgOpt = {
@@ -252,7 +255,7 @@ Api.prototype.joinPersonal = function (_data, cb) {
                              login: users[uId].login,
                              msg: val.msg,
                              date: moment(val.date).calendar(),
-                             dt: parseInt(val.date.valueOf() / 1000),
+                             dt: Math.round(val.date.valueOf() / 1000),
                              rId: rId,
                          };
                          history.push(msg);
@@ -315,7 +318,7 @@ Api.prototype.message = function (_data, cb) {
                 rId: _params.rId,
                 msg: insObj.msg,
                 date: moment(insObj.date).calendar(),
-                dt: parseInt(insObj.date.valueOf() / 1000),
+                dt: Math.round(insObj.date.valueOf() / 1000),
             });
         }));
     }));
