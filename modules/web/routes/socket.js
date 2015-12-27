@@ -82,6 +82,7 @@ module.exports = function (app, io) {
                     login: data.login,
                     date: data.date,
                     rId: data.rId,
+                    dt: data.dt,
                 });
                 socket.emit('message', {
                     msg: data.msg,
@@ -89,6 +90,7 @@ module.exports = function (app, io) {
                     login: data.login,
                     date: data.date,
                     rId: data.rId,
+                    dt: data.dt,
                 });
             }));
         });
