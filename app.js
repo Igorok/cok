@@ -57,7 +57,7 @@ safe.series([
     require(__dirname + '/modules/web/routes/index.js')(app);
     require(__dirname + '/modules/web/routes/socket.js')(app, io);
     // start server
-    var port = process.env.PORT || 3000;
+    var port = process.env.PORT || cokcore.ctx.cfg.app.port;
     server.listen(port, function () {
         console.log('Web listening at ', port);
     });

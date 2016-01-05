@@ -136,7 +136,6 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
             });
 
             self.socket.on("joinPersonal", function (data) {
-                console.log(data);
                 return self.renderChat(data);
             });
             self.socket.on("joinUser", function (data) {

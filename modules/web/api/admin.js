@@ -88,7 +88,7 @@ Api.prototype.editPermission = function (_data, cb) {
                     if (!! _result.length && (_result[0]._id.toString() != id)) {
                         return cb(new Error("Permission already exist!"));
                     } else {
-                        permissions.update({_id: mongo.ObjectID(id)}, {$set: {key: key, title: title}}, cb);
+                        permissions.update({_id: cokcore.ObjectID(id)}, {$set: {key: key, title: title}}, cb);
                     }
                 }));
             }
@@ -108,7 +108,7 @@ Api.prototype.removePermission = function (_data, cb) {
         var id = _params._id.toString();
 
         cokcore.collection("permissions", safe.sure(cb, function (permissions) {
-            permissions.remove({_id: mongo.ObjectID(id)}, cb)
+            permissions.remove({_id: cokcore.ObjectID(id)}, cb)
         }));
     }));
 };
@@ -169,7 +169,7 @@ Api.prototype.editGroup = function (_data, cb) {
                             if (!! _result.length && (_result[0]._id.toString() != id)) {
                                 return cb(new Error("Permission already exist!"));
                             } else {
-                                usergroups.update({_id: mongo.ObjectID(id)}, {$set: {
+                                usergroups.update({_id: cokcore.ObjectID(id)}, {$set: {
                                     title: title,
                                     description: description,
                                     permission: permission,
@@ -196,7 +196,7 @@ Api.prototype.removeGroup = function (_data, cb) {
         var id = _params._id.toString();
 
         cokcore.collection("usergroups", safe.sure(cb, function (usergroups) {
-            usergroups.remove({_id: mongo.ObjectID(id)}, cb)
+            usergroups.remove({_id: cokcore.ObjectID(id)}, cb)
         }));
     }));
 };

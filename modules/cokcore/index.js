@@ -53,6 +53,36 @@ var Core = function () {
             cb();
         }));
     };
+
+    self.isMongoID = function (_id) {
+        return _id instanceof mongo.ObjectID;
+    };
+
+    self.ObjectID = function () {
+        var id = arguments.length ? arguments[0] : undefined;
+        var strict = arguments.length > 1 ? Boolean(strict) : true;
+
+        if (! id) {
+            return undefined;
+        }
+
+        if (self.isMongoID(id)) {
+            return id;
+        }
+
+        if (strict) {
+            return new mongo.ObjectID(id);
+        }
+
+        var obj;
+        _.attempt(function () {
+            obj = new mongo.ObjectID(id);
+        });
+
+        return obj;
+    }
+
+
     /*
     * my api contain factories, and init function for async initialization
     */

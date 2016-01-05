@@ -47,7 +47,6 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
                 _id: _id,
             };
 
-            console.log();
             Api.call("user.deleteFriend", data, function (ret) {
                 cb();
             });

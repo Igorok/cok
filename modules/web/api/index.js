@@ -69,7 +69,7 @@ Api.prototype.picUpload = function (_data, cb) {
                     }));
                 },
                 function saveImage (cb) {
-                    cokcore.ctx.col.images.insert({userId: _user._id, created: new Date(), name: newFileName}, safe.sure(cb, function () {
+                    cokcore.ctx.col.images.insert({userId: _user._id, dtCreated: new Date(), name: newFileName}, safe.sure(cb, function () {
                         cb();
                     }));
                 }
@@ -86,7 +86,7 @@ Api.prototype.picUpload = function (_data, cb) {
 Api.prototype.mainPicUpload = function (_data, cb) {
     var self = this;
     self.picUpload(_data, safe.sure(cb, function (newFileName, _user, _params) {
-        cokcore.ctx.col.users.update({_id: mongo.ObjectID(_user._id)}, {$set: { picture: newFileName}}, safe.sure(cb, function () {
+        cokcore.ctx.col.users.update({_id: cokcore.ObjectID(_user._id)}, {$set: { picture: newFileName}}, safe.sure(cb, function () {
             cb(null, true);
         }));
     }));
@@ -122,12 +122,12 @@ Api.prototype.deletePic = function (_data, cb) {
         }
         var _id = _params._id;
         var userId = _user._id;
-        cokcore.ctx.col.images.findOne({_id: mongo.ObjectID(_id), userId: userId}, safe.sure(cb, function (_result) {
+        cokcore.ctx.col.images.findOne({_id: cokcore.ObjectID(_id), userId: userId}, safe.sure(cb, function (_result) {
             if (_.isEmpty(_result)) {
                 return cb('Wrong data');
             }
             var filePath = __dirname + '/../public/images/users/' + _result.name;
-            cokcore.ctx.col.images.remove({_id: mongo.ObjectID(_id)}, safe.sure(cb, function () {
+            cokcore.ctx.col.images.remove({_id: cokcore.ObjectID(_id)}, safe.sure(cb, function () {
                 fs.unlink(filePath, safe.sure(cb, function () {
                     cb();
                 }));
@@ -146,11 +146,11 @@ Api.prototype.setMainPic = function (_data, cb) {
         }
         var _id = _params._id;
         var userId = _user._id;
-        cokcore.ctx.col.images.findOne({_id: mongo.ObjectID(_id), userId: userId}, safe.sure(cb, function (_result) {
+        cokcore.ctx.col.images.findOne({_id: cokcore.ObjectID(_id), userId: userId}, safe.sure(cb, function (_result) {
             if (_.isEmpty(_result)) {
                 return cb('Wrong data');
             }
-            cokcore.ctx.col.users.update({_id: mongo.ObjectID(_user._id)}, {$set: { picture: _result.name}}, safe.sure(cb, function () {
+            cokcore.ctx.col.users.update({_id: cokcore.ObjectID(_user._id)}, {$set: { picture: _result.name}}, safe.sure(cb, function () {
                 cb();
             }));
         }));

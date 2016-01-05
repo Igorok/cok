@@ -1,5 +1,9 @@
 module.exports = {
     prod:false,
+    app: {
+        expireTokenDay: 7,
+        port: 3000,
+    },
     mongo:{
         host: "localhost",
         port: 27017,
