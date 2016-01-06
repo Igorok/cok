@@ -16,7 +16,6 @@ module.exports = function (app, io) {
          * take token, users ids and returned a room id and users with statuses
          */
         socket.on('joinPersonal', function (_obj) {
-            console.log('joinPersonal');
             if (_.isEmpty(_obj)) {
                 return emitError(404);
             }
@@ -114,7 +113,6 @@ module.exports = function (app, io) {
 
         // leave room
         socket.on('disconnect', function() {
-            console.log('disconnect')
             socket.leaveAll();
         });
         next();
