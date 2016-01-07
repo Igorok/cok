@@ -4,7 +4,6 @@ var path = require('path');
 var _ = require("lodash");
 var safe = require("safe");
 var mongo = require('mongodb');
-var requireRedis = require("redis");
 
 
 var Core = function () {
@@ -172,24 +171,6 @@ var Core = function () {
         }));
     };
 
-    // redis
-    self.redis = function (cb) {
-        if (! _redis) {
-            if (! self.ctx.cfg.redis.auth) {
-                _redis = requireRedis.createClient();
-                self.ctx.redis = _redis;
-                cb(null, _redis);
-            } else {
-                _redis = requireRedis.createClient(self.ctx.cfg.redis.port, self.ctx.cfg.redis.host);
-                _redis.auth(self.ctx.cfg.redis.password, safe.sure(cb, function() {
-                    self.ctx.redis = _redis;
-                    cb(null, _redis);
-                }));
-            }
-        } else {
-            cb(null, _redis);
-        }
-    };
 
     /**
      * my function for initialization of core.

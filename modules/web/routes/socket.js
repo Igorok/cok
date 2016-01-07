@@ -24,15 +24,10 @@ module.exports = function (app, io) {
             };
             data.params.push(_obj);
             cokcore.ctx.api.chat.joinPersonal(data, safe.sure(emitError, function (data) {
-                if(socket.rooms.indexOf(data._id) >= 0) {
+                socket.join(data._id, safe.sure(emitError, function () {
                     socket.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
                     socket.emit('joinPersonal', {_id: data._id, users: data.users, history: data.history});
-                } else {
-                    socket.join(data._id, safe.sure(emitError, function () {
-                        socket.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
-                        socket.emit('joinPersonal', {_id: data._id, users: data.users, history: data.history});
-                    }));
-                }
+                }));
             }));
         });
 
@@ -51,16 +46,10 @@ module.exports = function (app, io) {
             };
             data.params.push(_obj);
             cokcore.ctx.api.chat.joinRoom(data, safe.sure(emitError, function (data) {
-                if(socket.rooms.indexOf(data._id) >= 0) {
+                socket.join(data._id, safe.sure(emitError, function () {
                     socket.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
                     socket.emit('joinRoom', {_id: data._id, users: data.users, history: data.history});
-                } else {
-                    socket.join(data._id, safe.sure(emitError, function () {
-                        socket.to(data._id).emit('freshStatus', {_id: data._id, users: data.users});
-                        socket.emit('joinRoom', {_id: data._id, users: data.users, history: data.history});
-                    }));
-                }
-
+                }));
             }));
         });
         /**

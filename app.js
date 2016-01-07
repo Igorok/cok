@@ -5,7 +5,6 @@ var http = require('http');
 var compression = require('compression');
 var errorhandler = require('errorhandler');
 var bodyParser = require('body-parser');
-var multer = require('multer');
 var lessMiddleware = require('less-middleware');
 
 var app = express();
@@ -16,7 +15,6 @@ var io = require('socket.io').listen(server);
 app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(multer({ dest: './tmp/'}));
 app.use(lessMiddleware(__dirname + '/modules/web/less', {
     dest: __dirname + '/modules/web/public',
     preprocess: {
@@ -45,9 +43,6 @@ safe.series([
     },
     function (cb) {
         cokcore.db(cb);
-    },
-    function (cb) {
-        cokcore.redis(cb);
     },
     function (cb) {
         cokcore.apiLoad(__dirname + '/modules/web/api', cb);

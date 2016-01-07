@@ -126,7 +126,7 @@ Api.prototype.checkAuth = function (_data, cb) {
     if (! _data || ! _data.params || ! cb || (typeof(cb) != 'function')) {
         return cb (404);
     }
-    if (! _data.params[0] || ! _data.params[0].token, ! _data.params[0].uId) {
+    if (! _data.params[0] || ! _data.params[0].token || ! _data.params[0].uId) {
         return cb (403);
     }
     var uId = _data.params[0].uId.toString();
