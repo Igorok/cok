@@ -1,0 +1,29 @@
+{
+	"indexes": {
+		"chatgroups": {
+			"users._id_1_type_1": {
+				"users._id": 1,
+				"type": 1
+			}
+		},
+		"chatmessages": {
+			"date_1": {
+				"date": 1
+			},
+			"rId_1": {
+				"rId": 1
+			}
+		},
+		"users": {
+			"login_1": {
+				"login": 1
+			},
+			"email_1": {
+				"email": 1
+			},
+			"tokens.token_1": {
+				"tokens.token": 1
+			}
+		}
+	}
+}
