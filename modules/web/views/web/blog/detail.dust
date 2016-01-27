@@ -1,0 +1,11 @@
+<div class="widget">
+	{#data}
+		<p class="h4">
+			{#access.edit}
+				<a href="#blog-edit/{_id}">edit</a>&nbsp;
+			{/access.edit}
+			{name}
+		</p>
+		<p>{description}</p>
+	{/data}
+</div>

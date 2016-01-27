@@ -37,9 +37,14 @@
             "vReg": "/javascripts/web/login/vReg",
             "mReg": "/javascripts/web/login/mReg",
 
+            "mBlog": "/javascripts/web/blog/mBlog",
+            "vBlogList": "/javascripts/web/blog/vBlogList",
+            "vBlogForm": "/javascripts/web/blog/vBlogForm",
+            "vBlogDetail": "/javascripts/web/blog/vBlogDetail",
+
             "mUser": "/javascripts/web/user/mUser",
             "mFriend": "/javascripts/web/user/mFriend",
-            "vIndex": "/javascripts/web/user/vIndex",
+            "vProfile": "/javascripts/web/user/vProfile",
             "vFriendList": "/javascripts/web/user/vFriendList",
             "vFriendReq": "/javascripts/web/user/vFriendReq",
             "vUserList": "/javascripts/web/user/vUserList",

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <link href="/stylesheets/admin.css" rel="stylesheet">
+    </head>
+    <body class="background-dark">
+        <div class="container-fluid clearfix">
+            <div id="content">
+                <h1>404</h1>
+            </div>
+        </div>
+    </body>
+</html>

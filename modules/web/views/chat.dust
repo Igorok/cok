@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        {>webHeader/}
+        {>chatHeader/}
     </head>
     <body class="background-dark">
         <div id="errorCase"></div>
         <div class="container-fluid clearfix">
-            <div id="content"></div>
+            <div id="content">
+                <div class="row">
+                    <div id="menu" class="col-md-2">
+                    </div>
+                    <div id="main" class="col-md-10"></div>
+                </div>
+            </div>
         </div>
         <script>
             require (["jquery", "route", "bootstrap"], function ($, Route) {

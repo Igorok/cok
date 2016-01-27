@@ -1,3 +1,4 @@
+"use strict";
 var fs = require('fs');
 var _ = require('lodash');
 var cokcore = require('cokcore');
@@ -8,19 +9,23 @@ var multerUp = multer({
 
 // routes
 module.exports = function (app) {
-    app.get('/', index);
+    app.get('/', chat);
     app.get('/admin', admin);
     app.post('/jsonrpc', jsonrpc);
     app.post('/upload', multerUp.single('upload'), upload);
+    //The 404 Route (ALWAYS Keep this as the last route)
+    app.get('*', function (req, res, next) {
+        res.status(404).render('404', {layout: false});
+    });
 };
 
 
 
 /*
-* main page
+* chat page
 */
-function index (req, res) {
-    res.render('index', {layout: false});
+function chat (req, res) {
+    res.render('chat', {layout: false});
 }
 
 /*
@@ -31,9 +36,9 @@ function admin (req, res, next) {
 }
 
 function jsonrpc (req, res, next) {
-    var jsonrpc = req.body;
+    let jsonrpc = req.body;
     res.header("Cache-Control", "no-cache");
-    var params = jsonrpc.params;
+    let params = jsonrpc.params;
     if (typeof params !== 'object') {
         params = JSON.parse(params);
     }
@@ -43,18 +48,18 @@ function jsonrpc (req, res, next) {
     if (! _.isArray(params)) {
         params = [params];
     }
-    var func = jsonrpc.method.match(/^(.*)\.(.*)$/);
-    var module = func[1];
+    let func = jsonrpc.method.match(/^(.*)\.(.*)$/);
+    let module = func[1];
     func = func[2];
     if (! cokcore.ctx.api[module] || ! cokcore.ctx.api[module][func]) {
         console.trace(404, module, func);
         return res.status(404).send({err: 404});
     }
-    var fn = cokcore.ctx.api[module][func];
-    var rf = function () {
-        var jsonres = {jsonrpc: "2.0", id: jsonrpc.id};
+    let fn = cokcore.ctx.api[module][func];
+    let rf = function () {
+        let jsonres = {jsonrpc: "2.0", id: jsonrpc.id};
         if (arguments[0]) {
-            var err = arguments[0];
+            let err = arguments[0];
             console.trace(err, module, func);
             jsonres.error = {message: err.toString(), err: err, code:-1};
             jsonres.result = null;
@@ -69,7 +74,7 @@ function jsonrpc (req, res, next) {
 }
 
 function upload(req, res, next) {
-    var _result = {};
+    let _result = {};
     if (_.isEmpty(req.files.file)) {
         res.status(400).send({err: "The file is required"});
     } else if (_.isEmpty(req.body.action) || _.isEmpty(req.body.token)) {
@@ -80,9 +85,9 @@ function upload(req, res, next) {
             res.status(403).send({err: 403});
         });
     } else {
-        var actionArr = req.body.action.toString();
-        var params = req.body;
-        var data = {
+        let actionArr = req.body.action.toString();
+        let params = req.body;
+        let data = {
             params : [
                 req.body,
                 req.files.file
@@ -98,7 +103,6 @@ function upload(req, res, next) {
                     console.trace(err);
                     return res.status(500).send({err: err});
                 }
-                _result.error = null;
                 _result.result = _data;
                 res.send(_result);
             }]);

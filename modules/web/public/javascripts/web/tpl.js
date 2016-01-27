@@ -1,4 +1,76 @@
 define(["dust", "dust-helpers"], function(dust, dust_helpers) {
+  // modules/web/views/web/blog/detail.dust
+  (function() {
+    dust.register("blog_detail", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div class=\"widget\">").s(ctx.get(["data"], false), ctx, {
+        "block": body_1
+      }, {}).w("</div>");
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("<p class=\"h4\">").s(ctx.getPath(false, ["access", "edit"]), ctx, {
+        "block": body_2
+      }, {}).f(ctx.get(["name"], false), ctx, "h").w("</p><p>").f(ctx.get(["description"], false), ctx, "h").w("</p>");
+    }
+    body_1.__dustBody = !0;
+
+    function body_2(chk, ctx) {
+      return chk.w("<a href=\"#blog-edit/").f(ctx.get(["_id"], false), ctx, "h").w("\">edit</a>&nbsp;");
+    }
+    body_2.__dustBody = !0;
+    return body_0;
+  })();
+  // modules/web/views/web/blog/form.dust
+  (function() {
+    dust.register("blog_form", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div class=\"widget\"><form id=\"blogForm\"><div class=\"form-group\"><label for=\"name\">Blog name</label><input type=\"text\" class=\"form-control\" id=\"name\" placeholder=\"Blog name\" name=\"name\" ").s(ctx.get(["name"], false), ctx, {
+        "block": body_1
+      }, {}).w(" /></div><div class=\"form-group\"><label for=\"description\">Blog description</label><textarea class=\"form-control\" id=\"description\"  name=\"description\" rows=\"8\" cols=\"40\" placeholder=\"Blog description\">").s(ctx.get(["description"], false), ctx, {
+        "block": body_2
+      }, {}).w("</textarea></div><div class=\"checkbox\"><label for=\"public\" class=\"control-label\"><input type=\"checkbox\" id=\"public\" ").s(ctx.get(["public"], false), ctx, {
+        "block": body_3
+      }, {}).w(" /> Make public</label></div><button type=\"submit\" class=\"btn btn-success\"><span class=\"glyphicon glyphicon-floppy-disk\"></span>&nbsp;Save</button>&nbsp;&nbsp;<a href=\"#\" class=\"btn btn-warning\"><span class=\"glyphicon glyphicon-remove\"></span>&nbsp;Cancel</a></form></div>");
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("value=\"").f(ctx.getPath(true, []), ctx, "h").w("\"");
+    }
+    body_1.__dustBody = !0;
+
+    function body_2(chk, ctx) {
+      return chk.f(ctx.getPath(true, []), ctx, "h");
+    }
+    body_2.__dustBody = !0;
+
+    function body_3(chk, ctx) {
+      return chk.w("checked=\"true\"");
+    }
+    body_3.__dustBody = !0;
+    return body_0;
+  })();
+  // modules/web/views/web/blog/list.dust
+  (function() {
+    dust.register("blog_list", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<h1>main page</h1><div class=\"row\">").s(ctx.get(["data"], false), ctx, {
+        "block": body_1
+      }, {}).w("</div>");
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("<div class=\"col-md-4\"><div class=\"widget\"><p class=\"h4\"><span class=\"glyphicon glyphicon-info-sign\"></span>&nbsp;<a href=\"#blog/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["name"], false), ctx, "h").w("</a></p><p>").f(ctx.get(["description"], false), ctx, "h").w("</p></div></div>");
+    }
+    body_1.__dustBody = !0;
+    return body_0;
+  })();
   // modules/web/views/web/chat/form.dust
   (function() {
     dust.register("chat_form", body_0);
@@ -92,7 +164,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("layout", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"row\"><div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a href=\"#\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Account</a></li><li><a data-toggle=\"collapse\" href=\"#user\"  aria-expanded=\"false\" aria-controls=\"users\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"user\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#user\">Users List</a></li><li><a href=\"#friend\">Friends List</a></li><li><a href=\"#friend-requests\">Friends Requests</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#chat\"  aria-expanded=\"false\" aria-controls=\"chat\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-envelope\"></span>Chats</a><ul id=\"chat\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#chat-room\">Chats List</a></li><li><a href=\"#chat-room-edit/-1\">New chat</a></li></ul></li><li><a href=\"#logout\"><span class=\"glyphicon glyphicon-log-out\"></span>&nbsp;Logout</a></li></ul></div><div id=\"main\" class=\"col-md-10\"></div></div>");
+      return chk.w("<div class=\"row\"><div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#blog\"  aria-expanded=\"false\" aria-controls=\"blogs\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Blogs</a><ul id=\"blog\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#\">List</a></li><li><a href=\"#\">My blogs</a></li><li><a href=\"#\">New blog</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#user\"  aria-expanded=\"false\" aria-controls=\"users\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"user\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#profile\">Profile</a></li><li><a href=\"#user\">Users List</a></li><li><a href=\"#friend\">Friends List</a></li><li><a href=\"#friend-requests\">Friends Requests</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#chat\"  aria-expanded=\"false\" aria-controls=\"chat\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-envelope\"></span>Chats</a><ul id=\"chat\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#chat-room\">Chats List</a></li><li><a href=\"#chat-room-edit/-1\">New chat</a></li></ul></li><li><a href=\"#logout\"><span class=\"glyphicon glyphicon-log-out\"></span>&nbsp;Logout</a></li></ul></div><div id=\"main\" class=\"col-md-10\"></div></div>");
     }
     body_0.__dustBody = !0;
     return body_0;
@@ -115,6 +187,30 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return chk.w("<div class=\"col-md-offset-4 col-md-4\"><div class=\"widget\"><form id=\"loginForm\"><br /><p class=\"center\">Registration a new account</p><div class=\"form-group\"><label for=\"login\" class=\"control-label\">Login</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon-user\"></span></div><input type=\"text\" class=\"form-control\" id=\"login\" placeholder=\"Login\" value=\"\" /></div></div><div class=\"form-group\"><label for=\"email\" class=\"control-label\">Email</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon-envelope\"></span></div><input type=\"email\" class=\"form-control\" id=\"email\" placeholder=\"Email\" value=\"\" /></div></div><div class=\"form-group\"><label for=\"password\" class=\"control-label\">Password</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon glyphicon-lock\"></span></div><input type=\"password\" class=\"form-control\" id=\"password\" placeholder=\"Password\" value=\"\" /></div></div><div class=\"form-group\"><label for=\"passwordConf\" class=\"control-label\">Confirm password</label><div class=\"input-group\"><div class=\"input-group-addon\"><span class=\"glyphicon glyphicon-ok\"></span></div><input type=\"password\" class=\"form-control\" id=\"passwordConf\" placeholder=\"Confirm password\" value=\"\" /></div></div><button type=\"submit\" class=\"btn btn-danger btn-block\">&nbsp;&nbsp;Registration</button></form></div></div>");
     }
     body_0.__dustBody = !0;
+    return body_0;
+  })();
+  // modules/web/views/web/menu.dust
+  (function() {
+    dust.register("menu", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#blog\"  aria-expanded=\"false\" aria-controls=\"blogs\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Blogs</a><ul id=\"blog\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#\">List</a></li>").s(ctx.get(["user"], false), ctx, {
+        "block": body_1
+      }, {}).w("</ul></li>").s(ctx.get(["user"], false), ctx, {
+        "block": body_2
+      }, {}).w("</ul>");
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("<li><a href=\"#\">My blogs</a></li><li><a href=\"#blog-new\">New blog</a></li>");
+    }
+    body_1.__dustBody = !0;
+
+    function body_2(chk, ctx) {
+      return chk.w("<li><a data-toggle=\"collapse\" href=\"#user\"  aria-expanded=\"false\" aria-controls=\"users\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"user\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#profile\">Profile</a></li><li><a href=\"#user\">Users List</a></li><li><a href=\"#friend\">Friends List</a></li><li><a href=\"#friend-requests\">Friends Requests</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#chat\"  aria-expanded=\"false\" aria-controls=\"chat\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-envelope\"></span>Chats</a><ul id=\"chat\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#chat-room\">Chats List</a></li><li><a href=\"#chat-room-edit/-1\">New chat</a></li></ul></li><li><a href=\"#logout\"><span class=\"glyphicon glyphicon-log-out\"></span>&nbsp;Logout</a></li>");
+    }
+    body_2.__dustBody = !0;
     return body_0;
   })();
   // modules/web/views/web/message.dust
@@ -260,6 +356,69 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_5.__dustBody = !0;
     return body_0;
   })();
+  define("blog_detail", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("blog_detail", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
+  define("blog_form", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("blog_form", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
+  define("blog_list", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("blog_list", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
   define("chat_form", function() {
     return function(locals, callback) {
       var rendered;
@@ -449,6 +608,27 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
+  define("menu", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("menu", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
   define("message", function() {
     return function(locals, callback) {
       var rendered;
@@ -554,5 +734,5 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["chat_form", "chat_list", "chat_message", "chat_personal", "chat_roomEdit", "chat_users", "layout", "login_auth", "login_registration", "message", "user_detail", "user_friendList", "user_index", "user_list"];
+  return ["blog_detail", "blog_form", "blog_list", "chat_form", "chat_list", "chat_message", "chat_personal", "chat_roomEdit", "chat_users", "layout", "login_auth", "login_registration", "menu", "message", "user_detail", "user_friendList", "user_index", "user_list"];
 });

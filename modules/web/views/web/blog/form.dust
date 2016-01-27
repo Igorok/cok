@@ -1,0 +1,26 @@
+<div class="widget">
+    <form id="blogForm">
+        <div class="form-group">
+            <label for="name">Blog name</label>
+            <input type="text" class="form-control" id="name" placeholder="Blog name" name="name" {#name}value="{.}"{/name} />
+        </div>
+        <div class="form-group">
+            <label for="description">Blog description</label>
+            <textarea class="form-control" id="description"  name="description" rows="8" cols="40" placeholder="Blog description">{#description}{.}{/description}</textarea>
+        </div>
+        <div class="checkbox">
+            <label for="public" class="control-label">
+                <input type="checkbox" id="public" {#public}checked="true"{/public} /> Make public
+            </label>
+        </div>
+        <button type="submit" class="btn btn-success">
+            <span class="glyphicon glyphicon-floppy-disk"></span>&nbsp;
+            Save
+        </button>
+        &nbsp;&nbsp;
+        <a href="#" class="btn btn-warning">
+            <span class="glyphicon glyphicon-remove"></span>&nbsp;
+            Cancel
+        </a>
+    </form>
+</div>

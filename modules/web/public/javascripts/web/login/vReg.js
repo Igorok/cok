@@ -23,10 +23,10 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "mReg"], 
         },
         submitForm: function (cb) {
             var self = this;
-            self.model.set('login', self.$el.find('#login').val());
-            self.model.set('email', self.$el.find('#email').val());
-            self.model.set('password', self.$el.find('#password').val());
-            self.model.set('passwordConf', self.$el.find('#passwordConf').val());
+            self.model.set('login', self.$('#login').val());
+            self.model.set('email', self.$('#email').val());
+            self.model.set('password', self.$('#password').val());
+            self.model.set('passwordConf', self.$('#passwordConf').val());
             if (! self.model.isValid()) {
                 Msg.inputError(self.model.validationError);
             } else {

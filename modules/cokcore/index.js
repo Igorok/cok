@@ -7,9 +7,8 @@ var mongo = require('mongodb');
 
 
 var Core = function () {
-    var self = this;
-    var _db = null;
-    var _redis = null;
+    let self = this;
+    let _db = null;
 
     /**
      * function for fatal erros
@@ -35,18 +34,52 @@ var Core = function () {
         redis: null,
     };
 
+    // add and use functions for validation
+    let Validate = function () {
+        let fObj = {};
+        // add new rule of validation
+        this.add = function (_name, _func) {
+            if (
+                _name,
+                _func,
+                ! _.isString(_name),
+                ! _.isFunction(_func)
+            ) {
+                return self.exit("Wrong data");
+            }
+
+            fObj[_name] = _func;
+        };
+
+        this.check = function () {
+            let param = _.toArray(arguments);
+            if (param.length < 2) {
+                return self.exit("Wrong data");
+            }
+            let name = param[0];
+            if (! fObj[name]) {
+                return self.exit('Validation is not exists');
+            }
+            param = param.slice(1);
+            fObj[name].apply(this, param);
+        };
+    };
+    self.validate = new Validate();
+
+
+
     /*
     * async initialization api factories
     * api factory will have to include .init method
     * for initialization its requirements
     */
-    var apiSingleInit = function (_path, cb) {
-        var fileName = path.basename(_path);
+    let apiSingleInit = function (_path, cb) {
+        let fileName = path.basename(_path);
         fileName = fileName.replace('.js', '');
         if (self.ctx.api[fileName]) {
             return cb();
         }
-        var api = require(_path);
+        let api = require(_path);
         api.init(safe.sure(cb, function (_api) {
             self.ctx.api[fileName] = _api;
             cb();
@@ -58,8 +91,8 @@ var Core = function () {
     };
 
     self.ObjectID = function () {
-        var id = arguments.length ? arguments[0] : undefined;
-        var strict = arguments.length > 1 ? Boolean(strict) : true;
+        let id = arguments.length ? arguments[0] : undefined;
+        let strict = arguments.length > 1 ? Boolean(strict) : true;
 
         if (! id) {
             return undefined;
@@ -73,7 +106,7 @@ var Core = function () {
             return new mongo.ObjectID(id);
         }
 
-        var obj;
+        let obj;
         _.attempt(function () {
             obj = new mongo.ObjectID(id);
         });
@@ -86,7 +119,7 @@ var Core = function () {
     * my api contain factories, and init function for async initialization
     */
     self.apiLoad = function (_path, cb) {
-        var filesArr = [];
+        let filesArr = [];
         safe.series([
             function (cb) {
                 fs.exists(_path, function (exists) {
@@ -124,7 +157,7 @@ var Core = function () {
             return cb(null, _db);
         }
         console.log("Connecting to: " , self.ctx.cfg.mongo);
-        var dbc = new mongo.Db(
+        let dbc = new mongo.Db(
             self.ctx.cfg.mongo.db,
             new mongo.Server(
                 self.ctx.cfg.mongo.host,
@@ -140,16 +173,15 @@ var Core = function () {
         dbc.open(safe.sure(cb, function (db) {
             _db = db;
             if (! self.ctx.cfg.mongo.auth) {
-                cb(null, _db);
-            } else {
-                _db.authenticate(
-                    self.ctx.cfg.mongo.user,
-                    self.ctx.cfg.mongo.password,
-                    safe.sure(cb, function () {
-                        cb(null, _db);
-                    })
-                );
+                return cb(null, _db);
             }
+            _db.authenticate(
+                self.ctx.cfg.mongo.user,
+                self.ctx.cfg.mongo.password,
+                safe.sure(cb, function () {
+                    cb(null, _db);
+                })
+            );
         }));
     };
 
@@ -182,21 +214,21 @@ var Core = function () {
      * @param cb - that is a callback after a reading of directory
      */
     self.init = function (_path, cb) {
-        var confDef = new Promise (function (resolve, reject) {
+        let confDef = new Promise (function (resolve, reject) {
             fs.exists(_path + "/config-default.js", function (exist) {
                 if (! exist) {
                     return reject(new Error("config not found"));
                 }
-                var conf = require(_path + "/config-default.js");
+                let conf = require(_path + "/config-default.js");
                 resolve(conf);
             });
         });
-        var confLoc = new Promise (function (resolve, reject) {
+        let confLoc = new Promise (function (resolve, reject) {
             fs.exists(_path + "/config-local.js", function (exist) {
                 if (! exist) {
                     return resolve(null);
                 }
-                var conf = require(_path + "/config-local.js");
+                let conf = require(_path + "/config-local.js");
                 resolve(conf);
             });
         });

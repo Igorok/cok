@@ -55,13 +55,7 @@ define (["jquery", "underscore", "backbone", "message", "storageapi"], function 
                 url: '/upload',
                 type: 'POST',
                 success: function (ret) {
-                    if (ret.error) {
-                        var err = ret.error.message ? ret.error.message : JSON.stringify(ret.error);
-                        console.log(err);
-                        return Msg.showError(null, err);
-                    } else {
-                        cb(ret);
-                    }
+                    cb(ret);
                 },
                 error: function (ret) {
                     return Msg.showError(null, JSON.stringify(err));
@@ -85,11 +79,7 @@ define (["jquery", "underscore", "backbone", "message", "storageapi"], function 
         if (! user) {
             user = Storage.get('user');
         }
-        if (! user) {
-            return Msg.showError(null, "403");
-        } else {
-            return user;
-        }
+        return user;
     };
 
     Api.prototype.removeUser = function () {

@@ -163,13 +163,6 @@ Api.prototype.setMainPic = function (_data, cb) {
 
 
 
-
-
-
-
-
-
-
  /**
   * init function
   */

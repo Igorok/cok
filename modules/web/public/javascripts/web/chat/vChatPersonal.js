@@ -39,11 +39,11 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
         },
         message: function () {
             var self = this;
-            var msg = self.$el.find('#chatText').val();
+            var msg = self.$('#chatText').val();
             if (! msg || ! msg.length) {
                 return false;
             }
-            self.$el.find('#chatText').val('');
+            self.$('#chatText').val('');
 
             self.socket.emit("message", {
                 uId: self.user._id,
@@ -60,9 +60,9 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                 if (err) {
                     return Msg.showError(null, JSON.stringify(err));
                 }
-                var chatItems = self.$el.find("#messages");
+                var chatItems = self.$("#messages");
                 chatItems.append(text);
-                self.$el.find("#chatItems").scrollTop(chatItems.height());
+                self.$("#chatItems").scrollTop(chatItems.height());
                 return self;
             });
         },
@@ -82,7 +82,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
                 if (err) {
                     return Msg.showError(null, JSON.stringify(err));
                 }
-                self.$el.find("#uList").html(text);
+                self.$("#uList").html(text);
 
                 self.resize();
                 return self;
@@ -92,7 +92,7 @@ define (["jquery", "underscore", "backbone", "dust", "tpl", "message", "io", "ap
         freshStatus: function (arr) {
             var self = this;
             _.each(arr, function (val) {
-                var elem = self.$el.find("#" + val._id);
+                var elem = self.$("#" + val._id);
                 var status = 'label-' + self.statuses[val.status];
                 if (elem.hasClass(status)) {
                     return;

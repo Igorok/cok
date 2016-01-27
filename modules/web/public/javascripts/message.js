@@ -23,10 +23,9 @@ define (["jquery", "underscore", "backbone", "vMessage"], function ($, _, Backbo
         */
         var showError = function (_title, _text) {
             if (_text.toString() == "403") {
-                window.location.hash = "login";
-            } else {
-                show("danger", _title, _text);
+                return window.location.hash = "login";
             }
+            show("danger", _title, _text);
         };
 
         /*
@@ -39,7 +38,6 @@ define (["jquery", "underscore", "backbone", "vMessage"], function ($, _, Backbo
 
                 if (! errCount) {
                     var val ='<span class="control-label">' + _val + '</span>';
-
                     console.log('_errObj ', $("#" + _key).parents(".form-group").length);
                     elem.append(val).addClass("has-error");
                 }
