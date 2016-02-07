@@ -12,9 +12,10 @@
     var user = null;
     var require = {
         baseUrl: "/javascripts",
-        waitSeconds: 20,
+        waitSeconds: 30,
         paths: {
             "jquery": "jquery",
+            "moment": "moment",
             "storageapi": "storageapi",
             "bootstrap": "bootstrap",
             "typeahead": "bootstrap3-typeahead",
@@ -23,6 +24,8 @@
             "backbone": "backbone",
             "dust": "dust-full",
             "dust-helpers": "dust-helpers",
+            "dust-filters": "dust-filters",
+
             "io": "io",
             "tpl": "/javascripts/web/tpl",
 
@@ -41,6 +44,12 @@
             "vBlogList": "/javascripts/web/blog/vBlogList",
             "vBlogForm": "/javascripts/web/blog/vBlogForm",
             "vBlogDetail": "/javascripts/web/blog/vBlogDetail",
+
+            "mPost": "/javascripts/web/post/mPost",
+            "vPost": "/javascripts/web/post/vPost",
+
+            "vPostList": "/javascripts/web/post/vPostList",
+            "vPostDetail": "/javascripts/web/post/vPostDetail",
 
             "mUser": "/javascripts/web/user/mUser",
             "mFriend": "/javascripts/web/user/mFriend",
@@ -85,8 +94,12 @@
                 deps:["dust"],
                 exports: 'dust-helpers',
             },
+			"dust-filters": {
+                deps:["dust", "moment"],
+                exports: 'dust-filters',
+            },
             tpl: {
-                deps:["dust","dust-helpers"]
+                deps:["dust", "dust-helpers", "dust-filters"]
             },
         },
         deps: ['jquery', 'underscore']

@@ -6,21 +6,28 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     function body_0(chk, ctx) {
       return chk.w("<div class=\"widget\">").s(ctx.get(["data"], false), ctx, {
         "block": body_1
-      }, {}).w("</div>");
+      }, {}).w("</div><div id=\"postList\"></div>");
     }
     body_0.__dustBody = !0;
 
     function body_1(chk, ctx) {
-      return chk.w("<p class=\"h4\">").s(ctx.getPath(false, ["access", "edit"]), ctx, {
+      return chk.w("<div class=\"row\"><ol class=\"breadcrumb\"><li><a href=\"#blog\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Main</a></li><li><span class=\"glyphicon glyphicon-pencil\"></span>&nbsp;Blog</li></ol></div><p class=\"h4\">").s(ctx.getPath(false, ["access", "edit"]), ctx, {
         "block": body_2
-      }, {}).f(ctx.get(["name"], false), ctx, "h").w("</p><p>").f(ctx.get(["description"], false), ctx, "h").w("</p>");
+      }, {}).f(ctx.get(["name"], false), ctx, "h").w("</p><p>").f(ctx.get(["description"], false), ctx, "h").w("</p>").s(ctx.getPath(false, ["access", "edit"]), ctx, {
+        "block": body_3
+      }, {});
     }
     body_1.__dustBody = !0;
 
     function body_2(chk, ctx) {
-      return chk.w("<a href=\"#blog-edit/").f(ctx.get(["_id"], false), ctx, "h").w("\">edit</a>&nbsp;");
+      return chk.w("<a href=\"#blog-edit/").f(ctx.get(["_id"], false), ctx, "h").w("\"><span class=\"glyphicon glyphicon-edit\"></span></a>&nbsp;");
     }
     body_2.__dustBody = !0;
+
+    function body_3(chk, ctx) {
+      return chk.w("<p><a href=\"#post-new/").f(ctx.get(["_id"], false), ctx, "h").w("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;Create post</a></p>");
+    }
+    body_3.__dustBody = !0;
     return body_0;
   })();
   // modules/web/views/web/blog/form.dust
@@ -59,7 +66,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("blog_list", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<h1>main page</h1><div class=\"row\">").s(ctx.get(["data"], false), ctx, {
+      return chk.w("<div class=\"widget\"><h1>Main page</h1></div><div class=\"row\">").s(ctx.get(["data"], false), ctx, {
         "block": body_1
       }, {}).w("</div>");
     }
@@ -228,6 +235,116 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return chk.w("<h4>").f(ctx.getPath(true, []), ctx, "h").w("</h4>");
     }
     body_1.__dustBody = !0;
+    return body_0;
+  })();
+  // modules/web/views/web/post/detail.dust
+  (function() {
+    dust.register("post_detail", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div class=\"widget\">").s(ctx.get(["data"], false), ctx, {
+        "block": body_1
+      }, {}).w("</div>");
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("<div class=\"row\"><div class=\"col-md-10\"><div class=\"row\"><ol class=\"breadcrumb\"><li><a href=\"#blog\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Main</a></li><li><a href=\"#blog/").f(ctx.get(["_bId"], false), ctx, "h").w("\"><span class=\"glyphicon glyphicon-pencil\"></span>&nbsp;Blog</a></li><li><span>").f(ctx.get(["name"], false), ctx, "h").w("</span></li></ol></div></div><div class=\"col-md-2\"><p class=\"h6\"><span class=\"glyphicon glyphicon-time\"></span>&nbsp;").s(ctx.get(["updated"], false), ctx, {
+        "block": body_2
+      }, {}).nx(ctx.get(["updated"], false), ctx, {
+        "block": body_3
+      }, {}).w("</p></div></div><p class=\"h4\">").s(ctx.getPath(false, ["access", "edit"]), ctx, {
+        "block": body_4
+      }, {}).f(ctx.get(["name"], false), ctx, "h").w("</p><p>").f(ctx.get(["description"], false), ctx, "h").w("</p>");
+    }
+    body_1.__dustBody = !0;
+
+    function body_2(chk, ctx) {
+      return chk.f(ctx.get(["updated"], false), ctx, "h", ["calendar"]);
+    }
+    body_2.__dustBody = !0;
+
+    function body_3(chk, ctx) {
+      return chk.f(ctx.get(["created"], false), ctx, "h", ["calendar"]);
+    }
+    body_3.__dustBody = !0;
+
+    function body_4(chk, ctx) {
+      return chk.w("<a href=\"#post-edit/").f(ctx.get(["_bId"], false), ctx, "h").w("/").f(ctx.get(["_id"], false), ctx, "h").w("\"><span class=\"glyphicon glyphicon-edit\"></span></a>&nbsp;");
+    }
+    body_4.__dustBody = !0;
+    return body_0;
+  })();
+  // modules/web/views/web/post/form.dust
+  (function() {
+    dust.register("post_form", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div class=\"widget\"><form id=\"postForm\"><div class=\"form-group\"><label for=\"name\">Post name</label><input type=\"text\" class=\"form-control\" id=\"name\" placeholder=\"Post name\" name=\"name\" ").s(ctx.get(["name"], false), ctx, {
+        "block": body_1
+      }, {}).w(" /></div><div class=\"form-group\"><label for=\"description\">Post description</label><textarea class=\"form-control\" id=\"description\"  name=\"description\" rows=\"8\" cols=\"40\" placeholder=\"Post description\">").s(ctx.get(["description"], false), ctx, {
+        "block": body_2
+      }, {}).w("</textarea></div><div class=\"form-group\"><label for=\"status\">Status</label><select class=\"form-control\" id='status'>").s(ctx.get(["statuses"], false), ctx, {
+        "block": body_3
+      }, {}).w("</select></div><button type=\"submit\" class=\"btn btn-success\"><span class=\"glyphicon glyphicon-floppy-disk\"></span>&nbsp;Save</button>&nbsp;&nbsp;<a href=\"#\" class=\"btn btn-warning\"><span class=\"glyphicon glyphicon-remove\"></span>&nbsp;Cancel</a></form></div>");
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("value=\"").f(ctx.getPath(true, []), ctx, "h").w("\"");
+    }
+    body_1.__dustBody = !0;
+
+    function body_2(chk, ctx) {
+      return chk.f(ctx.getPath(true, []), ctx, "h");
+    }
+    body_2.__dustBody = !0;
+
+    function body_3(chk, ctx) {
+      return chk.w("<option value=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" ").h("eq", ctx, {
+        "block": body_4
+      }, {
+        "key": ctx.get(["_id"], false),
+        "value": ctx.get(["status"], false)
+      }).w(">").f(ctx.get(["name"], false), ctx, "h").w("</option>");
+    }
+    body_3.__dustBody = !0;
+
+    function body_4(chk, ctx) {
+      return chk.w("selected");
+    }
+    body_4.__dustBody = !0;
+    return body_0;
+  })();
+  // modules/web/views/web/post/list.dust
+  (function() {
+    dust.register("post_list", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div class=\"row\">").s(ctx.get(["data"], false), ctx, {
+        "block": body_1
+      }, {}).w("</div>");
+    }
+    body_0.__dustBody = !0;
+
+    function body_1(chk, ctx) {
+      return chk.w("<div class=\"col-md-4\"><div class=\"widget\"><p class=\"h6\"><span class=\"glyphicon glyphicon-time\"></span>&nbsp;").s(ctx.get(["updated"], false), ctx, {
+        "block": body_2
+      }, {}).nx(ctx.get(["updated"], false), ctx, {
+        "block": body_3
+      }, {}).w("</p><p class=\"h4\"><a href=\"#post/").f(ctx.get(["_bId"], false), ctx, "h").w("/").f(ctx.get(["_id"], false), ctx, "h").w("\">").f(ctx.get(["name"], false), ctx, "h").w("</a></p><p>").f(ctx.get(["description"], false), ctx, "h", ["substr"]).w("</p></div></div>");
+    }
+    body_1.__dustBody = !0;
+
+    function body_2(chk, ctx) {
+      return chk.f(ctx.get(["updated"], false), ctx, "h", ["calendar"]);
+    }
+    body_2.__dustBody = !0;
+
+    function body_3(chk, ctx) {
+      return chk.f(ctx.get(["created"], false), ctx, "h", ["calendar"]);
+    }
+    body_3.__dustBody = !0;
     return body_0;
   })();
   // modules/web/views/web/user/detail.dust
@@ -650,6 +767,69 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
+  define("post_detail", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("post_detail", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
+  define("post_form", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("post_form", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
+  define("post_list", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("post_list", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
   define("user_detail", function() {
     return function(locals, callback) {
       var rendered;
@@ -734,5 +914,5 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["blog_detail", "blog_form", "blog_list", "chat_form", "chat_list", "chat_message", "chat_personal", "chat_roomEdit", "chat_users", "layout", "login_auth", "login_registration", "menu", "message", "user_detail", "user_friendList", "user_index", "user_list"];
+  return ["blog_detail", "blog_form", "blog_list", "chat_form", "chat_list", "chat_message", "chat_personal", "chat_roomEdit", "chat_users", "layout", "login_auth", "login_registration", "menu", "message", "post_detail", "post_form", "post_list", "user_detail", "user_friendList", "user_index", "user_list"];
 });

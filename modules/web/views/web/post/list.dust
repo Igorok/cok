@@ -1,0 +1,21 @@
+<div class="row">
+	{#data}
+		<div class="col-md-4">
+			<div class="widget">
+				<p class="h6">
+					<span class="glyphicon glyphicon-time"></span>&nbsp;
+					{#updated}
+						{updated|calendar}
+					{/updated}
+					{^updated}
+						{created|calendar}
+					{/updated}
+				</p>
+				<p class="h4">
+					<a href="#post/{_bId}/{_id}">{name}</a>
+				</p>
+				<p>{description|substr}</p>
+			</div>
+		</div>
+	{/data}
+</div>

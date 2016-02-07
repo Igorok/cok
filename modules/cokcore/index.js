@@ -86,31 +86,25 @@ var Core = function () {
         }));
     };
 
-    self.isMongoID = function (_id) {
+    self.isObjectID = function (_id) {
         return _id instanceof mongo.ObjectID;
     };
 
-    self.ObjectID = function () {
-        let id = arguments.length ? arguments[0] : undefined;
-        let strict = arguments.length > 1 ? Boolean(strict) : true;
-
+    self.newObjectID = function () {
+		return new mongo.ObjectID();
+	};
+    self.ObjectID = function (_id) {
+        let id = _id;
         if (! id) {
             return undefined;
         }
-
-        if (self.isMongoID(id)) {
+        if (self.isObjectID(id)) {
             return id;
         }
-
-        if (strict) {
-            return new mongo.ObjectID(id);
-        }
-
         let obj;
         _.attempt(function () {
             obj = new mongo.ObjectID(id);
         });
-
         return obj;
     }
 

@@ -3,6 +3,11 @@ module.exports = {
     app: {
         expireTokenDay: 7,
         port: 3000,
+        postStatus: [
+            {_id: 'write', name: 'Write'},
+            {_id: 'publish', name: 'Publish'},
+            {_id: 'archive', name: 'Archive'},
+        ],
     },
     mongo:{
         host: "localhost",

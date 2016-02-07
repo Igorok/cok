@@ -1,6 +1,8 @@
-<h1>
-	main page
-</h1>
+<div class="widget">
+	<h1>
+		Main page
+	</h1>
+</div>
 <div class="row">
 {#data}
 	<div class="col-md-4">

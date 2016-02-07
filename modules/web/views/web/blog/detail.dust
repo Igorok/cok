@@ -1,11 +1,39 @@
 <div class="widget">
 	{#data}
+		<div class="row">
+			<ol class="breadcrumb">
+				<li>
+					<a href="#blog">
+						<span class="glyphicon glyphicon-home"></span>&nbsp;
+						Main
+					</a>
+				</li>
+				<li>
+					<span class="glyphicon glyphicon-pencil"></span>&nbsp;
+					Blog
+				</li>
+			</ol>
+		</div>
+
 		<p class="h4">
 			{#access.edit}
-				<a href="#blog-edit/{_id}">edit</a>&nbsp;
+				<a href="#blog-edit/{_id}">
+					<span class="glyphicon glyphicon-edit"></span>
+				</a>
+				&nbsp;
 			{/access.edit}
 			{name}
 		</p>
 		<p>{description}</p>
+		{#access.edit}
+		<p>
+			<a href="#post-new/{_id}">
+				<span class="glyphicon glyphicon-plus"></span>
+				&nbsp;
+				Create post
+			</a>
+		</p>
+		{/access.edit}
 	{/data}
 </div>
+<div id="postList"></div>

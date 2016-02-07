@@ -1,0 +1,46 @@
+<div class="widget">
+	{#data}
+		<div class="row">
+			<div class="col-md-10">
+				<div class="row">
+					<ol class="breadcrumb">
+						<li>
+							<a href="#blog">
+								<span class="glyphicon glyphicon-home"></span>&nbsp;
+								Main
+							</a>
+						</li>
+						<li>
+							<a href="#blog/{_bId}">
+								<span class="glyphicon glyphicon-pencil"></span>&nbsp;
+								Blog
+							</a></li>
+						<li><span>{name}</span></li>
+					</ol>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<p class="h6">
+					<span class="glyphicon glyphicon-time"></span>&nbsp;
+					{#updated}
+						{updated|calendar}
+					{/updated}
+					{^updated}
+						{created|calendar}
+					{/updated}
+				</p>
+			</div>
+		</div>
+
+		<p class="h4">
+			{#access.edit}
+				<a href="#post-edit/{_bId}/{_id}">
+					<span class="glyphicon glyphicon-edit"></span>
+				</a>
+				&nbsp;
+			{/access.edit}
+			{name}
+		</p>
+		<p>{description}</p>
+	{/data}
+</div>
