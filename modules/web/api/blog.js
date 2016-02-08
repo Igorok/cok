@@ -129,7 +129,7 @@ cokcore.validate.add('access_post_detail', function (user, blog, post, cb) {
 		if (user._id.toString() == post.uId.toString()) {
 			access.show = true;
 			access.edit = true;
-		} else if (post.status == 'publish') {
+		} else if ((post.status == 'publish') && (post.approved == 1)) {
 			access.show = true;
 		}
 	}
@@ -502,6 +502,7 @@ Api.prototype.postDetailPublic = function (_data, cb) {
 		let pq = {
 			_id: cokcore.ObjectID(_data.params[0]._id.toString()),
 			_bId: blog._id,
+			approved: 1,
 			status: 'publish',
 		};
 		// find post
@@ -598,6 +599,7 @@ Api.prototype.postListPublic = function (_data, cb) {
 		}
 		let pq = {
 			_bId: blog._id,
+			approved: 1,
 			status: 'publish',
 		};
 		cokcore.ctx.col.posts.find(pq, {sort: {date: -1}}).toArray(safe.sure(cb, function (posts) {
@@ -642,6 +644,7 @@ Api.prototype.postList = function (_data, cb) {
 		// find posts
 		function (cb) {
 			if (! access) {
+				query.approved = 1;
 				query.status = 'publish';
 			}
 			cokcore.ctx.col.posts.find(query, {sort: {date: -1}}).toArray(safe.sure(cb, function (_arr) {
