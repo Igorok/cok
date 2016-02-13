@@ -1,5 +1,5 @@
 define ([
-	"jquery", "underscore", "backbone", "dust", "tpl", "message", "mPost"
+	"jquery", "underscore", "backbone", "dust", "tpl", "message", "mPost", "wysibb"
 ], function ($, _, backbone, dust, tpl, Msg, mPost) {
 	'use strict';
 	var view = {};
@@ -41,6 +41,7 @@ define ([
 			var setObj = {
 				name: self.$('#name').val(),
 				description: self.$('#description').val(),
+				text: self.$('#text').val(),
 				status: self.$('#status').val(),
 			};
 
@@ -53,9 +54,13 @@ define ([
 			if (self._id) {
 				func = 'postEdit';
 			}
-			self.model.savePost(func, function () {
+			self.model.savePost(func, function (r) {
 				console.log('saved');
-				redirect(self._bId);
+				if (self._id) {
+					window.location.hash = 'post/' + self._bId + '/' + self._id;
+				} else {
+					window.location.hash = 'post/' + r._bId + '/' + r._id;
+				}
 			});
 
 		},
@@ -68,6 +73,7 @@ define ([
 				var data = {
 					_bId: self._bId,
 					_id: self._id,
+					edit: true,
 				};
 				self.model.postDetail(data, function () {
 					var access = self.model.get('access');
@@ -85,7 +91,10 @@ define ([
 					console.trace(err);
 				}
 				self.$el.html(text);
-				return self;
+				var wbbOpt = {
+					buttons: "bold,italic,underline,fontcolor,|,img,link,|,code,quote"
+				}
+				self.$("#text").wysibb(wbbOpt);
 			});
 		},
 	});

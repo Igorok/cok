@@ -50,8 +50,11 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
 			var user = Api.getUser();
 			func = "blog." + func;
 			Api.call(func, {uId: user._id, token: user.token, data: self.toJSON()}, function (ret) {
-				console.log('func ', func);
-				cb();
+				if (! ret && ! ret.result) {
+					return cb();
+				}
+
+				cb(ret.result[0]);
 			});
 		},
 		postDetail: function (opts, cb) {

@@ -255,7 +255,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
         "block": body_3
       }, {}).w("</p></div></div><p class=\"h4\">").s(ctx.getPath(false, ["access", "edit"]), ctx, {
         "block": body_4
-      }, {}).f(ctx.get(["name"], false), ctx, "h").w("</p><p>").f(ctx.get(["description"], false), ctx, "h").w("</p>");
+      }, {}).f(ctx.get(["name"], false), ctx, "h").w("</p><p>").f(ctx.get(["description"], false), ctx, "h").w("</p><div>").f(ctx.get(["text"], false), ctx, "h", ["s"]).w("</div>");
     }
     body_1.__dustBody = !0;
 
@@ -280,12 +280,14 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("post_form", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"widget\"><form id=\"postForm\"><div class=\"form-group\"><label for=\"name\">Post name</label><input type=\"text\" class=\"form-control\" id=\"name\" placeholder=\"Post name\" name=\"name\" ").s(ctx.get(["name"], false), ctx, {
+      return chk.w("<div class=\"widget\"><div class=\"row\"><ol class=\"breadcrumb\"><li><a href=\"#blog\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Main</a></li><li><a href=\"#blog/").f(ctx.get(["_bId"], false), ctx, "h").w("\"><span class=\"glyphicon glyphicon-pencil\"></span>&nbsp;Blog</a></li><li><span>").f(ctx.get(["name"], false), ctx, "h").w("</span></li></ol></div><form id=\"postForm\"><div class=\"form-group\"><label for=\"name\">Post name</label><input type=\"text\" class=\"form-control\" id=\"name\" placeholder=\"Post name\" name=\"name\" ").s(ctx.get(["name"], false), ctx, {
         "block": body_1
       }, {}).w(" /></div><div class=\"form-group\"><label for=\"description\">Post description</label><textarea class=\"form-control\" id=\"description\"  name=\"description\" rows=\"8\" cols=\"40\" placeholder=\"Post description\">").s(ctx.get(["description"], false), ctx, {
         "block": body_2
-      }, {}).w("</textarea></div><div class=\"form-group\"><label for=\"status\">Status</label><select class=\"form-control\" id='status'>").s(ctx.get(["statuses"], false), ctx, {
+      }, {}).w("</textarea></div><div class=\"form-group\"><label for=\"text\">Post text</label><textarea class=\"form-control\" id=\"text\"  name=\"text\" rows=\"8\" cols=\"40\" placeholder=\"Post text\">").s(ctx.get(["text"], false), ctx, {
         "block": body_3
+      }, {}).w("</textarea></div><div class=\"form-group\"><label for=\"status\">Status</label><select class=\"form-control\" id='status'>").s(ctx.get(["statuses"], false), ctx, {
+        "block": body_4
       }, {}).w("</select></div><button type=\"submit\" class=\"btn btn-success\"><span class=\"glyphicon glyphicon-floppy-disk\"></span>&nbsp;Save</button>&nbsp;&nbsp;<a href=\"#\" class=\"btn btn-warning\"><span class=\"glyphicon glyphicon-remove\"></span>&nbsp;Cancel</a></form></div>");
     }
     body_0.__dustBody = !0;
@@ -301,19 +303,24 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_2.__dustBody = !0;
 
     function body_3(chk, ctx) {
+      return chk.f(ctx.getPath(true, []), ctx, "h");
+    }
+    body_3.__dustBody = !0;
+
+    function body_4(chk, ctx) {
       return chk.w("<option value=\"").f(ctx.get(["_id"], false), ctx, "h").w("\" ").h("eq", ctx, {
-        "block": body_4
+        "block": body_5
       }, {
         "key": ctx.get(["_id"], false),
         "value": ctx.get(["status"], false)
       }).w(">").f(ctx.get(["name"], false), ctx, "h").w("</option>");
     }
-    body_3.__dustBody = !0;
+    body_4.__dustBody = !0;
 
-    function body_4(chk, ctx) {
+    function body_5(chk, ctx) {
       return chk.w("selected");
     }
-    body_4.__dustBody = !0;
+    body_5.__dustBody = !0;
     return body_0;
   })();
   // modules/web/views/web/post/list.dust

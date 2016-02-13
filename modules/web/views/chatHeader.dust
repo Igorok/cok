@@ -25,6 +25,7 @@
             "dust": "dust-full",
             "dust-helpers": "dust-helpers",
             "dust-filters": "dust-filters",
+            "wysibb": "/javascripts/wysibb/jquery.wysibb.min",
 
             "io": "io",
             "tpl": "/javascripts/web/tpl",

@@ -3,6 +3,7 @@ var safe = require('safe');
 var _ = require("lodash");
 var moment = require('moment');
 var cokcore = require('cokcore');
+var bbcode = require('bbcode');
 
 
 /*
@@ -188,6 +189,7 @@ cokcore.validate.add('post_create', function (_user, _params, cb) {
     if (
         _.isEmpty(_params.name) ||
         _.isEmpty(_params.description) ||
+        _.isEmpty(_params.text) ||
         _.isEmpty(_params.status)
     ) {
         return cb(new Error('Name, description and status are required'));
@@ -233,6 +235,7 @@ cokcore.validate.add('post_edit', function (_user, _params, cb) {
     if (
         _.isEmpty(_params.name) ||
         _.isEmpty(_params.description) ||
+        _.isEmpty(_params.text) ||
         _.isEmpty(_params.status)
     ) {
         return cb(new Error('Name, description and status are required'));
@@ -510,7 +513,10 @@ Api.prototype.postDetailPublic = function (_data, cb) {
 			if (! post) {
 				return cb(new Error(404));
 			}
-			cb(null, post, {});
+			bbcode.parse(post.text, function(content) {
+				post.text = content;
+				cb(null, post, {});
+			});
 		}));
 	}));
 };
@@ -518,6 +524,7 @@ Api.prototype.postDetailPublic = function (_data, cb) {
 * function to show public post
 * @param { string } _data._id - id of the post
 * @param { string } _data._bId - id of the blog
+* @param { boolean } _data.edit - flag to no parse bbcode
 * @return {object, object} - return data of post and access to this
 */
 Api.prototype.postDetail = function (_data, cb) {
@@ -570,7 +577,15 @@ Api.prototype.postDetail = function (_data, cb) {
             }));
         },
     ], safe.sure(cb, function () {
-        cb(null, post, access);
+		if (param.edit) {
+			return cb(null, post, access);
+		}
+		bbcode.parse(post.text, function(content) {
+			post.text = content;
+			cb(null, post, access);
+		});
+
+
     }));
 };
 
@@ -602,7 +617,14 @@ Api.prototype.postListPublic = function (_data, cb) {
 			approved: 1,
 			status: 'publish',
 		};
-		cokcore.ctx.col.posts.find(pq, {sort: {date: -1}}).toArray(safe.sure(cb, function (posts) {
+		var columns = {
+			name: 1,
+			description: 1,
+			created: 1,
+			updated: 1,
+			_bId: 1,
+		};
+		cokcore.ctx.col.posts.find(pq, columns, {sort: {date: -1}}).toArray(safe.sure(cb, function (posts) {
 			cb(null, posts);
 		}));
 	}));
@@ -647,7 +669,15 @@ Api.prototype.postList = function (_data, cb) {
 				query.approved = 1;
 				query.status = 'publish';
 			}
-			cokcore.ctx.col.posts.find(query, {sort: {date: -1}}).toArray(safe.sure(cb, function (_arr) {
+			var columns = {
+				name: 1,
+				description: 1,
+				created: 1,
+				status : 1,
+				updated: 1,
+				_bId: 1,
+			};
+			cokcore.ctx.col.posts.find(query, columns, {sort: {date: -1}}).toArray(safe.sure(cb, function (_arr) {
 	            pArr = _arr;
 				cb();
 	        }));
@@ -678,6 +708,7 @@ Api.prototype.postCreate = function (_data, cb) {
             let iObj = {
                 name: _.escape(param.name),
                 description:  _.escape(param.description),
+                text:  _.escape(param.text),
                 uId: user._id,
                 created: new Date(),
                 _bId: cokcore.ObjectID(param._bId.toString()),
@@ -726,6 +757,9 @@ Api.prototype.postEdit = function (_data, cb) {
             }
             if (param.description != post.description) {
                 setObj.description = _.escape(param.description);
+            }
+            if (param.text != post.text) {
+                setObj.text = _.escape(param.text);
             }
             if (param.status != post.status) {
                 setObj.status = _.escape(param.status);

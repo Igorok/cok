@@ -42,5 +42,6 @@
 			{name}
 		</p>
 		<p>{description}</p>
+		<div>{text|s}</div>
 	{/data}
 </div>

@@ -1,4 +1,20 @@
 <div class="widget">
+	<div class="row">
+		<ol class="breadcrumb">
+			<li>
+				<a href="#blog">
+					<span class="glyphicon glyphicon-home"></span>&nbsp;
+					Main
+				</a>
+			</li>
+			<li>
+				<a href="#blog/{_bId}">
+					<span class="glyphicon glyphicon-pencil"></span>&nbsp;
+					Blog
+				</a></li>
+			<li><span>{name}</span></li>
+		</ol>
+	</div>
 	<form id="postForm">
 		<div class="form-group">
 			<label for="name">Post name</label>
@@ -7,6 +23,10 @@
 		<div class="form-group">
 			<label for="description">Post description</label>
 			<textarea class="form-control" id="description"  name="description" rows="8" cols="40" placeholder="Post description">{#description}{.}{/description}</textarea>
+		</div>
+		<div class="form-group">
+			<label for="text">Post text</label>
+			<textarea class="form-control" id="text"  name="text" rows="8" cols="40" placeholder="Post text">{#text}{.}{/text}</textarea>
 		</div>
 
 		<div class="form-group">
