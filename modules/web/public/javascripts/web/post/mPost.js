@@ -69,7 +69,6 @@ define (["jquery", "underscore", "backbone", "message", "api"], function ($, _, 
 			}
 
 			Api.call("blog.postDetail", opts, function (ret) {
-				console.log('ret ', ret);
 				if (! ret && ! ret.result) {
 					return cb();
 				}

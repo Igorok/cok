@@ -1,4 +1,14 @@
 define(["dust", "dust-helpers"], function(dust, dust_helpers) {
+  // modules/web/views/web/about.dust
+  (function() {
+    dust.register("about", body_0);
+
+    function body_0(chk, ctx) {
+      return chk.w("<div class=\"widget\"><h3>Что это?</h3><p>Это - несколько личных не коммерческих веб страниц затерянных в мировой паутине.</p><p>Сайт был задуман и произведен на свет в целях отображения сугубо личной точки зрения на тему веб программирования. Автор не несет ответственность за последствия использования информации.</p></div>");
+    }
+    body_0.__dustBody = !0;
+    return body_0;
+  })();
   // modules/web/views/web/blog/detail.dust
   (function() {
     dust.register("blog_detail", body_0);
@@ -205,7 +215,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
         "block": body_1
       }, {}).w("</ul></li>").s(ctx.get(["user"], false), ctx, {
         "block": body_2
-      }, {}).w("</ul>");
+      }, {}).w("<li><a href=\"#about\"><span class=\"glyphicon glyphicon-info-sign\"></span>&nbsp;About</a></li></ul>");
     }
     body_0.__dustBody = !0;
 
@@ -480,6 +490,27 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_5.__dustBody = !0;
     return body_0;
   })();
+  define("about", function() {
+    return function(locals, callback) {
+      var rendered;
+
+      dust.render("about", locals, function(err, result) {
+        if (typeof callback === "function") {
+          try {
+            callback(err, result);
+          } catch (e) {}
+        }
+
+        if (err) {
+          throw err
+        } else {
+          rendered = result;
+        }
+      });
+
+      return rendered;
+    }
+  });
   define("blog_detail", function() {
     return function(locals, callback) {
       var rendered;
@@ -921,5 +952,5 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["blog_detail", "blog_form", "blog_list", "chat_form", "chat_list", "chat_message", "chat_personal", "chat_roomEdit", "chat_users", "layout", "login_auth", "login_registration", "menu", "message", "post_detail", "post_form", "post_list", "user_detail", "user_friendList", "user_index", "user_list"];
+  return ["about", "blog_detail", "blog_form", "blog_list", "chat_form", "chat_list", "chat_message", "chat_personal", "chat_roomEdit", "chat_users", "layout", "login_auth", "login_registration", "menu", "message", "post_detail", "post_form", "post_list", "user_detail", "user_friendList", "user_index", "user_list"];
 });

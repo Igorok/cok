@@ -42,4 +42,10 @@
 		</a>
 	</li>
 	{/user}
+	<li>
+		<a href="#about">
+			<span class="glyphicon glyphicon-info-sign"></span>&nbsp;
+			About
+		</a>
+	</li>
 </ul>

@@ -55,7 +55,6 @@ define ([
 				func = 'postEdit';
 			}
 			self.model.savePost(func, function (r) {
-				console.log('saved');
 				if (self._id) {
 					window.location.hash = 'post/' + self._bId + '/' + self._id;
 				} else {

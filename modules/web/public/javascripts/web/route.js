@@ -1,9 +1,12 @@
 define ([
-	"jquery", "underscore", "backbone", "dust", "io", "api", "message", "vAuth", "vBlogList", "vBlogForm", "vProfile", "vUserList", "vUserDetail", "vFriendList", "vReg", "vFriendReq", "vChatPersonal", "vChatList", "vChatRoomEdit", "vChatRoom", "vBlogDetail", "vPost",
+	"jquery", "underscore", "backbone", "dust", "io", "api", "message", "vAuth", "vBlogList", "vBlogForm", "vProfile",
+	"vUserList", "vUserDetail", "vFriendList", "vReg", "vFriendReq", "vChatPersonal", "vChatList", "vChatRoomEdit",
+	"vChatRoom", "vBlogDetail", "vPost",
 ], function ($, _, Backbone, dust, io, Api, Msg, vAuth, vBlogList, vBlogForm, vProfile, vUserList, vUserDetail, vFriendList, vReg, vFriendReq, vChatPersonal, vChatList, vChatRoomEdit, vChatRoom, vBlogDetail, vPost) {
 	"use strict";
 	var Route = Backbone.Router.extend({
 		routes:  {
+			"about": "about",
 			"": "blogList",
 			"blog": "blogList",
 			"blog/:id": "blogDetail",
@@ -63,6 +66,15 @@ define ([
 			self.user = Api.removeUser();
 			self.navigate("login");
 		},
+		about: function () {
+			dust.render("about", {}, function (err, text) {
+				if (err) {
+					console.trace(err);
+					return Msg.showError(null, JSON.stringify(err));
+				}
+				$('#main').html(text);
+			});
+		},
 		blogList: function () {
 			var view = new vBlogList();
 			$('#main').html(view.render().el);
@@ -108,7 +120,7 @@ define ([
 			if (! _bId || ! _id) {
 				self.navigate("blog/");
 			}
-			
+
 			var opts = {
 				_bId: _bId,
 				_id: _id,
