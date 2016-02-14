@@ -51,7 +51,9 @@ define ([
 		},
 
 		auth: function (options) {
+			console.log('login');
 			var view = new vAuth();
+			console.log('view ', view);
 			$('#main').html(view.render().el);
 		},
 		registration: function (options) {
@@ -64,7 +66,7 @@ define ([
 				return Msg.showError(null, "403");
 			}
 			self.user = Api.removeUser();
-			self.navigate("login");
+			window.location.href = "#login";
 		},
 		about: function () {
 			dust.render("about", {}, function (err, text) {
