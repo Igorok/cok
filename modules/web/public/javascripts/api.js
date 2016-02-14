@@ -29,6 +29,9 @@ define (["jquery", "underscore", "backbone", "message", "storageapi"], function 
                 if (ret.error) {
                     var err = ret.error.message ? ret.error.message : JSON.stringify(ret.error);
                     console.log(err);
+					if (err == '403') {
+						Api.prototype.removeUser();
+					}
                     return Msg.showError(null, err);
                 } else {
                     cb(ret);

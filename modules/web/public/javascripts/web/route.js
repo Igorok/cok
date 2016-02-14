@@ -51,9 +51,7 @@ define ([
 		},
 
 		auth: function (options) {
-			console.log('login');
 			var view = new vAuth();
-			console.log('view ', view);
 			$('#main').html(view.render().el);
 		},
 		registration: function (options) {

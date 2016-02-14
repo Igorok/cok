@@ -4,7 +4,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("about", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"widget\"><h3>Что это?</h3><p>Это - несколько личных не коммерческих веб страниц затерянных в мировой паутине.</p><p>Сайт был задуман и произведен на свет в целях отображения сугубо личной точки зрения на тему веб программирования. Автор не несет ответственность за последствия использования информации.</p></div>");
+      return chk.w("<div class=\"widget\"><h4>About</h4><p>I am web developer. I had planned these few personal pages for implement and checking of my private ideas. Sometimes i write here short notes about the web development.</p></div>");
     }
     body_0.__dustBody = !0;
     return body_0;
@@ -76,7 +76,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("blog_list", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"widget\"><h1>Main page</h1></div><div class=\"row\">").s(ctx.get(["data"], false), ctx, {
+      return chk.w("<div class=\"widget\"><p>This is the list of blogs located on this site</p></div><div class=\"row\">").s(ctx.get(["data"], false), ctx, {
         "block": body_1
       }, {}).w("</div>");
     }
@@ -176,16 +176,6 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     body_1.__dustBody = !0;
     return body_0;
   })();
-  // modules/web/views/web/layout.dust
-  (function() {
-    dust.register("layout", body_0);
-
-    function body_0(chk, ctx) {
-      return chk.w("<div class=\"row\"><div class=\"col-md-2\"><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#blog\"  aria-expanded=\"false\" aria-controls=\"blogs\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Blogs</a><ul id=\"blog\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#\">List</a></li><li><a href=\"#\">My blogs</a></li><li><a href=\"#\">New blog</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#user\"  aria-expanded=\"false\" aria-controls=\"users\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-user\"></span>Users</a><ul id=\"user\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#profile\">Profile</a></li><li><a href=\"#user\">Users List</a></li><li><a href=\"#friend\">Friends List</a></li><li><a href=\"#friend-requests\">Friends Requests</a></li></ul></li><li><a data-toggle=\"collapse\" href=\"#chat\"  aria-expanded=\"false\" aria-controls=\"chat\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-envelope\"></span>Chats</a><ul id=\"chat\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#chat-room\">Chats List</a></li><li><a href=\"#chat-room-edit/-1\">New chat</a></li></ul></li><li><a href=\"#logout\"><span class=\"glyphicon glyphicon-log-out\"></span>&nbsp;Logout</a></li></ul></div><div id=\"main\" class=\"col-md-10\"></div></div>");
-    }
-    body_0.__dustBody = !0;
-    return body_0;
-  })();
   // modules/web/views/web/login/auth.dust
   (function() {
     dust.register("login_auth", body_0);
@@ -211,7 +201,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("menu", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#blog\"  aria-expanded=\"false\" aria-controls=\"blogs\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Blogs</a><ul id=\"blog\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#\">List</a></li>").s(ctx.get(["user"], false), ctx, {
+      return chk.w("<div class=\"mainLogo\"><a href=\"#\"><img src=\"/images/new-logo.png\" alt=\"\" /></a></div><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#blog\"  aria-expanded=\"false\" aria-controls=\"blogs\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Blogs</a><ul id=\"blog\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#\">List</a></li>").s(ctx.get(["user"], false), ctx, {
         "block": body_1
       }, {}).w("</ul></li>").s(ctx.get(["user"], false), ctx, {
         "block": body_2
@@ -700,27 +690,6 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  define("layout", function() {
-    return function(locals, callback) {
-      var rendered;
-
-      dust.render("layout", locals, function(err, result) {
-        if (typeof callback === "function") {
-          try {
-            callback(err, result);
-          } catch (e) {}
-        }
-
-        if (err) {
-          throw err
-        } else {
-          rendered = result;
-        }
-      });
-
-      return rendered;
-    }
-  });
   define("login_auth", function() {
     return function(locals, callback) {
       var rendered;
@@ -952,5 +921,5 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
       return rendered;
     }
   });
-  return ["about", "blog_detail", "blog_form", "blog_list", "chat_form", "chat_list", "chat_message", "chat_personal", "chat_roomEdit", "chat_users", "layout", "login_auth", "login_registration", "menu", "message", "post_detail", "post_form", "post_list", "user_detail", "user_friendList", "user_index", "user_list"];
+  return ["about", "blog_detail", "blog_form", "blog_list", "chat_form", "chat_list", "chat_message", "chat_personal", "chat_roomEdit", "chat_users", "login_auth", "login_registration", "menu", "message", "post_detail", "post_form", "post_list", "user_detail", "user_friendList", "user_index", "user_list"];
 });

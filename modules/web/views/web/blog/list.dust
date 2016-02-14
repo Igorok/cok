@@ -1,7 +1,7 @@
 <div class="widget">
-	<h1>
-		Main page
-	</h1>
+	<p>
+		This is the list of blogs located on this site
+	</p>
 </div>
 <div class="row">
 {#data}
