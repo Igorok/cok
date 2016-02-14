@@ -201,7 +201,7 @@ define(["dust", "dust-helpers"], function(dust, dust_helpers) {
     dust.register("menu", body_0);
 
     function body_0(chk, ctx) {
-      return chk.w("<div class=\"mainLogo\"><a href=\"#\"><img src=\"/images/new-logo.png\" alt=\"\" /></a></div><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#blog\"  aria-expanded=\"false\" aria-controls=\"blogs\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Blogs</a><ul id=\"blog\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#\">List</a></li>").s(ctx.get(["user"], false), ctx, {
+      return chk.w("<div class=\"mainLogo\"><a href=\"#\"><img src=\"/images/logo-v2.png\" alt=\"\" /></a></div><ul id=\"navigation\" class=\"nav nav-pills nav-stacked\"><li><a data-toggle=\"collapse\" href=\"#blog\"  aria-expanded=\"false\" aria-controls=\"blogs\" class=\"menuItem collapsed\"><span class=\"glyphicon glyphicon-home\"></span>&nbsp;Blogs</a><ul id=\"blog\" class=\"nav nav-pills nav-stacked collapse nav-child\"><li><a href=\"#\">List</a></li>").s(ctx.get(["user"], false), ctx, {
         "block": body_1
       }, {}).w("</ul></li>").s(ctx.get(["user"], false), ctx, {
         "block": body_2
